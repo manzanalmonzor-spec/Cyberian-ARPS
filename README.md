@@ -20,7 +20,10 @@ Import the GitHub repo into Vercel and use:
 - Framework Preset: `Other`
 - Root Directory: `.`
 - Build Command: leave empty
-- Output Directory: `.`
+- Output Directory: leave empty
+
+This repo already includes [`vercel.json`](./vercel.json), which pins the project to the `Other` framework preset and clears any custom output directory override.
+The Vercel API handlers are in [`api/*.mjs`](./api) so they deploy correctly for a non-framework static project.
 
 After deploy, you will get a Vercel domain such as:
 
@@ -51,6 +54,13 @@ Use your real provider values there, not in the repo.
 ## 4. Redeploy on Vercel
 
 After adding the environment variables, redeploy the Vercel project.
+
+Quick route check after redeploy:
+
+- `GET /api/groq-chat` should return `405 Method not allowed`
+- `GET /api/send-sms` should return `405 Method not allowed`
+
+If either route still returns `404`, the deployment is still using the wrong Vercel project settings or an older deployment.
 
 ## 5. What Vercel is doing here
 

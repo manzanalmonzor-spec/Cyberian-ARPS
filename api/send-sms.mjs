@@ -18,13 +18,14 @@ async function getBody(request) {
 
 function normalizeSecret(value) {
   const trimmed = String(value || '').trim();
+  const withoutBearer = trimmed.replace(/^Bearer\s+/i, '');
   if (
-    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
-    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+    (withoutBearer.startsWith('"') && withoutBearer.endsWith('"')) ||
+    (withoutBearer.startsWith("'") && withoutBearer.endsWith("'"))
   ) {
-    return trimmed.slice(1, -1).trim();
+    return withoutBearer.slice(1, -1).trim().replace(/^Bearer\s+/i, '');
   }
-  return trimmed;
+  return withoutBearer;
 }
 
 export function GET() {

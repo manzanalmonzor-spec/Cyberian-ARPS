@@ -1,3 +1,5 @@
+export const config = { runtime: 'edge' };
+
 function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
     status,

@@ -8,15 +8,23 @@ import {
   doc,
   serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
-import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-functions.js';
-import { app, db } from '../../firebase-config.js';
-
-const functions = getFunctions(app, 'us-central1');
-const sendSms = httpsCallable(functions, 'sendSms');
+import { db } from '../../firebase-config.js';
 
 async function callPhilSMS(recipient, message) {
-  const result = await sendSms({ recipient, message });
-  return result.data;
+  const response = await fetch('/api/send-sms', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ recipient, message })
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.error || `HTTP ${response.status}`);
+  }
+
+  return data;
 }
 
 // Province of Antique default coordinates for weather alerts

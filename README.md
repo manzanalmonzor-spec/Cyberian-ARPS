@@ -4,13 +4,14 @@ This repository is set up for:
 
 - Vercel hosting the static frontend
 - Firebase Auth and Firestore
-- Firebase Functions handling SMS and AI chat
+- Vercel API routes handling SMS and AI chat
 
 Important:
 
 - The PhilSMS and Groq secrets are no longer stored in browser code.
-- You do not need Vercel environment variables for SMS/chat in this setup.
-- Those secrets now belong in Firebase Functions secrets.
+- SMS and chat now run through `/api/send-sms` and `/api/groq-chat` on Vercel.
+- The required secrets belong in Vercel environment variables.
+- These API routes are set up for your demo deployment; add stronger server-side auth/rate limiting before exposing them as a public production system.
 
 ## 1. Deploy the frontend on Vercel
 
@@ -38,37 +39,34 @@ Examples:
 - `your-project.vercel.app`
 - your custom domain if you attach one later
 
-## 3. Set Firebase Function secrets
+## 3. Set Vercel environment variables
 
-```powershell
-firebase use hackathon-7955d
-firebase functions:secrets:set PHILSMS_TOKEN
-firebase functions:secrets:set GROQ_API_KEY
-```
+In Vercel project settings, add:
 
-## 4. Deploy Firebase Functions
+- `PHILSMS_TOKEN`
+- `GROQ_API_KEY`
 
-```powershell
-cd functions
-npm install
-cd ..
-firebase deploy --only functions
-```
+Use your real provider values there, not in the repo.
+
+## 4. Redeploy on Vercel
+
+After adding the environment variables, redeploy the Vercel project.
 
 ## 5. What Vercel is doing here
 
-Vercel only serves the frontend.
+Vercel serves:
+
+- the static frontend
+- the SMS API route
+- the AI chat API route
 
 The app still depends on Firebase for:
 
 - sign in
 - Firestore data
-- SMS sending
-- AI chat
 
 If SMS or chat is failing after the Vercel deploy, the usual causes are:
 
 - the Vercel domain is not added to Firebase Auth authorized domains
-- Firebase Functions were not deployed
-- `PHILSMS_TOKEN` or `GROQ_API_KEY` was not set
-- the user is not authenticated, because the callable functions require login
+- `PHILSMS_TOKEN` or `GROQ_API_KEY` was not set in Vercel
+- the Vercel deployment was not redeployed after setting env vars

@@ -1102,19 +1102,20 @@
       }
 
       async function callGroqChat(payload) {
-        if (!window.arpsGroqChatCallablePromise) {
-          window.arpsGroqChatCallablePromise = Promise.all([
-            import('https://www.gstatic.com/firebasejs/10.12.5/firebase-functions.js'),
-            import('../firebase-config.js')
-          ]).then(([functionsModule, firebaseModule]) => {
-            const functions = functionsModule.getFunctions(firebaseModule.app, 'us-central1');
-            return functionsModule.httpsCallable(functions, 'groqChat');
-          });
+        const response = await fetch('/api/groq-chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error || `HTTP ${response.status}`);
         }
 
-        const groqChat = await window.arpsGroqChatCallablePromise;
-        const result = await groqChat(payload);
-        return result.data;
+        return data;
       }
 
       async function generateAdvisorMessage(temp, desc, wind, humidity, newsContext) {

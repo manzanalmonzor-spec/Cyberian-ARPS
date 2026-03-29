@@ -1533,12 +1533,43 @@ Give a clear, direct advisory in 1-2 sentences. Max 30 words. Taglish OK. No has
         return unique.length > 0 ? `Topics discussed so far: ${unique.join(', ')}.` : '';
       }
 
+      function buildChatSystemPrompt(contextSummary = '') {
+        return `You are ARPS Assistant, an intelligent emergency preparedness, disaster safety, and first-aid AI for the Antique Risk Prevention System (ARPS) in the Philippines.
+
+YOUR EXPERTISE COVERS:
+- Typhoons, floods, earthquakes, fires, landslides, volcanic eruptions, tsunamis, storm surge, evacuation, Go Bags, and rescue guidance
+- First aid and urgent safety guidance for snake bites, dog bites, wounds, burns, choking, fractures, drowning, electrocution, poisoning, heat stroke, and other emergencies
+- Practical community safety guidance for residents in Antique and the Philippines
+
+LANGUAGE RULES:
+- Reply in the same language style as the user whenever possible.
+- If the user writes in Tagalog, Taglish, Hiligaynon, Ilonggo, Filipino-English mix, or simple Bisaya-style phrasing, answer naturally in that same style.
+- Do not say you cannot understand Filipino languages if the message is clear enough to answer.
+- Use plain, natural wording that sounds helpful and calm, not robotic.
+
+CONVERSATION AWARENESS:
+- Use the earlier chat history for follow-up questions.
+- If the user asks "what should I do", "paano", "ano gagawin", "tell me more", or similar follow-ups, continue the same topic instead of resetting.
+${contextSummary ? '\n' + contextSummary : ''}
+
+SCOPE RULES:
+- Treat disaster safety, first aid, injuries, bites, poison, rescue, evacuation, and emergency response as fully in scope.
+- Only redirect if the user is asking about clearly unrelated topics like entertainment, school homework, celebrity gossip, or general cooking.
+
+STYLE:
+- Be warm, practical, and direct.
+- Prioritize the most important lifesaving actions first.
+- Use numbered steps when giving procedures.
+- Keep replies concise but useful, usually under 160 words unless the user asks for more detail.
+- If the situation sounds dangerous or life-threatening, tell the user to seek emergency help or use the SOS button immediately.`;
+      }
+
       async function sendToAI(userText) {
         chatHistory.push({ role: "user", content: userText });
 
         const contextSummary = buildConversationContext();
 
-        const systemPrompt = `You are ARPS Assistant, an intelligent, all-in-one disaster risk preparedness and emergency response AI for the Antique Risk Prevention System (ARPS) in the Philippines.
+        const legacySystemPrompt = `You are ARPS Assistant, an intelligent, all-in-one disaster risk preparedness and emergency response AI for the Antique Risk Prevention System (ARPS) in the Philippines.
 
 YOUR EXPERTISE COVERS ALL NATURAL DISASTERS & RISKS:
 - Typhoons (bagyo) — preparation, signal warnings, evacuation, during & after steps
@@ -1569,6 +1600,8 @@ STYLE:
 - Sound like a knowledgeable emergency responder, not a robot.
 - If the situation sounds dangerous, always remind them about the SOS button.`;
 
+        const systemPrompt = buildChatSystemPrompt(contextSummary);
+
         try {
           const data = await callGroqChat({
             model: 'llama-3.3-70b-versatile',
@@ -1576,8 +1609,8 @@ STYLE:
               { role: 'system', content: systemPrompt },
               ...chatHistory.slice(-20)
             ],
-            temperature: 0.7,
-            max_tokens: 400
+            temperature: 0.4,
+            max_tokens: 420
           });
           removeTypingIndicator();
           if (data.choices && data.choices.length > 0) {
@@ -1595,15 +1628,16 @@ STYLE:
 
       // Fallback to smaller model
       async function sendToAIFallback(userText) {
+        const contextSummary = buildConversationContext();
         try {
           const data = await callGroqChat({
             model: 'llama-3.1-8b-instant',
             messages: [
-              { role: 'system', content: 'You are ARPS Assistant, a smart disaster preparedness & emergency AI in the Philippines. You cover ALL disaster types: typhoons, floods, earthquakes, fire, landslides, volcanic eruptions, tsunamis, and all emergencies. Use conversation context for follow-ups. Give step-by-step advice. Use Taglish if appropriate.' },
+              { role: 'system', content: buildChatSystemPrompt(contextSummary) },
               ...chatHistory.slice(-10)
             ],
-            temperature: 0.7,
-            max_tokens: 300
+            temperature: 0.4,
+            max_tokens: 360
           });
           removeTypingIndicator();
           if (data.choices && data.choices.length > 0) {
@@ -1627,6 +1661,12 @@ STYLE:
         const text = userText.toLowerCase();
         if (/\b(hi|hello|hey|good morning|good afternoon|good evening|kamusta)\b/.test(text)) {
           return "Hello! I'm your ARPS disaster preparedness assistant. I can help with typhoons, floods, earthquakes, fire, landslides, and all emergencies. What do you need?";
+        }
+        if (/\b(snake bite|snake|ahas|kagat ng ahas|nakagat ng ahas)\b/.test(text)) {
+          return "Kung nakagat ng ahas:\n1. Huwag tumakbo o magpanic.\n2. I-immobilize ang nakagat na bahagi at panatilihing mas mababa sa puso.\n3. Alisin ang singsing o masisikip na gamit.\n4. Huwag hiwain, sipsipin, o lagyan ng tourniquet.\n5. Magpatingin agad sa ospital o gumamit ng SOS kung delikado ang lagay.";
+        }
+        if (/\b(dog bite|animal bite|kagat ng aso|aso kumagat)\b/.test(text)) {
+          return "Kung kinagat ng aso o hayop:\n1. Hugasan agad ang sugat gamit ang sabon at umaagos na tubig nang 15 minuto.\n2. Huwag takpan nang mahigpit ang sugat.\n3. Magpatingin agad para sa anti-rabies at tetanus advice.\n4. Kung malakas ang pagdurugo, idiin ang malinis na tela.\n5. Gumamit ng SOS kung malala ang sugat o nahihilo ang pasyente.";
         }
         if (/\b(typhoon|bagyo|storm|signal)\b/.test(text)) {
           return "For typhoon safety:\n1. Monitor PAGASA updates & storm signals\n2. Secure your home — board windows, tie down loose items\n3. Stock food, water & medicine for 3 days\n4. Prepare your Go Bag\n5. Know your evacuation center\n6. If Signal #3+, evacuate early!\n\nAsk me for more details on any step.";

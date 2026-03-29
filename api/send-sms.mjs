@@ -16,6 +16,17 @@ async function getBody(request) {
   }
 }
 
+function normalizeSecret(value) {
+  const trimmed = String(value || '').trim();
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1).trim();
+  }
+  return trimmed;
+}
+
 export function GET() {
   return json({ error: 'Method not allowed' }, 405, { Allow: 'POST, OPTIONS' });
 }
@@ -28,7 +39,7 @@ export function OPTIONS() {
 }
 
 export async function POST(request) {
-  const token = process.env.PHILSMS_TOKEN;
+  const token = normalizeSecret(process.env.PHILSMS_TOKEN);
   if (!token) {
     return json({ error: 'PHILSMS_TOKEN is not configured' }, 500);
   }
@@ -55,10 +66,14 @@ export async function POST(request) {
     });
 
     const data = await smsResponse.json().catch(() => ({}));
-    if (!smsResponse.ok) {
+    if (!smsResponse.ok || data.status === 'error') {
+      const status = data.message === 'Unauthenticated.' ? 401 : smsResponse.status || 400;
       return json(
-        { error: data.message || `PhilSMS error: HTTP ${smsResponse.status}` },
-        smsResponse.status
+        {
+          error: data.message || `PhilSMS error: HTTP ${smsResponse.status}`,
+          provider: data
+        },
+        status
       );
     }
 

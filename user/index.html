@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- PWA settings -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="../shared.js"></script>
+    <meta name="theme-color" content="#0b2e59">
+    <meta name="description" content="Antique Risk Prevention System (ARP) - Offline-first disaster response">
+    <title>Antique Risk Prevention System (ARP)</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Phosphor Icons for modern iconography -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        :root {
+
+            --primary-bg: #fafafa;
+            --primary-color: #111827;
+            --accent-color: #e63946;
+            --warning-color: #fca311;
+            --success-color: #2a9d8f;
+            --text-main: #111827;
+            --text-muted: #4b5563;
+            --white: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.8s ease backwards;
+        }
+
+        .delay-1 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.4s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.6s;
+        }
+
+        /* --- Header & Navigation --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 5%;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+        }
+
+        header.scrolled {
+            padding: 0.8rem 5%;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+        }
+
+        .logo-container img {
+            height: 55px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-text {
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--warning-color);
+            line-height: 1.2;
+            letter-spacing: 0.5px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-color);
+            transition: var(--transition);
+        }
+
+        nav a:hover {
+            color: var(--accent-color);
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .btn-nav-wrapper {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-nav {
+            background: var(--accent-color);
+            color: var(--white);
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.4);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-nav:hover {
+            background: #d62828;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(230, 57, 70, 0.5);
+            color: var(--white);
+        }
+
+        .btn-nav i {
+            font-size: 1.2rem;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 7rem 5% 5rem;
+            background: var(--white);
+            color: var(--text-main);
+            gap: 4rem;
+        }
+
+        .hero-content {
+            flex: 1.1;
+            max-width: 750px;
+            margin-top: 0;
+        }
+
+        .hero-illustration {
+            flex: 0.9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .hero-illustration img {
+            width: 100%;
+            max-width: 650px;
+            height: auto;
+            object-fit: contain;
+            animation: float 6s ease-in-out infinite;
+            mix-blend-mode: multiply;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -1px;
+            color: #111827;
+        }
+
+        .hero h1 span {
+            color: var(--warning-color);
+        }
+
+        .hero p {
+            font-size: clamp(1.1rem, 2vw, 1.25rem);
+            margin-bottom: 2.5rem;
+            color: var(--text-muted);
+            max-width: 750px;
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: var(--white);
+            padding: 1.2rem 2.5rem;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(230, 57, 70, 0.4);
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+
+        .btn-primary:hover {
+            background: #d62828;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(230, 57, 70, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            color: var(--white);
+            padding: 1.2rem 2.5rem;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* --- Context Section --- */
+        .context-section {
+            padding: 7rem 5%;
+            background: var(--white);
+            text-align: center;
+            position: relative;
+        }
+
+        .context-inner {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .context-section h2 {
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .context-section p {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .context-highlight {
+            color: var(--accent-color);
+            font-weight: 700;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .stat-card {
+            padding: 2rem;
+            background: var(--primary-bg);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        /* --- Features Section --- */
+        .features {
+            padding: 7rem 5%;
+            background: var(--primary-bg);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--white);
+            padding: 3rem 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: -1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:nth-child(1)::before {
+            background: var(--success-color);
+        }
+
+        .feature-card:nth-child(2)::before {
+            background: var(--primary-color);
+        }
+
+        .feature-card:nth-child(3)::before {
+            background: var(--warning-color);
+        }
+
+        .feature-card:nth-child(4)::before {
+            background: #3b82f6;
+        }
+
+        .feature-card:nth-child(5)::before {
+            background: #8b5cf6;
+        }
+
+        .feature-card:nth-child(6)::before {
+            background: var(--accent-color);
+        }
+
+        .feature-icon {
+            font-size: 2.8rem;
+            margin-bottom: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            background: rgba(11, 46, 89, 0.05);
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1);
+        }
+
+        .feature-card:nth-child(1) .feature-icon {
+            color: var(--success-color);
+            background: rgba(42, 157, 143, 0.1);
+        }
+
+        .feature-card:nth-child(2) .feature-icon {
+            color: var(--primary-color);
+            background: rgba(11, 46, 89, 0.1);
+        }
+
+        .feature-card:nth-child(3) .feature-icon {
+            color: var(--warning-color);
+            background: rgba(252, 163, 17, 0.1);
+        }
+
+        .feature-card:nth-child(4) .feature-icon {
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .feature-card:nth-child(5) .feature-icon {
+            color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .feature-card:nth-child(6) .feature-icon {
+            color: var(--accent-color);
+            background: rgba(230, 57, 70, 0.1);
+        }
+
+        .feature-card h3 {
+            font-size: 1.4rem;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background: #06152a;
+            color: #94a3b8;
+            padding: 2.5rem 5% 1rem;
+            position: relative;
+        }
+
+        .footer-waves {
+            position: absolute;
+            top: -50px;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2306152a' fill-opacity='1' d='M0,160L48,144C96,128,192,96,288,106.7C384,117,480,171,576,170.7C672,171,768,117,864,112C960,107,1056,149,1152,165.3C1248,181,1344,171,1392,165.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .footer-col .logo-container {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-col .logo-text {
+            color: var(--white);
+        }
+
+        .footer-col h4 {
+            color: var(--white);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .footer-col ul {
+            list-style: none;
+            font-size: 0.85rem;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 0.4rem;
+        }
+
+        .footer-col a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .footer-col a:hover {
+            color: var(--warning-color);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .social-links span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--white);
+            font-size: 1.1rem;
+            cursor: default;
+        }
+
+        .social-links a:hover {
+            background: var(--accent-color);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        @media (min-width: 768px) {
+            .footer-bottom {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 992px) {
+            nav ul {
+                gap: 1.5rem;
+            }
+
+            .hero-content {
+                margin-top: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            /* Could add a hamburger menu here */
+            .btn-nav-wrapper {
+                display: none;
+            }
+
+            .hero {
+                padding-top: 7rem;
+                text-align: left;
+                flex-direction: column-reverse;
+                gap: 2rem;
+            }
+
+            .hero-illustration img {
+                max-width: 450px;
+                margin-bottom: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stat-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .feature-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header id="header">
+        <a href="#" class="logo-container">
+            <!-- Ensure path directly references the Images folder in the hack directory -->
+            <img src="../Images/ARPLOGO.png" alt="ARP Logo" onerror="this.src=''; this.alt='No Logo Found';">
+            <div class="logo-text">
+                ARPS
+            </div>
+        </a>
+        <nav>
+            <ul>
+                <li><a href="#context">About</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="evacuation.html">Map Tracker</a></li>
+                <li><a href="weather.html">Early Warnings</a></li>
+            </ul>
+        </nav>
+        <div class="btn-nav-wrapper">
+            <a href="report.html" class="btn-nav">
+                <i class="ph-bold ph-warning"></i> Report Emergency
+            </a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="fade-in delay-1">Offline-Ready <span>Disaster Response</span> For Rural Resilience.</h1>
+            <p class="fade-in delay-2">Bridging the safety gap across Antique. When signal drops, our digital platform
+                ensures your distress signal reaches the Provincial Command Center via SMS fallback, augmented by
+                real-time geomapping and AI guidance.</p>
+            <div class="hero-actions fade-in delay-3">
+                <a href="loginpage.html" class="btn-primary">
+                    <i class="ph-bold ph-shield-check"></i> Open Citizen App
+                </a>
+            </div>
+        </div>
+        <div class="hero-illustration fade-in delay-2">
+            <img src="../Images/hero_illustration.png" alt="ARPS Digital Dashboard Illustration">
+        </div>
+    </section>
+
+    <section id="context" class="context-section">
+        <div class="context-inner">
+            <h2 class="fade-in">Why We Built This</h2>
+            <p class="fade-in delay-1">With the Philippines consistently ranking as the <span
+                    class="context-highlight">#1 most disaster-prone country</span> globally, and the 2024 Shear Line
+                floods exposing critical vulnerabilities, intelligent intervention is no longer optional.</p>
+            <p class="fade-in delay-2">We designed the Antique Risk Prevention System (ARP) to replace delayed, unclear
+                voice-based reporting with a robust Progressive Web App that works where traditional networks fail.
+                Coastal and mountainous barangays are protected by automated distress routing and precise geospatial
+                mapping.</p>
+
+            <div class="stat-grid fade-in delay-3">
+                <div class="stat-card">
+                    <div class="stat-number">40%</div>
+                    <div class="stat-label">Vulnerable Coastal Pop.</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Offline Fallback Delivery</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Blind Spot Reports</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="section-header">
+            <h2 class="fade-in">Intelligent Subsystems</h2>
+            <p class="fade-in delay-1">Comprehensive tools replacing outdated reporting methods with speed, accuracy,
+                and automation.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card scroll-reveal">
+                <div class="feature-icon"><i class="ph-duotone ph-wifi-slash"></i></div>
+                <h3>Offline-First & SMS Fallback</h3>
+                <p>Functions seamlessly without mobile data. Distress signals are cached on-device and automatically
+                    converted into structured SMS texts targeting the GSM network to guarantee delivery.</p>
+            </div>
+
+            <div class="feature-card scroll-reveal">
+                <div class="feature-icon"><i class="ph-duotone ph-map-pin-line"></i></div>
+                <h3>Precise Geomapping</h3>
+                <p>Eliminate confusion with real-time GPS tracking. The system precisely pinpoints distress signals
+                    across all Antique barangays, heavily reducing responder search time.</p>
+            </div>
+
+            <div class="feature-card scroll-reveal">
+                <div class="feature-icon"><i class="ph-duotone ph-warning-circle"></i></div>
+                <h3>Interactive Hazard Maps</h3>
+                <p>Visualize flood-prone, landslide-prone, and storm-surge vulnerable areas. Helps both residents and
+                    provincial authorities understand risk zones dynamically.</p>
+            </div>
+
+            <div class="feature-card scroll-reveal">
+                <div class="feature-icon"><i class="ph-duotone ph-cloud-lightning"></i></div>
+                <h3>PAGASA Integration</h3>
+                <p>Get immediate early-warning alerts for incoming typhoons, heavy rainfall, and seismic activity based
+                    on real-time datastreams from national monitoring agencies.</p>
+            </div>
+
+            <div class="feature-card scroll-reveal">
+                <div class="feature-icon"><i class="ph-duotone ph-robot"></i></div>
+                <h3>AI Situation Classifier</h3>
+                <p>A smart classification engine analyzes minimal user input to instantly route the alert to the correct
+                    responder type: Police, Fire, or Medical units.</p>
+            </div>
+
+            <div class="feature-card scroll-reveal">
+                <div class="feature-icon"><i class="ph-duotone ph-users-three"></i></div>
+                <h3>Smart Evacuation Routing</h3>
+                <p>The system constantly computes the safest, nearest evacuation center relative to your current
+                    location vs. active hazard boundaries.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-waves"></div>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <a href="#" class="logo-container">
+                    <div class="logo-text">
+                        ARPS
+                    </div>
+                </a>
+                <p style="font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.6;">A Progressive Web Application
+                    engineered to modernize disaster response protocols, ensuring no distress signal goes unheard.</p>
+                <div class="social-links">
+                    <span><i class="ph-fill ph-facebook-logo"></i></span>
+                    <span><i class="ph-fill ph-twitter-logo"></i></span>
+                    <span><i class="ph-fill ph-instagram-logo"></i></span>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>Citizen Platform</h4>
+                <ul>
+                    <li><a href="home.html"><i class="ph ph-caret-right"></i> User Dashboard</a></li>
+                    <li><a href="report.html"><i class="ph ph-caret-right"></i> SOS Reporting</a></li>
+                    <li><a href="evacuation.html"><i class="ph ph-caret-right"></i> Evacuation Centers</a></li>
+                    <li><a href="weather.html"><i class="ph ph-caret-right"></i> Weather Radar</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Administration</h4>
+                <ul>
+                    <li><a href="../admin/index.html"><i class="ph ph-caret-right"></i> Command Login</a></li>
+                    <li><a href="#"><i class="ph ph-caret-right"></i> Unit Dispatching</a></li>
+                    <li><a href="#"><i class="ph ph-caret-right"></i> Audit Logs</a></li>
+                    <li><a href="#"><i class="ph ph-caret-right"></i> Infrastructure Status</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Provincial Hotlines</h4>
+                <ul>
+                    <li><i class="ph-fill ph-phone" style="color: var(--warning-color); margin-right: 8px;"></i> Police:
+                        117</li>
+                    <li><i class="ph-fill ph-phone" style="color: var(--warning-color); margin-right: 8px;"></i> PDRRMO:
+                        540-8888</li>
+                    <li><i class="ph-fill ph-phone" style="color: var(--warning-color); margin-right: 8px;"></i> Fire:
+                        911</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Antique Risk Prevention System (ARP). Designed for rapid deployment.</p>
+            <p style="font-size: 0.85rem; color: #64748b;">Offline-First Architecture</p>
+        </div>
+    </footer>
+
+    <script>
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+                header.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+            } else {
+                header.classList.remove('scrolled');
+                header.style.boxShadow = '0 4px 20px rgba(0,0,0,0.05)';
+            }
+        });
+
+        // Intersection Observer for scroll reveal animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-reveal').forEach((el, index) => {
+            el.style.opacity = '0';
+            el.style.animation = `fadeInUp 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards ${index * 0.1}s`;
+            el.style.animationPlayState = 'paused';
+            observer.observe(el);
+        });
+    </script>
+</body>
+
+</html>

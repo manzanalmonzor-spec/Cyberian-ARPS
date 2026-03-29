@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script src="../shared.js"></script>
+    <meta name="theme-color" content="#1E293B" />
+    <title>ARPS — User Approvals</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["DM Sans", "Segoe UI", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="../shared.css" />
+    <style>
+      .sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        color: #94A3B8;
+        font-weight: 600;
+        font-size: 14px;
+        border-radius: 12px;
+        transition: all 0.2s;
+        text-decoration: none;
+      }
+      .sidebar-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #ffffff;
+      }
+      .sidebar-item.active {
+        background: #2563EB;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      }
+
+      /* Tab styles */
+      .tab-btn {
+        position: relative;
+        padding: 10px 20px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #64748B;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        transition: color 0.2s;
+        font-family: inherit;
+        border-radius: 10px;
+      }
+      .tab-btn:hover {
+        color: #1E293B;
+        background: #F1F5F9;
+      }
+      .tab-btn.active {
+        color: #1D4ED8;
+        background: #EFF6FF;
+      }
+      .tab-btn .tab-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 6px;
+        margin-left: 6px;
+        font-size: 11px;
+        font-weight: 800;
+        border-radius: 999px;
+        line-height: 1;
+      }
+      .tab-btn.active .tab-count {
+        background: #DBEAFE;
+        color: #1D4ED8;
+      }
+      .tab-btn:not(.active) .tab-count {
+        background: #F1F5F9;
+        color: #94A3B8;
+      }
+
+      /* Search input */
+      .search-input {
+        padding: 9px 14px 9px 36px;
+        font-size: 13px;
+        border: 1px solid #E2E8F0;
+        border-radius: 10px;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        font-family: inherit;
+        width: 260px;
+        background: #fff;
+      }
+      .search-input:focus {
+        border-color: #93C5FD;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+      }
+      .search-wrap {
+        position: relative;
+      }
+      .search-wrap svg {
+        position: absolute;
+        left: 11px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94A3B8;
+        pointer-events: none;
+      }
+
+      /* Table fade-in */
+      @keyframes rowIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .row-animate {
+        animation: rowIn 0.25s ease both;
+      }
+
+      /* Panel transition */
+      .tab-panel { display: none; }
+      .tab-panel.active { display: block; }
+    </style>
+  </head>
+  <body class="bg-[#F8FAFC] font-sans">
+    <div class="flex h-screen overflow-hidden">
+      <!-- Sidebar -->
+      <aside class="w-[280px] bg-[#0F172A] text-white flex flex-col shrink-0 shadow-2xl z-50">
+        <div class="px-6 py-8 border-b border-white/10">
+          <div class="sidebar-brand">
+            <div class="flex items-center gap-3">
+              <img src="../Images/ARPLOGO.png" alt="ARPS logo" class="w-10 h-10 object-contain" />
+              <div>
+                <h3 class="text-2xl font-black tracking-tight text-white leading-none">ARPS</h3>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Admin Panel</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <nav class="px-4 py-6 flex-1 gap-1 flex flex-col">
+          <a href="./dashboard.html" class="sidebar-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg> Dashboard
+          </a>
+          <a href="./map.html" class="sidebar-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            </svg> Live Map
+          </a>
+          <a href="./alerts.html" class="sidebar-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg> Alerts
+          </a>
+          <a href="./centers.html" class="sidebar-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg> Centers
+          </a>
+          <a href="./weather.html" class="sidebar-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+            </svg> Weather
+          </a>
+          <a href="./approvals.html" class="sidebar-item active">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg> User Approvals
+          </a>
+          <a href="./settings.html" class="sidebar-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+            </svg> Settings
+          </a>
+        </nav>
+      </aside>
+
+      <!-- Main -->
+      <main class="flex-1 overflow-auto p-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+          <div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Citizen Registrations</h1>
+            <p class="text-[14px] text-slate-500 font-medium mt-1.5">Review, authorize, and manage citizen accounts.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="text-[13px] text-slate-400" id="currentDate"></div>
+          </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="grid grid-cols-3 gap-4 mb-6 max-w-5xl">
+          <div class="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-5 flex items-center gap-4">
+            <div class="w-11 h-11 rounded-[12px] bg-amber-100 flex items-center justify-center shrink-0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div>
+              <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Pending</p>
+              <p class="text-2xl font-black text-slate-900 mt-0.5" id="statPending">0</p>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-5 flex items-center gap-4">
+            <div class="w-11 h-11 rounded-[12px] bg-emerald-100 flex items-center justify-center shrink-0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <div>
+              <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Approved</p>
+              <p class="text-2xl font-black text-slate-900 mt-0.5" id="statApproved">0</p>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-5 flex items-center gap-4">
+            <div class="w-11 h-11 rounded-[12px] bg-blue-100 flex items-center justify-center shrink-0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <div>
+              <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Total Users</p>
+              <p class="text-2xl font-black text-slate-900 mt-0.5" id="statTotal">0</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="bg-white rounded-3xl border border-slate-200/60 shadow-sm w-full max-w-5xl">
+          <!-- Tabs + Search Row -->
+          <div class="flex items-center justify-between px-5 pt-5 pb-4 border-b border-slate-200/60">
+            <div class="flex items-center gap-1">
+              <button class="tab-btn active" data-tab="pending" id="tabPending">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:4px;vertical-align:-2px"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Pending
+                <span class="tab-count" id="tabPendingCount">0</span>
+              </button>
+              <button class="tab-btn" data-tab="approved" id="tabApproved">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="margin-right:4px;vertical-align:-2px"><path d="M5 13l4 4L19 7"/></svg>
+                Approved Users
+                <span class="tab-count" id="tabApprovedCount">0</span>
+              </button>
+            </div>
+
+            <div class="search-wrap">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="M21 21l-4.35-4.35"/>
+              </svg>
+              <input type="text" class="search-input" id="searchInput" placeholder="Search by name or email..." />
+            </div>
+          </div>
+
+          <!-- Tab Panel: Pending -->
+          <div class="tab-panel active" id="panelPending">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200">
+                    <th class="text-left py-3 px-5 text-xs font-semibold text-slate-400 uppercase">User Info</th>
+                    <th class="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Details</th>
+                    <th class="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Documents</th>
+                    <th class="text-right py-3 px-5 text-xs font-semibold text-slate-400 uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="pendingBody">
+                </tbody>
+              </table>
+              <div id="pendingEmpty" class="hidden text-center py-16">
+                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                </div>
+                <p class="text-slate-500 font-semibold mb-1">No pending registrations</p>
+                <p class="text-slate-400 text-sm">All citizen accounts have been processed.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Panel: Approved -->
+          <div class="tab-panel" id="panelApproved">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200">
+                    <th class="text-left py-3 px-5 text-xs font-semibold text-slate-400 uppercase">User Info</th>
+                    <th class="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Approved On</th>
+                    <th class="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase">At-Risk</th>
+                    <th class="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase">ID Document</th>
+                    <th class="text-right py-3 px-5 text-xs font-semibold text-slate-400 uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="approvedBody">
+                </tbody>
+              </table>
+              <div id="approvedEmpty" class="hidden text-center py-16">
+                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+                <p class="text-slate-500 font-semibold mb-1">No approved users yet</p>
+                <p class="text-slate-400 text-sm">Approved citizens will appear here.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ID Viewer Modal -->
+    <div id="idViewerModal" class="hidden" style="z-index:300">
+      <div class="fixed inset-0 bg-black/80 flex items-center justify-center backdrop-blur-sm" onclick="closeIdViewer()">
+        <div class="bg-white rounded-2xl max-w-2xl w-full mx-4 overflow-hidden animate-slideUp flex flex-col" onclick="event.stopPropagation()">
+          <div class="px-5 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+            <h3 class="text-base font-bold text-slate-800" id="idViewerTitle">Submitted ID Document</h3>
+            <button onclick="closeIdViewer()" class="w-8 h-8 rounded-lg bg-slate-200 text-slate-600 flex items-center justify-center hover:bg-slate-300 transition-colors">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="p-5 bg-slate-100 flex justify-center items-center min-h-[300px] max-h-[80vh] overflow-auto">
+            <img id="idViewerImage" src="" alt="User ID" class="max-w-full h-auto rounded-lg shadow-md border border-slate-200">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Detail Modal -->
+    <div id="userDetailModal" class="hidden" style="z-index:300">
+      <div class="fixed inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm" onclick="closeUserDetail()">
+        <div class="bg-white rounded-2xl max-w-md w-full mx-4 overflow-hidden animate-slideUp" onclick="event.stopPropagation()">
+          <div class="px-5 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+            <h3 class="text-base font-bold text-slate-800" id="detailTitle">User Details</h3>
+            <button onclick="closeUserDetail()" class="w-8 h-8 rounded-lg bg-slate-200 text-slate-600 flex items-center justify-center hover:bg-slate-300 transition-colors">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="p-5" id="detailContent"></div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { db } from "../firebase-config.js";
+      import { collection, query, where, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+      window.toast = function(msg, type='success') {
+        const t = document.createElement('div');
+        t.className = 'toast toast-' + type;
+        t.style.bottom = '20px';
+        t.textContent = (type === 'success' ? '✓ ' : type === 'info' ? 'ℹ ' : '⚠ ') + msg;
+        document.body.appendChild(t);
+        setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, 2500);
+      };
+
+      document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
+        weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
+      });
+
+      // ── State ──
+      let pendingUsers = [];
+      let approvedUsers = [];
+      let currentTab = 'pending';
+      let searchQuery = '';
+
+      // ── Tab switching ──
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const panels = {
+        pending: document.getElementById('panelPending'),
+        approved: document.getElementById('panelApproved')
+      };
+
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentTab = btn.dataset.tab;
+          tabBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          Object.values(panels).forEach(p => p.classList.remove('active'));
+          panels[currentTab].classList.add('active');
+          renderCurrentTab();
+        });
+      });
+
+      // ── Search ──
+      const searchInput = document.getElementById('searchInput');
+      searchInput.addEventListener('input', () => {
+        searchQuery = searchInput.value.trim().toLowerCase();
+        renderCurrentTab();
+      });
+
+      // ── Firestore listeners ──
+      // Pending users
+      const pendingQuery = query(collection(db, "users"), where("status", "==", "pending"));
+      onSnapshot(pendingQuery, (snapshot) => {
+        pendingUsers = [];
+        snapshot.forEach((d) => {
+          let user = d.data();
+          user.docId = d.id;
+          pendingUsers.push(user);
+        });
+        pendingUsers.sort((a, b) => {
+          let ta = a.timestamp ? a.timestamp.toMillis() : 0;
+          let tb = b.timestamp ? b.timestamp.toMillis() : 0;
+          return tb - ta;
+        });
+        updateCounts();
+        if (currentTab === 'pending') renderPending();
+      });
+
+      // Approved users
+      const approvedQuery = query(collection(db, "users"), where("status", "==", "approved"));
+      onSnapshot(approvedQuery, (snapshot) => {
+        approvedUsers = [];
+        snapshot.forEach((d) => {
+          let user = d.data();
+          user.docId = d.id;
+          approvedUsers.push(user);
+        });
+        approvedUsers.sort((a, b) => {
+          let ta = a.timestamp ? a.timestamp.toMillis() : 0;
+          let tb = b.timestamp ? b.timestamp.toMillis() : 0;
+          return tb - ta;
+        });
+        updateCounts();
+        if (currentTab === 'approved') renderApproved();
+      });
+
+      function updateCounts() {
+        document.getElementById('tabPendingCount').textContent = pendingUsers.length;
+        document.getElementById('tabApprovedCount').textContent = approvedUsers.length;
+        document.getElementById('statPending').textContent = pendingUsers.length;
+        document.getElementById('statApproved').textContent = approvedUsers.length;
+        document.getElementById('statTotal').textContent = pendingUsers.length + approvedUsers.length;
+      }
+
+      function renderCurrentTab() {
+        if (currentTab === 'pending') renderPending();
+        else renderApproved();
+      }
+
+      function filterUsers(list) {
+        if (!searchQuery) return list;
+        return list.filter(u => {
+          const name = (u.name || '').toLowerCase();
+          const email = (u.email || '').toLowerCase();
+          const contact = (u.contact || u.phone || '').toLowerCase();
+          return name.includes(searchQuery) || email.includes(searchQuery) || contact.includes(searchQuery);
+        });
+      }
+
+      // ── Render Pending ──
+      function renderPending() {
+        const tbody = document.getElementById('pendingBody');
+        const emptyMsg = document.getElementById('pendingEmpty');
+        const filtered = filterUsers(pendingUsers);
+
+        tbody.innerHTML = '';
+
+        if (filtered.length === 0) {
+          emptyMsg.classList.remove('hidden');
+          if (searchQuery && pendingUsers.length > 0) {
+            emptyMsg.querySelector('p:first-of-type').textContent = 'No matching pending users';
+            emptyMsg.querySelector('p:last-of-type').textContent = `No results for "${searchQuery}"`;
+          } else {
+            emptyMsg.querySelector('p:first-of-type').textContent = 'No pending registrations';
+            emptyMsg.querySelector('p:last-of-type').textContent = 'All citizen accounts have been processed.';
+          }
+        } else {
+          emptyMsg.classList.add('hidden');
+
+          filtered.forEach((user, i) => {
+            const timeStr = user.timestamp ? user.timestamp.toDate().toLocaleString('en-PH', {
+              month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true
+            }) : 'Just now';
+            const realIndex = pendingUsers.indexOf(user);
+            const genderIcon = user.gender === 'Male' ? '♂' : user.gender === 'Female' ? '♀' : '⚥';
+            const genderColor = user.gender === 'Male' ? 'text-blue-600 bg-blue-50' : user.gender === 'Female' ? 'text-pink-600 bg-pink-50' : 'text-violet-600 bg-violet-50';
+
+            const row = document.createElement('tr');
+            row.className = 'border-b border-slate-100 hover:bg-slate-50 transition-colors row-animate';
+            row.style.animationDelay = `${i * 0.04}s`;
+            row.innerHTML = `
+              <td class="py-4 px-5">
+                <div class="flex items-center gap-3">
+                  ${user.selfie_front || user.selfie_image
+                    ? `<img src="${user.selfie_front || user.selfie_image}" alt="Selfie" class="w-10 h-10 rounded-full object-cover border-2 border-amber-300 shrink-0 cursor-pointer" onclick="openIdViewer('pending', ${realIndex}, 'selfie_front')" />`
+                    : `<div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                      </div>`
+                  }
+                  <div>
+                    <p class="text-sm font-bold text-slate-800">${highlightMatch(user.name || 'No name')}</p>
+                    <p class="text-xs text-slate-500">${highlightMatch(user.email || 'No email')}</p>
+                    ${user.contact ? `<p class="text-[11px] text-slate-400 mt-0.5">${user.contact}</p>` : ''}
+                  </div>
+                </div>
+              </td>
+              <td class="py-4 px-4">
+                <div class="space-y-1">
+                  ${user.age ? `<p class="text-[13px] text-slate-700 font-medium">${user.age} yrs old</p>` : ''}
+                  ${user.gender ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full ${genderColor}">${genderIcon} ${user.gender}</span>` : ''}
+                  ${user.barangay ? `<p class="text-[11px] text-slate-400 mt-1">${user.barangay}</p>` : ''}
+                  <p class="text-[10px] text-slate-400 mt-1">${timeStr}</p>
+                </div>
+              </td>
+              <td class="py-4 px-4">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  ${user.id_front || user.id_image
+                    ? `<button onclick="openIdViewer('pending', ${realIndex}, 'id_front')" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md border border-blue-200 transition-colors">ID ▶</button>`
+                    : ''
+                  }
+                  ${user.id_back
+                    ? `<button onclick="openIdViewer('pending', ${realIndex}, 'id_back')" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md border border-blue-200 transition-colors">ID ◀</button>`
+                    : ''
+                  }
+                  ${user.selfie_front
+                    ? `<button onclick="openIdViewer('pending', ${realIndex}, 'selfie_front')" class="text-[10px] font-bold text-violet-600 bg-violet-50 hover:bg-violet-100 px-2 py-1 rounded-md border border-violet-200 transition-colors">Front</button>`
+                    : ''
+                  }
+                  ${user.selfie_left
+                    ? `<button onclick="openIdViewer('pending', ${realIndex}, 'selfie_left')" class="text-[10px] font-bold text-violet-600 bg-violet-50 hover:bg-violet-100 px-2 py-1 rounded-md border border-violet-200 transition-colors">Left</button>`
+                    : ''
+                  }
+                  ${user.selfie_right
+                    ? `<button onclick="openIdViewer('pending', ${realIndex}, 'selfie_right')" class="text-[10px] font-bold text-violet-600 bg-violet-50 hover:bg-violet-100 px-2 py-1 rounded-md border border-violet-200 transition-colors">Right</button>`
+                    : ''
+                  }
+                </div>
+              </td>
+              <td class="py-4 px-5 text-right">
+                <div class="flex items-center justify-end gap-2">
+                  <button onclick="viewUserDetail(${realIndex}, 'pending')" title="Review" class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 flex items-center justify-center border border-slate-200 hover:bg-slate-600 hover:text-white transition-colors">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
+                  <button onclick="approveUser(${realIndex})" title="Approve" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200 hover:bg-emerald-600 hover:text-white transition-colors">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </button>
+                  <button onclick="rejectUser(${realIndex})" title="Reject" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center border border-red-200 hover:bg-red-600 hover:text-white transition-colors">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                </div>
+              </td>
+            `;
+            tbody.appendChild(row);
+          });
+        }
+      }
+
+      // ── Render Approved ──
+      function renderApproved() {
+        const tbody = document.getElementById('approvedBody');
+        const emptyMsg = document.getElementById('approvedEmpty');
+        const filtered = filterUsers(approvedUsers);
+
+        tbody.innerHTML = '';
+
+        if (filtered.length === 0) {
+          emptyMsg.classList.remove('hidden');
+          if (searchQuery && approvedUsers.length > 0) {
+            emptyMsg.querySelector('p:first-of-type').textContent = 'No matching approved users';
+            emptyMsg.querySelector('p:last-of-type').textContent = `No results for "${searchQuery}"`;
+          } else {
+            emptyMsg.querySelector('p:first-of-type').textContent = 'No approved users yet';
+            emptyMsg.querySelector('p:last-of-type').textContent = 'Approved citizens will appear here.';
+          }
+        } else {
+          emptyMsg.classList.add('hidden');
+
+          filtered.forEach((user, i) => {
+            const timeStr = user.timestamp ? user.timestamp.toDate().toLocaleString('en-PH', {
+              month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true
+            }) : 'Unknown';
+            const realIndex = approvedUsers.indexOf(user);
+            const atRisk = user.atRisk || user.at_risk || 'None';
+            const atRiskBadge = atRisk && atRisk !== 'None'
+              ? `<span class="bg-red-100 text-red-700 text-[11px] font-bold px-2 py-0.5 rounded-full">${atRisk}</span>`
+              : `<span class="text-xs text-slate-400">None</span>`;
+            const genderIcon = user.gender === 'Male' ? '♂' : user.gender === 'Female' ? '♀' : '⚥';
+            const genderColor = user.gender === 'Male' ? 'text-blue-600 bg-blue-50' : user.gender === 'Female' ? 'text-pink-600 bg-pink-50' : 'text-violet-600 bg-violet-50';
+
+            const row = document.createElement('tr');
+            row.className = 'border-b border-slate-100 hover:bg-slate-50 transition-colors row-animate';
+            row.style.animationDelay = `${i * 0.04}s`;
+            row.innerHTML = `
+              <td class="py-4 px-5">
+                <div class="flex items-center gap-3">
+                  ${user.selfie_front || user.selfie_image
+                    ? `<img src="${user.selfie_front || user.selfie_image}" alt="Selfie" class="w-10 h-10 rounded-full object-cover border-2 border-emerald-300 shrink-0 cursor-pointer" onclick="openIdViewer('approved', ${realIndex}, 'selfie_front')" />`
+                    : `<div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                      </div>`
+                  }
+                  <div>
+                    <p class="text-sm font-bold text-slate-800">${highlightMatch(user.name || 'No name')}</p>
+                    <p class="text-xs text-slate-500">${highlightMatch(user.email || 'No email')}</p>
+                    ${user.contact || user.phone ? `<p class="text-[11px] text-slate-400 mt-0.5">${user.contact || user.phone}</p>` : ''}
+                  </div>
+                </div>
+              </td>
+              <td class="py-4 px-4">
+                <div class="space-y-1">
+                  <p class="text-[13px] text-slate-600 font-medium">${timeStr}</p>
+                  ${user.age ? `<p class="text-[11px] text-slate-500">${user.age} yrs · ${user.gender ? genderIcon + ' ' + user.gender : ''}</p>` : ''}
+                  ${user.barangay ? `<p class="text-[11px] text-slate-400">${user.barangay}</p>` : ''}
+                </div>
+              </td>
+              <td class="py-4 px-4">${atRiskBadge}</td>
+              <td class="py-4 px-4">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  ${user.id_front || user.id_image
+                    ? `<button onclick="openIdViewer('approved', ${realIndex}, 'id_front')" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md border border-blue-200 transition-colors">ID ▶</button>`
+                    : `<span class="text-xs text-slate-400">No ID</span>`
+                  }
+                  ${user.id_back
+                    ? `<button onclick="openIdViewer('approved', ${realIndex}, 'id_back')" class="text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md border border-blue-200 transition-colors">ID ◀</button>`
+                    : ''
+                  }
+                  ${user.selfie_front
+                    ? `<button onclick="openIdViewer('approved', ${realIndex}, 'selfie_front')" class="text-[10px] font-bold text-violet-600 bg-violet-50 hover:bg-violet-100 px-2 py-1 rounded-md border border-violet-200 transition-colors">Front</button>`
+                    : ''
+                  }
+                  ${user.selfie_left
+                    ? `<button onclick="openIdViewer('approved', ${realIndex}, 'selfie_left')" class="text-[10px] font-bold text-violet-600 bg-violet-50 hover:bg-violet-100 px-2 py-1 rounded-md border border-violet-200 transition-colors">Left</button>`
+                    : ''
+                  }
+                  ${user.selfie_right
+                    ? `<button onclick="openIdViewer('approved', ${realIndex}, 'selfie_right')" class="text-[10px] font-bold text-violet-600 bg-violet-50 hover:bg-violet-100 px-2 py-1 rounded-md border border-violet-200 transition-colors">Right</button>`
+                    : ''
+                  }
+                </div>
+              </td>
+              <td class="py-4 px-5 text-right">
+                <div class="flex items-center justify-end gap-2">
+                  <button onclick="viewUserDetail(${realIndex}, 'approved')" title="View details" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-200 hover:bg-blue-600 hover:text-white transition-colors">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
+                  <button onclick="revokeUser(${realIndex})" title="Revoke approval" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center border border-red-200 hover:bg-red-600 hover:text-white transition-colors">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                </div>
+              </td>
+            `;
+            tbody.appendChild(row);
+          });
+        }
+      }
+
+      // ── Highlight search matches ──
+      function highlightMatch(text) {
+        if (!searchQuery) return text;
+        const escaped = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escaped})`, 'gi');
+        return text.replace(regex, '<mark class="bg-yellow-200 text-yellow-900 px-0.5 rounded">$1</mark>');
+      }
+
+      // ── ID Viewer (supports ID front/back, selfie angles) ──
+      window.openIdViewer = function(tab, index, type = 'id') {
+        const user = tab === 'pending' ? pendingUsers[index] : approvedUsers[index];
+        let imgSrc = null;
+        let title = '';
+        if (type === 'id_front') {
+          imgSrc = user?.id_front || user?.id_image;
+          title = `ID Front — ${user?.name}`;
+        } else if (type === 'id_back') {
+          imgSrc = user?.id_back;
+          title = `ID Back — ${user?.name}`;
+        } else if (type === 'id') {
+          imgSrc = user?.id_front || user?.id_image;
+          title = `Government ID — ${user?.name}`;
+        } else if (type === 'selfie_front') {
+          imgSrc = user?.selfie_front;
+          title = `Front Selfie — ${user?.name}`;
+        } else if (type === 'selfie_left') {
+          imgSrc = user?.selfie_left;
+          title = `Left Side — ${user?.name}`;
+        } else if (type === 'selfie_right') {
+          imgSrc = user?.selfie_right;
+          title = `Right Side — ${user?.name}`;
+        } else {
+          imgSrc = user?.selfie_image || user?.selfie_front;
+          title = `Selfie — ${user?.name}`;
+        }
+        if (!user || !imgSrc) { toast(`No image available`, 'error'); return; }
+        document.getElementById('idViewerImage').src = imgSrc;
+        document.getElementById('idViewerTitle').textContent = title;
+        document.getElementById('idViewerModal').classList.remove('hidden');
+      };
+
+      window.closeIdViewer = function() {
+        document.getElementById('idViewerModal').classList.add('hidden');
+        document.getElementById('idViewerImage').src = '';
+      };
+
+      // ── User Detail Modal (works for both pending and approved) ──
+      window.viewUserDetail = function(index, tab = 'approved') {
+        const user = tab === 'pending' ? pendingUsers[index] : approvedUsers[index];
+        if (!user) return;
+        const timeStr = user.timestamp ? user.timestamp.toDate().toLocaleString('en-PH', {
+          month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true
+        }) : 'Unknown';
+        const atRisk = user.atRisk || user.at_risk || 'None';
+        const statusBadge = user.status === 'approved'
+          ? '<span class="bg-emerald-100 text-emerald-700 text-[11px] font-bold px-2 py-0.5 rounded-full">Approved</span>'
+          : '<span class="bg-amber-100 text-amber-700 text-[11px] font-bold px-2 py-0.5 rounded-full">Pending</span>';
+        const genderIcon = user.gender === 'Male' ? '♂' : user.gender === 'Female' ? '♀' : '⚥';
+
+        document.getElementById('detailTitle').textContent = user.name || 'User Details';
+        document.getElementById('detailContent').innerHTML = `
+          <div class="space-y-4" style="max-height:70vh;overflow-y:auto;">
+            <div class="flex items-center gap-4 mb-4">
+              ${user.selfie_image
+                ? `<img src="${user.selfie_image}" alt="Selfie" class="w-14 h-14 rounded-full object-cover border-2 border-slate-300 shrink-0 cursor-pointer" onclick="openIdViewer('${tab}', ${index}, 'selfie')" />`
+                : `<div class="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  </div>`
+              }
+              <div>
+                <h4 class="text-lg font-bold text-slate-900">${user.name || 'Unknown'}</h4>
+                ${statusBadge}
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Email</p>
+                <p class="text-sm font-medium text-slate-800 mt-1">${user.email || '—'}</p>
+              </div>
+              <div>
+                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Contact</p>
+                <p class="text-sm font-medium text-slate-800 mt-1">${user.contact || user.phone || '—'}</p>
+              </div>
+              <div>
+                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Age</p>
+                <p class="text-sm font-medium text-slate-800 mt-1">${user.age ? user.age + ' yrs old' : '—'}</p>
+              </div>
+              <div>
+                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Gender</p>
+                <p class="text-sm font-medium text-slate-800 mt-1">${user.gender ? genderIcon + ' ' + user.gender : '—'}</p>
+              </div>
+              <div>
+                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Barangay</p>
+                <p class="text-sm font-medium text-slate-800 mt-1">${user.barangay || user.address || '—'}</p>
+              </div>
+              <div>
+                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">At-Risk</p>
+                <p class="text-sm font-medium text-slate-800 mt-1">${atRisk !== 'None' ? `<span class="bg-red-100 text-red-700 text-[11px] font-bold px-2 py-0.5 rounded-full">${atRisk}</span>` : '<span class="text-slate-400">None</span>'}</p>
+              </div>
+              <div>
+                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Registered</p>
+                <p class="text-sm font-medium text-slate-800 mt-1">${timeStr}</p>
+              </div>
+              <div>
+                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">User ID</p>
+                <p class="text-[11px] font-mono text-slate-500 mt-1">${user.docId}</p>
+              </div>
+            </div>
+            ${user.id_front || user.id_back || user.id_image || user.selfie_front || user.selfie_image ? `
+              <div class="mt-3 pt-3 border-t border-slate-200">
+                ${user.id_front || user.id_back ? `
+                  <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mb-2">🪪 Government ID (Front / Back)</p>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
+                    ${user.id_front ? `<img src="${user.id_front}" alt="ID Front" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;border:1px solid #e2e8f0;cursor:pointer;" onclick="openIdViewer('${tab}', ${index}, 'id_front')" />` : '<div style="width:100%;aspect-ratio:4/3;border-radius:10px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:11px;">N/A</div>'}
+                    ${user.id_back ? `<img src="${user.id_back}" alt="ID Back" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;border:1px solid #e2e8f0;cursor:pointer;" onclick="openIdViewer('${tab}', ${index}, 'id_back')" />` : '<div style="width:100%;aspect-ratio:4/3;border-radius:10px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:11px;">N/A</div>'}
+                  </div>
+                ` : user.id_image ? `
+                  <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mb-2">🪪 Government ID</p>
+                  <img src="${user.id_image}" alt="ID" class="w-full max-h-[200px] object-contain rounded-xl border border-slate-200 bg-slate-50 cursor-pointer mb-3" onclick="openIdViewer('${tab}', ${index}, 'id')" />
+                ` : ''}
+                ${user.selfie_front || user.selfie_left || user.selfie_right ? `
+                  <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mb-2">📸 Selfie Verification (Front / Left / Right)</p>
+                  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;">
+                    ${user.selfie_front ? `<img src="${user.selfie_front}" alt="Front" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;border:1px solid #e2e8f0;cursor:pointer;" onclick="openIdViewer('${tab}', ${index}, 'selfie_front')" />` : '<div style="width:100%;aspect-ratio:3/4;border-radius:10px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:11px;">N/A</div>'}
+                    ${user.selfie_left ? `<img src="${user.selfie_left}" alt="Left" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;border:1px solid #e2e8f0;cursor:pointer;" onclick="openIdViewer('${tab}', ${index}, 'selfie_left')" />` : '<div style="width:100%;aspect-ratio:3/4;border-radius:10px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:11px;">N/A</div>'}
+                    ${user.selfie_right ? `<img src="${user.selfie_right}" alt="Right" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;border:1px solid #e2e8f0;cursor:pointer;" onclick="openIdViewer('${tab}', ${index}, 'selfie_right')" />` : '<div style="width:100%;aspect-ratio:3/4;border-radius:10px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:11px;">N/A</div>'}
+                  </div>
+                ` : user.selfie_image ? `
+                  <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mb-2">📸 Selfie with ID</p>
+                  <img src="${user.selfie_image}" alt="Selfie" class="w-full max-h-[200px] object-contain rounded-xl border border-slate-200 bg-slate-50 cursor-pointer mb-3" onclick="openIdViewer('${tab}', ${index}, 'selfie')" />
+                ` : ''}
+              </div>
+            ` : ''}
+          </div>
+        `;
+        document.getElementById('userDetailModal').classList.remove('hidden');
+      };
+
+      window.closeUserDetail = function() {
+        document.getElementById('userDetailModal').classList.add('hidden');
+      };
+
+      // ── Actions ──
+      window.approveUser = async function(index) {
+        const user = pendingUsers[index];
+        if (confirm(`Are you sure you want to approve ${user.name}?`)) {
+          try {
+            await updateDoc(doc(db, "users", user.docId), { status: 'approved' });
+            toast('Approved ' + user.name, 'success');
+          } catch (e) {
+            console.error(e);
+            toast('Failed to approve', 'error');
+          }
+        }
+      };
+
+      window.rejectUser = async function(index) {
+        const user = pendingUsers[index];
+        if (confirm(`Are you sure you want to reject ${user.name}?`)) {
+          try {
+            await updateDoc(doc(db, "users", user.docId), { status: 'rejected' });
+            toast('Rejected ' + user.name, 'error');
+          } catch (e) {
+            console.error(e);
+            toast('Failed to reject', 'error');
+          }
+        }
+      };
+
+      window.revokeUser = async function(index) {
+        const user = approvedUsers[index];
+        if (confirm(`Are you sure you want to revoke access for ${user.name}? They will need to re-register.`)) {
+          try {
+            await updateDoc(doc(db, "users", user.docId), { status: 'rejected' });
+            toast('Revoked access for ' + user.name, 'info');
+          } catch (e) {
+            console.error(e);
+            toast('Failed to revoke', 'error');
+          }
+        }
+      };
+    </script>
+  </body>
+</html>

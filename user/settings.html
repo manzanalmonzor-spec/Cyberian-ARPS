@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="../shared.js"></script>
+  <meta name="theme-color" content="#DC2626">
+  <title>ARPS - Settings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../shared.css">
+  <script>tailwind.config={theme:{extend:{fontFamily:{sans:['DM Sans','Segoe UI','system-ui','sans-serif']}}}}</script>
+  <script src="js/auth-guard.js"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+<div class="app-wrapper w-full min-h-screen relative pb-24 md:pb-8">
+  <div class="app-container max-w-[480px] md:max-w-none mx-auto w-full">
+    <div class="flex items-center gap-3 px-4 md:px-8 pt-6 md:pt-10 pb-4">
+      <a href="home.html" class="w-9 h-9 rounded-[10px] bg-white border border-slate-200 flex items-center justify-center btn-press"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg></a>
+      <h2 class="text-lg font-bold text-slate-900">Settings</h2>
+    </div>
+
+    <div class="mx-4 md:mx-8 mt-4 md:mt-6 flex flex-col gap-4">
+      <section class="bg-white rounded-2xl border border-slate-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-[0.18em]">My Profile</p>
+          <button id="btnEditProfile" class="text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 rounded-md transition-colors">Edit Profile</button>
+        </div>
+        <div class="flex flex-col gap-3.5">
+          <div>
+            <p class="text-[10px] text-slate-500 uppercase tracking-wider font-bold mb-0.5">Full Name</p>
+            <p id="dispName" class="text-[13px] font-semibold text-slate-900">Juan Dela Cruz</p>
+          </div>
+          <div>
+            <p class="text-[10px] text-slate-500 uppercase tracking-wider font-bold mb-0.5">Contact Number</p>
+            <p id="dispContact" class="text-[13px] font-semibold text-slate-900">+63 912 345 6789</p>
+          </div>
+          <div class="bg-red-50/50 rounded-xl p-3 border border-red-100 mt-1">
+            <p class="text-[10px] text-red-600 uppercase tracking-wider font-bold flex items-center gap-1 mb-1">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              At-Risk Status
+            </p>
+            <p id="dispAtRisk" class="text-[13px] font-bold text-slate-900">None</p>
+            <p class="text-[10px] text-slate-500 mt-1 leading-relaxed font-medium">This info is sent automatically to responders when you trigger an SOS or Report to prioritize your rescue.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-white rounded-2xl border border-slate-200 p-5">
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-[0.18em]">Alerts</p>
+        <div class="mt-4 flex items-center justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900">Emergency Notifications</h3>
+            <p class="text-xs text-slate-400 mt-1">Receive severe weather and incident updates.</p>
+          </div>
+          <span class="badge badge-resolved">Enabled</span>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900">Location Sharing</h3>
+            <p class="text-xs text-slate-400 mt-1">Allow responders to use your live location during SOS events.</p>
+          </div>
+          <span class="badge badge-responding">On</span>
+        </div>
+      </section>
+
+      <section class="bg-white rounded-2xl border border-slate-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-[0.18em]">Contacts</p>
+          <button id="btnEditContact" class="text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 rounded-md transition-colors">Edit Contact</button>
+        </div>
+        <div class="rounded-xl bg-slate-50 p-4">
+          <p class="text-sm font-bold text-slate-900">Primary Emergency Contact</p>
+          <p id="dispEcName" class="text-xs text-slate-400 mt-1">Not set</p>
+          <p id="dispEcNumber" class="text-sm font-semibold text-slate-900 mt-2">—</p>
+        </div>
+      </section>
+
+      <section class="bg-white rounded-2xl border border-slate-200 p-5">
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-[0.18em]">Account</p>
+        <div class="mt-3">
+          <p class="text-[10px] text-slate-500 uppercase tracking-wider font-bold mb-0.5">Signed in as</p>
+          <p id="dispEmail" class="text-[13px] font-semibold text-slate-900"></p>
+        </div>
+        <button onclick="arpsLogout()" class="mt-4 w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold text-sm py-3 rounded-xl transition-all border border-red-200 flex items-center justify-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign Out
+        </button>
+      </section>
+
+      <section class="bg-white rounded-2xl border border-slate-200 p-5">
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-[0.18em]">App</p>
+        <div class="mt-4 flex items-center justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900">Map Provider</h3>
+            <p class="text-xs text-slate-400 mt-1">Leaflet with OpenStreetMap tiles</p>
+          </div>
+          <span class="text-xs font-semibold text-slate-500">v1.0</span>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="bottom-nav-brand">
+      <img src="../Images/ARPLOGO.png" alt="ARPS logo">
+      <div class="bottom-nav-brand-copy">
+        <strong>ARPS</strong>
+        <span>Response System</span>
+      </div>
+    </div>
+    <a href="home.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg><span>Home</span></a>
+    <a href="report.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Report</span></a>
+    <a href="sos.html" class="sos-nav-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg><span>SOS</span></a>
+    <a href="evacuation.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg><span>Centers</span></a>
+    <a href="settings.html" class="nav-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Settings</span></a>
+  </nav>
+
+  <!-- Edit Emergency Contact Modal -->
+  <div id="contactModal" class="fixed inset-0 z-[60] bg-slate-900/50 backdrop-blur-md hidden flex items-center justify-center transition-opacity opacity-0 p-5">
+    <div class="bg-white w-full max-w-[380px] rounded-3xl shadow-2xl shadow-slate-900/20 transform scale-90 opacity-0 transition-all duration-300 flex flex-col" id="contactModalContent" style="max-height:calc(100vh - 40px)">
+
+      <!-- Modal Header -->
+      <div class="relative p-6 pb-4 shrink-0">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-red-500/30">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.22 1.18 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.56-.56a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+        </div>
+        <h3 class="text-lg font-extrabold text-slate-900 text-center">Emergency Contact</h3>
+        <p class="text-[11px] text-slate-400 text-center mt-1 font-medium">Update your primary emergency contact</p>
+        <button id="btnCloseContactModal" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="px-6 pb-2 flex flex-col gap-4 overflow-y-auto overscroll-contain">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Contact Name</label>
+          <input id="inputEcName" type="text" placeholder="e.g. Maria Santos" class="w-full px-4 py-3 rounded-xl border-[1.5px] border-slate-200 text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all bg-slate-50 focus:bg-white">
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Contact Number</label>
+          <input id="inputEcNumber" type="tel" placeholder="+63 9XX XXX XXXX" class="w-full px-4 py-3 rounded-xl border-[1.5px] border-slate-200 text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all bg-slate-50 focus:bg-white">
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-6 pt-4 shrink-0">
+        <button id="btnSaveContact" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold text-sm py-3.5 rounded-xl transition-all shadow-lg shadow-blue-600/25 active:scale-[0.98]">Save Changes</button>
+        <button id="btnCancelContact" class="w-full text-slate-400 hover:text-slate-600 font-semibold text-xs py-2.5 mt-1 transition-colors">Cancel</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div id="profileModal" class="fixed inset-0 z-[60] bg-slate-900/50 backdrop-blur-md hidden flex items-center justify-center transition-opacity opacity-0 p-5">
+    <div class="bg-white w-full max-w-[380px] rounded-3xl shadow-2xl shadow-slate-900/20 transform scale-90 opacity-0 transition-all duration-300 flex flex-col" id="profileModalContent" style="max-height:calc(100vh - 40px)">
+
+      <!-- Modal Header -->
+      <div class="relative p-6 pb-4 shrink-0">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-blue-500/30">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <h3 class="text-lg font-extrabold text-slate-900 text-center">Edit Profile</h3>
+        <p class="text-[11px] text-slate-400 text-center mt-1 font-medium">Update your personal information</p>
+        <button id="btnCloseModal" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="px-6 pb-2 flex flex-col gap-4 overflow-y-auto overscroll-contain">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Full Name</label>
+          <input id="inputName" type="text" placeholder="Enter your full name" class="w-full px-4 py-3 rounded-xl border-[1.5px] border-slate-200 text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all bg-slate-50 focus:bg-white">
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Contact Number</label>
+          <input id="inputContact" type="tel" placeholder="+63 9XX XXX XXXX" class="w-full px-4 py-3 rounded-xl border-[1.5px] border-slate-200 text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all bg-slate-50 focus:bg-white">
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">At-Risk Status (Optional)</label>
+          <select id="inputAtRisk" class="w-full px-4 py-3 rounded-xl border-[1.5px] border-slate-200 text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all bg-slate-50 focus:bg-white appearance-none" style="background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 fill=%22%2394a3b8%22 viewBox=%220 0 16 16%22><path d=%22M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 01.753 1.659l-4.796 5.48a1 1 0 01-1.506 0z%22/></svg>');background-repeat:no-repeat;background-position:right 12px center">
+            <option value="None">None</option>
+            <option value="Elderly (Senior Citizen)">Elderly (Senior Citizen)</option>
+            <option value="Pregnant">Pregnant</option>
+            <option value="Person with Disability (PWD)">Person with Disability (PWD)</option>
+            <option value="Infant / Toddler">Infant / Toddler</option>
+            <option value="Medical Condition / Bedridden">Medical Condition / Bedridden</option>
+            <option value="Multiple / Other">Multiple / Other</option>
+          </select>
+          <p class="text-[10px] text-slate-400 font-medium leading-relaxed">Helps prioritize rescue in emergencies.</p>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-6 pt-4 shrink-0">
+        <button id="btnSaveProfile" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold text-sm py-3.5 rounded-xl transition-all shadow-lg shadow-blue-600/25 active:scale-[0.98]">Save Changes</button>
+        <button id="btnCancelProfile" class="w-full text-slate-400 hover:text-slate-600 font-semibold text-xs py-2.5 mt-1 transition-colors">Cancel</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const session = window.arpsUser;
+    const profileKey = 'arps_profile_' + (session ? session.uid : 'guest');
+
+    // Show email in account section
+    const dispEmail = document.getElementById('dispEmail');
+    if (dispEmail && session) {
+      dispEmail.textContent = session.email;
+    }
+
+    // Elements
+    const dispName = document.getElementById('dispName');
+    const dispContact = document.getElementById('dispContact');
+    const dispAtRisk = document.getElementById('dispAtRisk');
+
+    const inputName = document.getElementById('inputName');
+    const inputContact = document.getElementById('inputContact');
+    const inputAtRisk = document.getElementById('inputAtRisk');
+
+    const modal = document.getElementById('profileModal');
+    const modalContent = document.getElementById('profileModalContent');
+    const btnEditProfile = document.getElementById('btnEditProfile');
+    const btnCloseModal = document.getElementById('btnCloseModal');
+    const btnSaveProfile = document.getElementById('btnSaveProfile');
+
+    // Load from per-user LocalStorage
+    function loadProfile() {
+      const profile = JSON.parse(localStorage.getItem(profileKey) || '{}');
+      const name = profile.name || (session ? session.name : 'Resident');
+      const contact = profile.contact || '';
+      const atRisk = profile.atRisk || 'None';
+
+      dispName.textContent = name;
+      dispContact.textContent = contact || 'Not set';
+      dispAtRisk.textContent = atRisk;
+
+      inputName.value = name;
+      inputContact.value = contact;
+      inputAtRisk.value = atRisk;
+    }
+
+    function syncLocalAccountName(nextName) {
+      if (!session || session.authMode !== 'local-email' || !nextName) {
+        return;
+      }
+
+      let accounts;
+      try {
+        accounts = JSON.parse(localStorage.getItem('arps_local_accounts') || '[]');
+      } catch (error) {
+        console.error('Failed to read local auth accounts.', error);
+        return;
+      }
+
+      if (!Array.isArray(accounts)) {
+        return;
+      }
+
+      let updated = false;
+      accounts.forEach((account) => {
+        if (account && account.uid === session.uid) {
+          account.name = nextName;
+          updated = true;
+        }
+      });
+
+      if (updated) {
+        localStorage.setItem('arps_local_accounts', JSON.stringify(accounts));
+      }
+    }
+
+    // Modal Logic
+    const btnCancelProfile = document.getElementById('btnCancelProfile');
+
+    function openModal() {
+      loadProfile();
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        modalContent.style.transform = 'scale(1)';
+        modalContent.style.opacity = '1';
+      }, 10);
+    }
+
+    function closeModal() {
+      modal.classList.add('opacity-0');
+      modalContent.style.transform = 'scale(0.9)';
+      modalContent.style.opacity = '0';
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
+    }
+
+    btnEditProfile.addEventListener('click', openModal);
+    btnCloseModal.addEventListener('click', closeModal);
+    btnCancelProfile.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // Save Logic
+    btnSaveProfile.addEventListener('click', () => {
+      const newProfile = {
+        name: inputName.value.trim(),
+        contact: inputContact.value.trim(),
+        atRisk: inputAtRisk.value.trim()
+      };
+
+      localStorage.setItem(profileKey, JSON.stringify(newProfile));
+
+      // Also update session name so it reflects across the app
+      if (session && newProfile.name) {
+        session.name = newProfile.name;
+        localStorage.setItem('arps_session', JSON.stringify(session));
+        syncLocalAccountName(newProfile.name);
+      }
+
+      loadProfile();
+      closeModal();
+
+      const t = document.createElement("div");
+      t.className = "toast toast-success";
+      t.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>Profile updated successfully';
+      document.body.appendChild(t);
+      setTimeout(() => { t.classList.add("out"); setTimeout(() => t.remove(), 300); }, 2500);
+    });
+
+    // Emergency Contact Logic
+    const contactKey = 'arps_emergency_contact_' + (session ? session.uid : 'guest');
+    const dispEcName = document.getElementById('dispEcName');
+    const dispEcNumber = document.getElementById('dispEcNumber');
+    const inputEcName = document.getElementById('inputEcName');
+    const inputEcNumber = document.getElementById('inputEcNumber');
+    const contactModal = document.getElementById('contactModal');
+    const contactModalContent = document.getElementById('contactModalContent');
+
+    function loadContact() {
+      const ec = JSON.parse(localStorage.getItem(contactKey) || '{}');
+      dispEcName.textContent = ec.name || 'Not set';
+      dispEcNumber.textContent = ec.number || '—';
+      inputEcName.value = ec.name || '';
+      inputEcNumber.value = ec.number || '';
+    }
+
+    function openContactModal() {
+      loadContact();
+      contactModal.classList.remove('hidden');
+      setTimeout(() => {
+        contactModal.classList.remove('opacity-0');
+        contactModalContent.style.transform = 'scale(1)';
+        contactModalContent.style.opacity = '1';
+      }, 10);
+    }
+
+    function closeContactModal() {
+      contactModal.classList.add('opacity-0');
+      contactModalContent.style.transform = 'scale(0.9)';
+      contactModalContent.style.opacity = '0';
+      setTimeout(() => contactModal.classList.add('hidden'), 300);
+    }
+
+    document.getElementById('btnEditContact').addEventListener('click', openContactModal);
+    document.getElementById('btnCloseContactModal').addEventListener('click', closeContactModal);
+    document.getElementById('btnCancelContact').addEventListener('click', closeContactModal);
+    contactModal.addEventListener('click', (e) => { if (e.target === contactModal) closeContactModal(); });
+
+    document.getElementById('btnSaveContact').addEventListener('click', () => {
+      const ec = { name: inputEcName.value.trim(), number: inputEcNumber.value.trim() };
+      localStorage.setItem(contactKey, JSON.stringify(ec));
+      loadContact();
+      closeContactModal();
+      const t = document.createElement('div');
+      t.className = 'toast toast-success';
+      t.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>Emergency contact updated';
+      document.body.appendChild(t);
+      setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, 2500);
+    });
+
+    // Init
+    loadProfile();
+    loadContact();
+  });
+</script>
+</body>
+</html>

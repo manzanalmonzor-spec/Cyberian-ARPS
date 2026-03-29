@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="../shared.js"></script>
+  <meta name="theme-color" content="#DC2626">
+  <title>ARPS — Emergency SOS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../shared.css">
+  <script>tailwind.config={theme:{extend:{fontFamily:{sans:['DM Sans','Segoe UI','system-ui','sans-serif']}}}}</script>
+  <style>
+    @keyframes sosRing {
+      0%   { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(2.6); opacity: 0; }
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .sos-ring {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 3px solid #DC2626;
+      animation: sosRing 2.2s ease-out infinite;
+      pointer-events: none;
+    }
+    .sos-ring:nth-child(2) { animation-delay: 0.75s; }
+    .sos-ring:nth-child(3) { animation-delay: 1.5s; }
+    .type-card {
+      animation: cardIn 0.3s cubic-bezier(0.16,1,0.3,1) both;
+      transition: transform 0.12s, box-shadow 0.12s;
+      cursor: pointer;
+    }
+    .type-card:active { transform: scale(0.95); }
+  </style>
+  <script src="js/auth-guard.js"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+<div class="app-wrapper w-full min-h-screen relative pb-24 md:pb-8">
+<div class="app-container max-w-[480px] md:max-w-none mx-auto w-full">
+
+  <!-- Header -->
+  <div class="flex items-center gap-3 px-4 md:px-8 pt-6 md:pt-10 pb-4">
+    <a href="home.html" class="w-9 h-9 rounded-[10px] bg-white border border-slate-200 flex items-center justify-center btn-press">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+    </a>
+    <h2 class="text-lg font-bold text-slate-900">Emergency SOS</h2>
+  </div>
+
+  <!-- ── STEP 1: SOS Button ──────────────────────────────────────────────── -->
+  <div id="step-main" class="hidden flex-col items-center justify-center min-h-[72vh] px-6 animate-fade">
+    <p class="text-[13px] text-slate-500 mb-10 text-center leading-relaxed">
+      Press the button below<br>to send an emergency alert
+    </p>
+
+    <!-- Big SOS button with pulse rings -->
+    <div class="relative flex items-center justify-center" style="width:210px;height:210px">
+      <span class="sos-ring"></span>
+      <span class="sos-ring"></span>
+      <span class="sos-ring"></span>
+      <button id="btnSOS"
+        class="relative w-44 h-44 rounded-full flex items-center justify-center border-none cursor-pointer font-sans select-none"
+        style="background:linear-gradient(150deg,#EF4444,#991B1B);box-shadow:0 0 0 8px rgba(220,38,38,0.18),0 16px 50px rgba(185,28,28,0.5)">
+        <span class="text-white font-black text-5xl tracking-tight" style="text-shadow:0 3px 10px rgba(0,0,0,0.3)">SOS</span>
+      </button>
+    </div>
+
+    <p class="mt-10 text-xs text-slate-400 text-center">Your GPS location will be shared with responders</p>
+    <a href="home.html" class="mt-6 text-slate-400 hover:text-slate-600 text-sm font-semibold no-underline py-2 px-4">Cancel</a>
+  </div>
+
+  <!-- ── STEP 2: What kind of emergency? ────────────────────────────────── -->
+  <div id="step-type" class="flex flex-col px-4 md:px-8 pt-2 pb-6 animate-fade">
+    <div class="text-center mb-6">
+      <h3 class="text-[18px] font-extrabold text-slate-900">What's the emergency?</h3>
+      <p class="text-[13px] text-slate-500 mt-1">Tap the type of help you need</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3" id="typeGrid">
+
+      <!-- Medical -->
+      <button class="type-card bg-white rounded-2xl border-2 border-red-100 p-5 flex flex-col items-center gap-2.5" style="animation-delay:0s" data-type="Medical">
+        <div class="w-14 h-14 rounded-[16px] bg-red-50 flex items-center justify-center">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <span class="text-sm font-extrabold text-slate-900">Medical</span>
+        <span class="text-[10px] text-slate-400 text-center leading-snug">Injury · Illness · Cardiac</span>
+      </button>
+
+      <!-- Fire -->
+      <button class="type-card bg-white rounded-2xl border-2 border-orange-100 p-5 flex flex-col items-center gap-2.5" style="animation-delay:0.05s" data-type="Fire">
+        <div class="w-14 h-14 rounded-[16px] bg-orange-50 flex items-center justify-center">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#EA580C" stroke-width="2" stroke-linecap="round"><path d="M12 2c0 0-5.5 6-5.5 10.5a5.5 5.5 0 0011 0C17.5 8 12 2 12 2z"/><path d="M9.5 14.5c0 0 1.5-1 2.5-1s2.5 1 2.5 1"/></svg>
+        </div>
+        <span class="text-sm font-extrabold text-slate-900">Fire</span>
+        <span class="text-[10px] text-slate-400 text-center leading-snug">Structure · Vehicle fire</span>
+      </button>
+
+      <!-- Police -->
+      <button class="type-card bg-white rounded-2xl border-2 border-blue-100 p-5 flex flex-col items-center gap-2.5" style="animation-delay:0.1s" data-type="Police">
+        <div class="w-14 h-14 rounded-[16px] bg-blue-50 flex items-center justify-center">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01"/></svg>
+        </div>
+        <span class="text-sm font-extrabold text-slate-900">Police</span>
+        <span class="text-[10px] text-slate-400 text-center leading-snug">Crime · Threat · Violence</span>
+      </button>
+
+      <!-- Flood -->
+      <button class="type-card bg-white rounded-2xl border-2 border-sky-100 p-5 flex flex-col items-center gap-2.5" style="animation-delay:0.15s" data-type="Flood">
+        <div class="w-14 h-14 rounded-[16px] bg-sky-50 flex items-center justify-center">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2" stroke-linecap="round"><path d="M12 21c3.5 0 6-2.5 6-6.2C18 11 12 3 12 3S6 11 6 14.8C6 18.5 8.5 21 12 21z"/></svg>
+        </div>
+        <span class="text-sm font-extrabold text-slate-900">Flood</span>
+        <span class="text-[10px] text-slate-400 text-center leading-snug">Rising water · Rescue</span>
+      </button>
+
+      <!-- Earthquake -->
+      <button class="type-card bg-white rounded-2xl border-2 border-amber-100 p-5 flex flex-col items-center gap-2.5" style="animation-delay:0.2s" data-type="Earthquake">
+        <div class="w-14 h-14 rounded-[16px] bg-amber-50 flex items-center justify-center">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round"><path d="M3 20h18M6 20l4-8 3 4 2-3 3 7"/></svg>
+        </div>
+        <span class="text-sm font-extrabold text-slate-900">Earthquake</span>
+        <span class="text-[10px] text-slate-400 text-center leading-snug">Trapped · Collapse</span>
+      </button>
+
+      <!-- Typhoon -->
+      <button class="type-card bg-white rounded-2xl border-2 border-violet-100 p-5 flex flex-col items-center gap-2.5" style="animation-delay:0.25s" data-type="Typhoon">
+        <div class="w-14 h-14 rounded-[16px] bg-violet-50 flex items-center justify-center">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6D28D9" stroke-width="2" stroke-linecap="round"><path d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2"/></svg>
+        </div>
+        <span class="text-sm font-extrabold text-slate-900">Typhoon</span>
+        <span class="text-[10px] text-slate-400 text-center leading-snug">Storm surge · Winds</span>
+      </button>
+
+    </div>
+
+    <button id="btnBackToSOS" class="mt-5 text-slate-400 hover:text-slate-600 text-sm font-semibold bg-transparent border-none cursor-pointer font-sans w-full flex items-center justify-center gap-1.5 py-2">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Cancel
+    </button>
+  </div>
+
+  <!-- ── STEP 3: Sending ─────────────────────────────────────────────────── -->
+  <div id="step-sending" class="hidden flex-col items-center justify-center min-h-[70vh] px-6 md:px-12">
+    <div class="w-20 h-20 rounded-full border-4 border-slate-200 mb-7 animate-spin" style="border-top-color:#DC2626"></div>
+    <h3 class="text-lg font-bold text-slate-900 text-center">Sending Emergency Alert...</h3>
+    <div class="mt-5 flex flex-col gap-3 text-left max-w-[260px] w-full">
+      <div id="s1" class="flex items-center gap-2.5 opacity-0">
+        <div class="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center" id="s1i"><div class="w-2 h-2 rounded-full border-2 border-slate-300 animate-spin" style="border-top-color:#1D4ED8"></div></div>
+        <span class="text-[13px] text-slate-400 font-medium" id="s1t">Capturing GPS location...</span>
+      </div>
+      <div id="s2" class="flex items-center gap-2.5 opacity-0">
+        <div class="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center" id="s2i"><div class="w-2 h-2 rounded-full border-2 border-slate-300 animate-spin" style="border-top-color:#1D4ED8"></div></div>
+        <span class="text-[13px] text-slate-400 font-medium" id="s2t">Sending SOS signal...</span>
+      </div>
+      <div id="s3" class="flex items-center gap-2.5 opacity-0">
+        <div class="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center" id="s3i"><div class="w-2 h-2 rounded-full border-2 border-slate-300 animate-spin" style="border-top-color:#1D4ED8"></div></div>
+        <span class="text-[13px] text-slate-400 font-medium" id="s3t">Notifying responders...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 4: Success ─────────────────────────────────────────────────── -->
+  <div id="step-success" class="hidden flex-col items-center justify-center min-h-[70vh] px-6 md:px-12">
+    <div class="w-24 h-24 rounded-full flex items-center justify-center mb-6 animate-scale" style="background:linear-gradient(145deg,#D1FAE5,#A7F3D0)">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <h3 class="text-xl font-extrabold text-emerald-600 text-center">SOS Alert Sent!</h3>
+    <p class="text-slate-500 text-sm mt-3 text-center leading-relaxed">Help is on the way. Stay calm and stay where you are.</p>
+    <div class="w-full bg-white rounded-2xl border border-slate-200 p-4 mt-6">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-xs text-slate-400">Emergency Type</span>
+        <span class="text-xs font-semibold text-slate-900" id="typeSent">–</span>
+      </div>
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-xs text-slate-400">Time Sent</span>
+        <span class="text-xs font-semibold text-slate-900" id="timeSent">–</span>
+      </div>
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-xs text-slate-400">Location</span>
+        <span class="text-xs font-semibold text-slate-900 text-right max-w-[55%]" id="locSent">–</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-xs text-slate-400">Status</span>
+        <span class="badge badge-pending">Pending</span>
+      </div>
+    </div>
+    <a href="report.html" class="mt-6 w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold text-sm py-3.5 rounded-xl flex items-center justify-center btn-press no-underline gap-2">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      Track Response Status
+    </a>
+    <button id="btnSendAnother" class="mt-3 text-slate-400 hover:text-slate-600 text-sm font-medium py-2 px-4 bg-transparent border-none cursor-pointer font-sans">Send Another SOS</button>
+  </div>
+
+  <!-- Bottom Nav -->
+  </div>
+  <nav class="bottom-nav">
+  <div class="bottom-nav-brand">
+    <img src="../Images/ARPLOGO.png" alt="ARPS logo">
+    <div class="bottom-nav-brand-copy">
+      <strong>ARPS</strong>
+      <span>Response System</span>
+    </div>
+  </div>
+  <a href="home.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg><span>Home</span></a>
+  <a href="report.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Report</span></a>
+  <a href="sos.html" class="sos-nav-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg><span>SOS</span></a>
+  <a href="evacuation.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg><span>Centers</span></a>
+  <a href="settings.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Settings</span></a>
+</nav>
+</div>
+
+<script type="module" src="./js/sos.js"></script>
+</body>
+</html>

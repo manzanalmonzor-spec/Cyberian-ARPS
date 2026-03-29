@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="../shared.js"></script>
+  <meta name="theme-color" content="#DC2626">
+  <title>ARPS — Home</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../shared.css">
+  <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Plus Jakarta Sans', 'DM Sans', 'system-ui', 'sans-serif'] } } } }</script>
+  <script src="js/auth-guard.js"></script>
+  <style>
+    @keyframes advBreathe {
+      0%, 100% { transform: scaleY(1) translateY(0); }
+      50% { transform: scaleY(1.01) translateY(-1px); }
+    }
+    .adv-eagle-body-group {
+      transform-origin: 50px 70px;
+      animation: advBreathe 3s infinite ease-in-out;
+    }
+
+    .home-page {
+      overflow-x: clip;
+    }
+
+    .home-page-content {
+      padding-bottom: calc(8.75rem + env(safe-area-inset-bottom));
+    }
+
+    @media (max-width: 767px) {
+      .home-page {
+        min-height: 100svh;
+      }
+
+      .home-page .bottom-nav {
+        bottom: calc(24px + env(safe-area-inset-bottom));
+        z-index: 2000;
+        will-change: transform;
+        backface-visibility: hidden;
+        transition: transform .22s ease, opacity .22s ease;
+      }
+
+      .home-page .sos-nav-center {
+        z-index: 2001;
+      }
+
+      .home-page .chat-widget {
+        bottom: calc(106px + env(safe-area-inset-bottom));
+      }
+
+      .home-page.keyboard-open .bottom-nav {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(-50%) translateY(24px);
+      }
+
+      .home-page.keyboard-open .chat-widget {
+        bottom: calc(12px + env(safe-area-inset-bottom));
+      }
+    }
+
+    @supports (height: 100dvh) {
+      .home-page {
+        min-height: 100dvh;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .home-page-content {
+        padding-bottom: 2rem;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 font-sans">
+  <div class="app-wrapper home-page w-full min-h-screen relative">
+    <div class="app-container home-page-content max-w-[480px] md:max-w-none mx-auto w-full">
+
+      <!-- Top Menu Bar -->
+      <div
+        class="relative z-[2301] flex items-center justify-between px-5 md:px-10 pt-4 md:pt-8 pb-0 md:pb-1 animate-fade">
+        <div class="flex items-center gap-2">
+          <span class="relative flex h-2 w-2 shrink-0"><span
+              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span
+              class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span>
+          <span class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest">Active & Safe</span>
+        </div>
+
+        <div class="relative z-[2302]">
+          <button id="menuBtn"
+            class="relative z-[2303] w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center btn-press shadow-sm hover:border-blue-100 transition-all">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Resident&backgroundColor=c0aede" alt="Profile"
+              class="w-8 h-8 rounded-lg"
+              onerror="this.outerHTML='<svg width=\'20\' height=\'20\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'#0F172A\' stroke-width=\'2\' stroke-linecap=\'round\'><path d=\'M4 6h16M4 12h16M4 18h16\'/></svg>'">
+          </button>
+        </div>
+      </div>
+
+      <div id="menuDropdown" class="menu-overlay hidden">
+        <div class="menu-overlay-shell">
+          <div class="menu-sheet">
+            <div class="px-4 py-3 flex items-center gap-3 border-b border-slate-100 mb-2">
+              <img src="../Images/ARPLOGO.png" alt="ARPS Logo" class="h-8 w-auto">
+              <span class="font-black text-slate-800 text-lg tracking-tight">ARPS</span>
+            </div>
+            <a href="home.html" class="dropdown-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
+              </svg>Home</a>
+            <a href="report.html" class="dropdown-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>Report Incident</a>
+            <a href="gps.html" class="dropdown-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>My Location</a>
+            <a href="weather.html" class="dropdown-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+              </svg>Weather</a>
+            <a href="alerts.html" class="dropdown-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>Alerts</a>
+            <a href="evacuation.html" class="dropdown-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>Evacuation Centers</a>
+            <div class="h-px bg-slate-100 my-1"></div>
+            <a href="settings.html" class="dropdown-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+              </svg>Settings</a>
+            <div class="h-px bg-slate-100 my-1"></div>
+            <a href="#" onclick="arpsLogout(); return false;" class="dropdown-item" style="color:#DC2626"><svg
+                width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>Sign Out</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Header with Weather side-by-side -->
+      <div class="flex justify-between items-end px-5 md:px-10 pt-0 md:pt-2 pb-3 md:pb-4">
+        <div class="animate-fade flex-1">
+          <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-none">Hello, <span
+              class="user-display-name">Resident</span></h2>
+          <p class="text-xs md:text-sm text-slate-500 mt-2 font-semibold flex items-center gap-1" id="header-location">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span id="header-location-text">Locating...</span>
+          </p>
+        </div>
+
+        <a href="weather.html"
+          class="flex flex-col items-end text-right no-underline hover:opacity-80 transition-opacity animate-fade">
+          <div class="flex items-center gap-1.5 mb-0.5">
+            <span id="weather-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0EA5E9"
+                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+              </svg></span>
+            <span id="weather-temp" class="text-2xl font-black text-slate-800 tracking-tighter">--°</span>
+          </div>
+          <span id="weather-desc" class="text-[11px] font-bold text-sky-600">Loading...</span>
+        </a>
+      </div>
+
+      <!-- Weather Advisor (PAGASA) -->
+      <div class="px-5 md:px-10 mt-1 md:mt-2 mb-8 animate-slideUp" style="animation-delay: 0.1s;">
+        <div
+          class="relative min-h-[118px] sm:min-h-[80px] bg-white/90 backdrop-blur-xl rounded-[24px] p-3 pl-24 sm:p-4 sm:pl-28 md:pl-32 border border-sky-100/80 shadow-[0_8px_30px_-12px_rgba(14,165,233,0.15)] flex items-center gap-3 sm:gap-4 group hover:shadow-[0_12px_40px_-12px_rgba(14,165,233,0.25)] transition-all overflow-visible">
+          <div
+            class="absolute top-0 right-0 w-32 h-32 bg-sky-200/40 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none group-hover:bg-sky-300/40 group-hover:scale-150 transition-all duration-500">
+          </div>
+
+          <!-- Advisor Eagle — BIG, 3D, popping out of card -->
+          <div
+            class="absolute -left-3 -top-8 sm:-left-3 sm:-top-8 md:-left-2 md:-top-12 z-20 pointer-events-none w-[130px] h-[130px]"
+            id="advisorEagleWrap">
+            <svg viewBox="0 0 100 100" class="w-full h-full" xmlns="http://www.w3.org/2000/svg"
+              style="filter: drop-shadow(0px 15px 25px rgba(0,0,0,0.8)) drop-shadow(0px 5px 8px rgba(0,0,0,0.5));">
+              <defs>
+                <linearGradient id="awWingGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#4a3525"/>
+                  <stop offset="60%" stop-color="#1f140c"/>
+                  <stop offset="100%" stop-color="#0a0704"/>
+                </linearGradient>
+                <linearGradient id="awBodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#3d2b1d"/>
+                  <stop offset="100%" stop-color="#120b06"/>
+                </linearGradient>
+                <radialGradient id="awHeadGrad" cx="50%" cy="30%" r="50%">
+                  <stop offset="0%" stop-color="#ffffff"/>
+                  <stop offset="70%" stop-color="#f2f2f2"/>
+                  <stop offset="100%" stop-color="#cccccc"/>
+                </radialGradient>
+                <linearGradient id="awBeakGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ffcc00"/>
+                  <stop offset="60%" stop-color="#e69900"/>
+                  <stop offset="100%" stop-color="#996600"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Body + wings (breathing) -->
+              <g class="adv-eagle-body-group">
+                <!-- Tail feathers -->
+                <path d="M 40 75 L 36 98 L 50 94 L 64 98 L 60 75 Z" fill="#e6e6e6" stroke="#b3b3b3" stroke-width="0.5"/>
+                <path d="M 43 80 L 41 95 M 57 80 L 59 95" stroke="#cccccc" stroke-width="0.5" fill="none"/>
+                <!-- Body -->
+                <path d="M 36 45 C 30 65, 36 88, 50 88 C 64 88, 70 65, 64 45 Z" fill="url(#awBodyGrad)"/>
+                <!-- Left wing -->
+                <g id="adv-left-wing">
+                  <path d="M 42 42 C 30 55, 28 80, 39 92 C 45 80, 44 60, 45 45 Z" fill="#120b06"/>
+                  <path d="M 42 42 C 33 55, 32 80, 41 87 C 45 75, 45 55, 46 45 Z" fill="url(#awWingGrad)"/>
+                  <path d="M 38 55 L 40 75 M 35 65 L 38 85" stroke="#2a1d12" stroke-width="0.5" fill="none"/>
+                </g>
+                <!-- Right wing -->
+                <g id="adv-right-wing">
+                  <path d="M 58 42 C 70 55, 72 80, 61 92 C 55 80, 56 60, 55 45 Z" fill="#120b06"/>
+                  <path d="M 58 42 C 67 55, 68 80, 59 87 C 55 75, 55 55, 54 45 Z" fill="url(#awWingGrad)"/>
+                  <path d="M 62 55 L 60 75 M 65 65 L 62 85" stroke="#2a1d12" stroke-width="0.5" fill="none"/>
+                </g>
+                <!-- White chest collar -->
+                <path d="M 33 42 L 40 54 L 50 48 L 60 54 L 67 42 Z" fill="#e6e6e6"/>
+              </g>
+
+              <!-- Head (mouse-tracked) -->
+              <g id="adv-eagle-head">
+                <!-- White head -->
+                <path d="M 33 42 C 33 15, 67 15, 67 42 C 67 45, 55 47, 50 48 C 45 47, 33 45, 33 42 Z" fill="url(#awHeadGrad)"/>
+                <!-- Beak -->
+                <path d="M 46 30 C 50 28, 54 28, 55 35 C 56 46, 50 54, 48 56 C 48 48, 52 38, 46 32 Z" fill="url(#awBeakGrad)"/>
+                <ellipse cx="50" cy="34" rx="1.2" ry="0.6" fill="#4a3300" transform="rotate(-25 50 34)"/>
+                <!-- Eyes (blinking) -->
+                <g id="adv-eagle-eyes">
+                  <path d="M 41 24 C 45 24, 48 26, 48 29 C 45 29, 41 27, 41 24 Z" fill="#1a1a1a"/>
+                  <path d="M 59 24 C 55 24, 52 26, 52 29 C 55 29, 59 27, 59 24 Z" fill="#1a1a1a"/>
+                  <circle cx="44" cy="27.5" r="1.8" fill="#ffcc00"/>
+                  <circle cx="56" cy="27.5" r="1.8" fill="#ffcc00"/>
+                  <!-- Pupils (mouse-tracked) -->
+                  <g id="adv-eagle-pupils">
+                    <circle cx="44" cy="27.5" r="1" fill="black"/>
+                    <circle cx="56" cy="27.5" r="1" fill="black"/>
+                    <circle cx="43.5" cy="27" r="0.4" fill="white"/>
+                    <circle cx="55.5" cy="27" r="0.4" fill="white"/>
+                  </g>
+                </g>
+                <!-- Crest feathers -->
+                <path d="M 38 21 L 49 26 L 44 21 Z" fill="#ffffff" style="filter:drop-shadow(0px 2px 1px rgba(0,0,0,0.4))"/>
+                <path d="M 62 21 L 51 26 L 56 21 Z" fill="#ffffff" style="filter:drop-shadow(0px 2px 1px rgba(0,0,0,0.4))"/>
+              </g>
+            </svg>
+            <!-- Online dot -->
+            <div
+              class="hidden sm:flex absolute bottom-2 right-2 w-5 h-5 bg-white rounded-full items-center justify-center z-10 shadow-sm">
+              <span class="relative flex h-2.5 w-2.5"><span
+                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span
+                  class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span></span>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="flex-1 min-w-0 relative z-10">
+            <div class="flex items-start justify-between gap-2 mb-2 sm:mb-1.5">
+              <div
+                class="inline-flex items-center gap-1 px-1.5 py-0.5 sm:gap-1.5 sm:px-2 sm:py-1 bg-sky-100/80 text-sky-700 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.12em] sm:tracking-[0.14em] rounded-lg border border-sky-200/50">
+                <svg width="10" height="10" class="sm:w-3 sm:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2.5">
+                  <path d="M12 20V10M18 20V4M6 20v-4" />
+                </svg>
+                PAGASA Advisor
+              </div>
+              <div id="advisor-status-badge"
+                class="inline-flex shrink-0 items-center gap-1 px-1.5 py-0.5 sm:px-2 bg-amber-50 text-amber-600 text-[8px] sm:text-[10px] font-bold rounded-md border border-amber-200/50 whitespace-nowrap">
+                <span
+                  class="animate-spin inline-block w-2 h-2 sm:w-2.5 sm:h-2.5 border-[1.5px] border-current border-t-transparent rounded-full"></span>
+                Checking...
+              </div>
+            </div>
+            <p id="pagasa-advisor-text"
+              class="text-[12px] sm:text-sm md:text-[15px] text-slate-800 font-bold leading-relaxed">
+              <span id="advisor-loading" class="flex items-center gap-2 text-slate-400">
+                <span class="animate-pulse">Fetching latest weather advisory...</span>
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOS Button -->
+      <div class="flex justify-center my-12 animate-scale" style="animation-delay: 0.2s;">
+        <div class="relative flex items-center justify-center">
+          <!-- Ripple rings -->
+          <div class="absolute w-52 h-52 md:w-80 md:h-80 rounded-full border border-red-500/30 animate-ping-slow"
+            style="animation-duration: 3s;"></div>
+          <div class="absolute w-52 h-52 md:w-80 md:h-80 rounded-full border border-red-500/20 animate-ping-slow"
+            style="animation-duration: 3s; animation-delay: 1.5s;"></div>
+          <div class="absolute w-[184px] h-[184px] md:w-[280px] md:h-[280px] rounded-full bg-red-500/5 animate-pulse"
+            style="animation-duration: 2s;"></div>
+
+          <a href="sos.html"
+            class="relative z-10 w-44 h-44 md:w-64 md:h-64 rounded-full flex flex-col items-center justify-center btn-press no-underline group overflow-hidden shadow-[0_16px_40px_-10px_rgba(220,38,38,0.5),inset_0_-8px_20px_rgba(0,0,0,0.1),inset_0_4px_10px_rgba(255,255,255,0.4)] transition-all hover:shadow-[0_20px_60px_-10px_rgba(220,38,38,0.6),inset_0_-8px_20px_rgba(0,0,0,0.1),inset_0_4px_10px_rgba(255,255,255,0.4)] border-4 border-white">
+            <div
+              class="absolute inset-0 bg-gradient-to-b from-red-400 via-red-500 to-red-700 group-hover:from-red-500 group-hover:via-red-600 group-hover:to-red-800 transition-colors duration-300">
+            </div>
+            <!-- Texture overlay -->
+            <div
+              class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')] opacity-50 mix-blend-overlay">
+            </div>
+            <!-- Inner glow -->
+            <div class="absolute inset-0 rounded-full border-4 border-white/20"></div>
+
+            <svg class="relative z-10 mb-2 transform group-hover:scale-110 transition-transform duration-300" width="44"
+              height="44" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <path d="M12 8v4"></path>
+              <path d="M12 16h.01"></path>
+            </svg>
+            <span
+              class="relative z-10 text-5xl md:text-6xl font-black text-white tracking-[0.1em] drop-shadow-lg leading-none">SOS</span>
+            <span
+              class="relative z-10 text-[10px] md:text-xs text-red-50 font-bold mt-2.5 uppercase tracking-[0.2em] bg-black/20 px-3 py-1 rounded-full backdrop-blur-md border border-white/10">Tap
+              to Activate</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Status Cards -->
+      <div class="px-5 md:px-10 mb-8 animate-slideUp" style="animation-delay: 0.3s;">
+        <div class="flex items-center justify-between mb-4 px-1">
+          <h3 class="text-sm font-extrabold text-slate-800 tracking-tight">At a Glance</h3>
+          <button
+            class="text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md transition-colors">Edit</button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 md:gap-4">
+          <!-- Shelter Card -->
+          <a href="evacuation.html"
+            class="bg-white/90 backdrop-blur-xl rounded-[20px] p-4 border border-slate-100/80 shadow-[0_4px_24px_-8px_rgba(15,23,42,0.06)] card-hover block no-underline relative overflow-hidden group">
+            <div
+              class="absolute top-0 right-0 w-24 h-24 bg-emerald-100/60 rounded-full blur-2xl -mr-10 -mt-10 transition-all duration-500 group-hover:bg-emerald-200/60 group-hover:scale-150">
+            </div>
+            <div class="relative z-10">
+              <div class="flex items-center gap-2 mb-3">
+                <div
+                  class="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-100 to-emerald-50 flex items-center justify-center text-emerald-600 shadow-sm border border-emerald-100/50">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                  </svg>
+                </div>
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Shelter</span>
+              </div>
+              <div class="mt-1">
+                <p class="text-base font-extrabold text-slate-800 truncate">Brgy. Hall</p>
+                <p class="text-[11px] font-bold text-emerald-600 mt-0.5 flex items-center gap-1">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14"></path>
+                    <path d="M12 5l7 7-7 7"></path>
+                  </svg>
+                  1.2 km away
+                </p>
+              </div>
+            </div>
+          </a>
+
+          <!-- Location Card -->
+          <a href="gps.html"
+            class="bg-white/90 backdrop-blur-xl rounded-[20px] p-4 border border-slate-100/80 shadow-[0_4px_24px_-8px_rgba(15,23,42,0.06)] card-hover block no-underline relative overflow-hidden group">
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-indigo-100/40 rounded-full blur-2xl -mr-10 -mt-10 transition-all duration-500 group-hover:bg-indigo-200/40 group-hover:scale-150">
+            </div>
+            <div class="relative z-10">
+              <div class="flex items-center gap-2 mb-3">
+                <div
+                  class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-100 to-indigo-50 flex items-center justify-center text-indigo-600 shadow-sm border border-indigo-100/50">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+                  </svg>
+                </div>
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Location</span>
+              </div>
+              <div class="mt-1">
+                <p id="lat-lng-display" class="text-base font-extrabold text-slate-800 truncate">Locating...</p>
+                <p id="gps-status-label" class="text-[11px] font-bold text-indigo-500 mt-0.5 flex items-center gap-1">
+                  <span class="flex h-1.5 w-1.5 relative"><span
+                      class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span><span
+                      class="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span></span>
+                  GPS Active · Locating...
+                </p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Safety Learning Hub -->
+      <div class="px-5 md:px-10 mb-8 animate-slideUp" style="animation-delay: 0.4s;">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-4 px-1">
+          <div>
+            <h3 class="text-sm font-extrabold text-slate-800 tracking-tight">Safety Learning Hub</h3>
+            <p class="text-[11px] text-slate-400 font-medium mt-0.5">Disaster preparedness tips you should know</p>
+          </div>
+          <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md">Read & Learn</span>
+        </div>
+
+        <!-- Category Tabs — horizontal scroll on mobile -->
+        <div class="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide" id="learnTabs" style="-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+          <button data-tab="flood"      class="learn-tab active-tab shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all">🌊 Flood</button>
+          <button data-tab="typhoon"    class="learn-tab shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all">🌀 Typhoon</button>
+          <button data-tab="earthquake" class="learn-tab shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all">🌍 Earthquake</button>
+          <button data-tab="fire"       class="learn-tab shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all">🔥 Fire</button>
+          <button data-tab="medical"    class="learn-tab shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all">🏥 Medical</button>
+          <button data-tab="gobag"      class="learn-tab shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all">🎒 Go Bag</button>
+        </div>
+
+        <!-- Tips Content -->
+        <div id="learnContent" class="flex flex-col gap-3"></div>
+      </div>
+
+      <style>
+        .learn-tab { background:#f8fafc; color:#64748b; border-color:#e2e8f0; }
+        .learn-tab.active-tab { background:#1D4ED8; color:#fff; border-color:#1D4ED8; }
+        .learn-card { border-radius:20px; background:#fff; border:1.5px solid; padding:16px; display:flex; gap:14px; align-items:flex-start; box-shadow:0 4px 20px -8px rgba(15,23,42,0.08); }
+        @keyframes learnIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        .learn-card { animation: learnIn 0.25s cubic-bezier(0.16,1,0.3,1) both; }
+      </style>
+
+      <script>
+        (function() {
+          const TIPS = {
+            flood: {
+              color: '#0369A1', bg: '#F0F9FF', border: '#BAE6FD',
+              tips: [
+                { icon: '🚨', title: 'Know Your Flood Zone', body: 'Check if your home is in a low-lying or flood-prone area. Ask your LGU for the official hazard map of your barangay.' },
+                { icon: '⬆️', title: 'Move Up, Not Out — First', body: 'When water rises, go to the highest floor of your home first. Only evacuate to a shelter if instructed by authorities or water reaches dangerous levels.' },
+                { icon: '⚡', title: 'Turn Off Electricity', body: 'When flooding starts, turn off the main circuit breaker. Never touch electrical switches or appliances while standing in water.' },
+                { icon: '🚫', title: 'Never Walk in Floodwater', body: 'Just 15 cm of fast-moving water can knock you down. Floodwater often hides open manholes, sharp debris, and live wires.' },
+                { icon: '🧃', title: 'Store Clean Water Now', body: 'Fill containers, pots, and bottles with clean water before the flood hits. Floodwater contaminates water sources quickly.' },
+                { icon: '📱', title: 'Monitor Water Level Alerts', body: 'Follow PAGASA and NDRRMC on social media. Sign up for LGU text alerts. Set a family code word for "evacuate now."' },
+                { icon: '🧹', title: 'After the Flood', body: 'Do not return home until authorities say it is safe. Clean and disinfect all surfaces. Throw out food that touched floodwater — it is contaminated.' },
+                { icon: '🩺', title: 'Watch for Leptospirosis', body: 'Avoid wading in floodwater if you have open wounds. Leptospirosis bacteria thrives in floodwater. Wash exposed skin thoroughly with soap immediately.' },
+              ]
+            },
+            typhoon: {
+              color: '#6D28D9', bg: '#F5F3FF', border: '#DDD6FE',
+              tips: [
+                { icon: '📡', title: 'Understand Signal Numbers', body: 'Signal #1 = 60 km/h winds. Signal #2 = 75 km/h. Signal #3 = 90 km/h. Signal #4 = 120 km/h. Signal #5 = 185+ km/h. Prepare to evacuate at Signal #3.' },
+                { icon: '🏠', title: 'Secure Your Home', body: 'Board up windows, reinforce doors, tie down or bring in outdoor furniture, plants, and anything that can become a projectile in strong winds.' },
+                { icon: '🪟', title: 'Stay Away from Windows', body: 'During the typhoon, stay in an interior room away from windows. Flying glass is one of the most common causes of injury during typhoons.' },
+                { icon: '⚠️', title: 'The Calm Eye is Deceptive', body: 'If the winds suddenly stop — do not go outside. You may be in the eye of the typhoon. Dangerous winds will return from the opposite direction within minutes.' },
+                { icon: '📦', title: 'Prepare 3 Days of Supplies', body: 'Stock canned food, water (4 liters per person per day), medicines, flashlights, batteries, candles, and important documents in a waterproof bag.' },
+                { icon: '🌊', title: 'Storm Surge is the Deadliest', body: 'Storm surge — the wall of ocean water pushed inland — kills more people than wind. If your area is in a storm surge zone, evacuate immediately before the typhoon lands.' },
+                { icon: '🚗', title: 'Evacuate Early', body: 'Do not wait until the typhoon is near. Roads flood and become impassable quickly. Leave when officials issue evacuation orders — do not wait for the last minute.' },
+                { icon: '🔌', title: 'Charge Everything Now', body: 'Charge phones, power banks, and rechargeable lights before the storm. Prepare physical cash — ATMs and card machines may not work after a typhoon.' },
+              ]
+            },
+            earthquake: {
+              color: '#B45309', bg: '#FFFBEB', border: '#FDE68A',
+              tips: [
+                { icon: '⬇️', title: 'Drop, Cover, Hold On', body: 'The moment shaking starts: DROP to hands and knees, COVER your head and neck under a sturdy table or against an interior wall, HOLD ON until shaking stops.' },
+                { icon: '🚪', title: 'Stay Inside During Shaking', body: 'The old advice to stand in a doorway is outdated and dangerous. Stay where you are — running outside risks being hit by falling debris.' },
+                { icon: '📐', title: 'Triangle of Life — Myth', body: 'The "triangle of life" method (crouching beside furniture) is not recommended by experts. Drop, Cover, Hold On is the proven, officially-endorsed method.' },
+                { icon: '🏗️', title: 'After Shaking Stops', body: 'Check yourself for injuries first. Expect aftershocks. Do not use elevators. If indoors and smell gas, open windows, leave, and do not use switches or flames.' },
+                { icon: '🌊', title: 'Tsunami After Earthquake', body: 'If you are near the coast and feel strong shaking — do not wait for an official warning. Move inland or to high ground immediately. A strong quake IS the warning.' },
+                { icon: '📍', title: 'Learn Your Fault Lines', body: 'The Philippines has the West Valley Fault and many others. Ask your LGU if your home is near an active fault line. Proximity greatly increases risk.' },
+                { icon: '🧱', title: 'Identify Safe Spots at Home', body: 'Before a quake happens, identify safe spots in each room: sturdy tables, interior walls away from windows. Discuss this with your family now.' },
+                { icon: '🔦', title: 'Never Use Matches After a Quake', body: 'Gas lines may have ruptured. Always use a flashlight — never an open flame — when checking for damage after an earthquake.' },
+              ]
+            },
+            fire: {
+              color: '#C2410C', bg: '#FFF7ED', border: '#FED7AA',
+              tips: [
+                { icon: '🚨', title: 'Alert Everyone First', body: 'Shout "Fire!" to alert everyone before doing anything else. Every second matters. Make noise — do not assume others know.' },
+                { icon: '🚪', title: 'Feel the Door Before Opening', body: 'Touch the door with the back of your hand before opening it. If it is hot, do not open it — fire is on the other side. Find another exit or seal the gap.' },
+                { icon: '⬇️', title: 'Stay Low in Smoke', body: 'Smoke rises. Crawl on your hands and knees where the air is cleaner — about 30 cm from the floor. Cover your mouth and nose with a wet cloth.' },
+                { icon: '📍', title: 'Know Two Exit Routes', body: 'For every room you regularly use, know at least two ways out. Practice your escape plan with your family twice a year, including at night.' },
+                { icon: '🧯', title: 'Use PASS for Fire Extinguisher', body: 'PULL the pin. AIM at the base of the fire. SQUEEZE the handle slowly. SWEEP side to side. Only use an extinguisher if the fire is small and you have a clear exit behind you.' },
+                { icon: '🏃', title: 'Never Go Back Inside', body: 'Once you are out, stay out. Do not go back for belongings, pets, or people — inform firefighters immediately and let professionals handle the rescue.' },
+                { icon: '📱', title: 'Meet at a Fixed Point', body: 'Choose a fixed meeting spot outside (e.g., the barangay post or a neighbor\'s gate). Call the Bureau of Fire Protection (BFP) at 911 as soon as you are safe.' },
+                { icon: '🕯️', title: 'Top Causes at Home', body: 'Most home fires start from: unattended cooking, candles left near curtains, overloaded extension cords, LPG gas leaks, and electrical short circuits. Address these first.' },
+              ]
+            },
+            medical: {
+              color: '#059669', bg: '#F0FDF4', border: '#A7F3D0',
+              tips: [
+                { icon: '🫀', title: 'CPR — Push Hard and Fast', body: 'If someone is unresponsive and not breathing: call 911, then push down on the center of their chest at least 5 cm deep, 100–120 times per minute. Do not stop until help arrives.' },
+                { icon: '🩸', title: 'Stop Bleeding — Apply Pressure', body: 'Press a clean cloth firmly over the wound and do not lift it. If blood soaks through, add more cloth on top. For limb wounds, a tourniquet 5 cm above the wound may be needed for severe bleeding.' },
+                { icon: '🔥', title: 'Burns — Cool with Water', body: 'Run cool (not cold or icy) water over the burn for at least 20 minutes. Do not apply toothpaste, butter, or ice. Cover loosely with clean cloth. Seek medical care for blisters or large burns.' },
+                { icon: '⚡', title: 'Choking — 5-and-5 Method', body: 'Give 5 firm back blows between the shoulder blades. Then give 5 abdominal thrusts (Heimlich). Alternate until the object is cleared. For infants, use gentle back blows only.' },
+                { icon: '🌡️', title: 'Heat Stroke — Cool Rapidly', body: 'Move the person to shade. Remove excess clothing. Apply cool wet cloths to neck, armpits, and groin. Fan vigorously. Give cool water if conscious. Call emergency immediately.' },
+                { icon: '🐍', title: 'Snake Bite — Immobilize', body: 'Keep the victim still and the bitten limb below heart level. Remove rings and tight clothing near the bite. Do NOT cut, suck, or apply a tourniquet. Get to a hospital with antivenom immediately.' },
+                { icon: '💊', title: 'Build a Home Medicine Kit', body: 'Your kit should have: bandages, antiseptic, oral rehydration salts (ORS), paracetamol, antidiarrheal, antihistamine, scissors, thermometer, and any personal prescription medicines.' },
+                { icon: '📞', title: 'Philippine Emergency Numbers', body: 'National Emergency: 911 | Red Cross: 143 | DOH Hotline: 1555 | PNP: 117 | Bureau of Fire: 911. Save these on every phone in your household now.' },
+              ]
+            },
+            gobag: {
+              color: '#0F766E', bg: '#F0FDFA', border: '#99F6E4',
+              tips: [
+                { icon: '🎒', title: 'What is a Go Bag?', body: 'A Go Bag (evacuation bag) is a pre-packed backpack you can grab in 60 seconds and sustain your family for 72 hours. Every household should have one ready.' },
+                { icon: '💧', title: 'Water — Most Critical Item', body: 'Pack at least 1 liter of water per person per day (3 days = 3 liters minimum). Include water purification tablets as backup. Water is your top priority.' },
+                { icon: '🥫', title: 'Food for 72 Hours', body: 'Pack non-perishable food: canned goods, crackers, energy bars, instant noodles, dried fruit. Include a manual can opener. Rotate stock every 6 months.' },
+                { icon: '📄', title: 'Important Documents', body: 'Keep copies of: birth certificates, PhilHealth/SSS/GSIS cards, land titles, insurance policies, and IDs in a waterproof zip-lock bag. Store digital copies on a USB drive.' },
+                { icon: '💊', title: 'Medicines and First Aid', body: 'Include a 7-day supply of any prescription medicines, basic first aid kit, and extra glasses or contact lenses if needed. Check expiry dates every 6 months.' },
+                { icon: '🔦', title: 'Light, Power, and Tools', body: 'Pack a flashlight with extra batteries (or hand-crank), a power bank (keep it charged), a whistle to signal for help, and a multi-tool or pocket knife.' },
+                { icon: '👕', title: 'Clothing and Warmth', body: 'One change of sturdy clothes and closed-toe shoes per person. A lightweight rain poncho. A warm blanket or emergency mylar blanket. Extra underwear and socks.' },
+                { icon: '📍', title: 'Keep It Accessible', body: 'Store your Go Bag near your front door or under your bed — not in a locked storage room. Every family member should know where it is and be able to carry it out alone.' },
+              ]
+            }
+          };
+
+          const tabButtons = document.querySelectorAll('.learn-tab');
+          const contentEl  = document.getElementById('learnContent');
+          let currentTab   = 'flood';
+
+          const COLORS = {
+            flood:      { active: '#0369A1', ring: 'ring-sky-200' },
+            typhoon:    { active: '#6D28D9', ring: 'ring-violet-200' },
+            earthquake: { active: '#B45309', ring: 'ring-amber-200' },
+            fire:       { active: '#C2410C', ring: 'ring-orange-200' },
+            medical:    { active: '#059669', ring: 'ring-emerald-200' },
+            gobag:      { active: '#0F766E', ring: 'ring-teal-200' },
+          };
+
+          function renderTips(tab) {
+            const { color, bg, border, tips } = TIPS[tab];
+            contentEl.innerHTML = tips.map((t, i) => `
+              <div class="learn-card" style="border-color:${border};background:${bg};animation-delay:${i * 0.04}s">
+                <div class="shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center text-xl" style="background:${color}18">${t.icon}</div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-[13px] font-extrabold mb-1" style="color:${color}">${t.title}</p>
+                  <p class="text-[12px] text-slate-600 leading-relaxed font-medium">${t.body}</p>
+                </div>
+              </div>
+            `).join('');
+          }
+
+          function setActiveTab(tab) {
+            currentTab = tab;
+            tabButtons.forEach(btn => {
+              const isActive = btn.dataset.tab === tab;
+              btn.classList.toggle('active-tab', isActive);
+              if (isActive) {
+                btn.style.background = COLORS[tab].active;
+                btn.style.borderColor = COLORS[tab].active;
+                btn.style.color = '#fff';
+              } else {
+                btn.style.background = '';
+                btn.style.borderColor = '';
+                btn.style.color = '';
+              }
+            });
+            renderTips(tab);
+          }
+
+          tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => setActiveTab(btn.dataset.tab));
+          });
+
+          setActiveTab('flood');
+        })();
+      </script>
+
+      <!-- AI Chat Bot Widget -->
+      <div id="aiChatWidget" class="chat-widget fixed z-[170] flex flex-col items-end gap-3 pointer-events-none">
+        <div id="aiChatWindow"
+          class="pointer-events-none invisible mb-1 flex flex-col overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/95 opacity-0 shadow-[0_30px_70px_-18px_rgba(15,23,42,0.35)] backdrop-blur-xl transition-all duration-300 ease-out origin-bottom-right translate-y-4 scale-[0.98]">
+          <div
+            class="relative overflow-hidden bg-[linear-gradient(135deg,#4F46E5_0%,#4338CA_58%,#2563EB_100%)] px-3 py-2.5 text-white">
+            <div class="absolute -right-6 -top-8 h-20 w-20 rounded-full bg-white/10 blur-2xl"></div>
+            <div class="absolute inset-x-0 bottom-0 h-px bg-white/15"></div>
+            <div class="relative flex items-center justify-between gap-2">
+              <div class="flex min-w-0 items-center gap-2.5">
+                <div
+                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-white/15 backdrop-blur">
+                  <img src="../Images/ARPLOGO.png" alt="ARPS logo" class="h-5 w-5 object-contain drop-shadow-sm">
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2">
+                    <h3 class="truncate text-[13px] font-black tracking-tight leading-none">ARPS Assistant</h3>
+                    <span class="flex items-center gap-1"><span
+                        class="h-1.5 w-1.5 rounded-full bg-emerald-300"></span><span
+                        class="text-[9px] font-semibold text-emerald-200">Online</span></span>
+                  </div>
+                  <p class="mt-0.5 text-[10px] text-indigo-200/80 font-medium">Disaster preparedness & emergency help
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-1">
+                <button id="clearChatBtn" type="button"
+                  class="flex h-7 w-7 items-center justify-center rounded-lg text-indigo-200 transition-colors hover:bg-white/15 hover:text-white"
+                  title="Clear Chat">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                      d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" />
+                  </svg>
+                </button>
+                <button id="closeChatBtn" type="button"
+                  class="flex h-7 w-7 items-center justify-center rounded-lg text-indigo-200 transition-colors hover:bg-white/15 hover:text-white"
+                  title="Close Chat">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="aiChatMessages"
+            class="flex flex-1 flex-col gap-4 overflow-y-auto bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.08),_transparent_35%),linear-gradient(180deg,#F8FAFC_0%,#EEF2FF_100%)] px-4 py-4"
+            aria-live="polite"></div>
+
+          <!-- Image preview bar -->
+          <div id="imagePreviewBar" class="hidden border-t border-slate-100 bg-slate-50/80 px-3 py-2">
+            <div class="flex items-center gap-2">
+              <div class="relative">
+                <img id="imagePreviewThumb" src="" alt="Preview"
+                  class="h-14 w-14 rounded-xl object-cover border border-slate-200 shadow-sm">
+                <button id="removeImageBtn" type="button"
+                  class="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white shadow-md hover:bg-red-600 transition-colors"
+                  title="Remove image">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-[11px] font-bold text-slate-600 truncate" id="imageFileName">photo.jpg</p>
+                <p class="text-[10px] text-slate-400 font-medium">AI will analyze this image</p>
+              </div>
+            </div>
+          </div>
+          <div class="border-t border-slate-200/80 bg-white/95 px-3 py-2.5">
+            <form id="aiChatForm" class="relative flex items-end gap-2">
+              <input type="file" id="imageUploadInput" accept="image/*" capture="environment" class="hidden">
+              <button id="imageUploadBtn" type="button"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-500 transition-all hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-600 btn-press"
+                title="Upload or take a photo">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+              </button>
+              <div class="relative flex-1">
+                <textarea id="aiChatInput" rows="1" placeholder="Ask about disasters, upload a photo..."
+                  class="w-full resize-none overflow-hidden rounded-[18px] border border-slate-200 bg-slate-100/90 py-2.5 pl-3.5 pr-12 text-[13px] text-slate-800 outline-none transition-all focus:border-indigo-300 focus:bg-white focus:ring-4 focus:ring-indigo-100"
+                  style="min-height:44px; max-height:100px;"></textarea>
+                <button type="submit"
+                  class="absolute bottom-1 right-1.5 flex h-9 w-9 items-center justify-center rounded-full bg-[linear-gradient(135deg,#4F46E5_0%,#2563EB_100%)] text-white shadow-[0_8px_16px_rgba(79,70,229,0.3)] transition-transform hover:scale-105 btn-press">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <button id="aiChatToggleBtn" type="button" aria-expanded="false" aria-controls="aiChatWindow"
+          aria-label="Toggle ARPS Assistant chat"
+          class="pointer-events-auto group relative flex h-14 w-14 items-center justify-center rounded-full bg-[linear-gradient(135deg,#4F46E5_0%,#2563EB_100%)] text-white shadow-[0_12px_28px_rgba(79,70,229,0.35)] transition-all hover:scale-105 hover:shadow-[0_14px_34px_rgba(79,70,229,0.42)] btn-press">
+          <span
+            class="absolute inset-0 rounded-full bg-indigo-400/20 blur-xl opacity-80 transition-opacity duration-300 group-hover:opacity-100"></span>
+          <div class="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-400"></div>
+          <span
+            class="relative flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/12 backdrop-blur-sm transition-transform duration-300 group-hover:scale-105">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              <path d="M8.5 9.5h7"></path>
+              <path d="M8.5 13h4.5"></path>
+            </svg>
+          </span>
+        </button>
+      </div>
+
+    </div>
+    <nav class="bottom-nav">
+      <div class="bottom-nav-brand">
+        <img src="../Images/ARPLOGO.png" alt="ARPS logo">
+        <div class="bottom-nav-brand-copy">
+          <strong>ARPS</strong>
+          <span>Response System</span>
+        </div>
+      </div>
+      <a href="home.html" class="nav-item active"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
+        </svg><span>Home</span></a>
+      <a href="report.html" class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg><span>Report</span></a>
+      <a href="sos.html" class="sos-nav-center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <path d="M12 8v4" />
+          <path d="M12 16h.01" />
+        </svg><span>SOS</span></a>
+      <a href="evacuation.html" class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg><span>Centers</span></a>
+      <a href="settings.html" class="nav-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+        </svg><span>Settings</span></a>
+    </nav>
+  </div>
+
+  <script>
+    // Menu toggle
+    const menuBtn = document.getElementById('menuBtn');
+    const menuDrop = document.getElementById('menuDropdown');
+
+    function openMenu() {
+      menuDrop.classList.remove('hidden');
+      document.body.classList.add('dropdown-open');
+    }
+
+    function closeMenu() {
+      menuDrop.classList.add('hidden');
+      document.body.classList.remove('dropdown-open');
+    }
+
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (menuDrop.classList.contains('hidden')) {
+        openMenu();
+      } else {
+        closeMenu();
+      }
+    });
+    menuDrop.addEventListener('click', (e) => {
+      if (!e.target.closest('.menu-sheet')) {
+        closeMenu();
+        return;
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
+    });
+
+    // ── Fast GPS + Reverse Geocode for real location name ──
+    (function initLocationDisplay() {
+      const latLngEl = document.getElementById('lat-lng-display');
+      const locationSubEl = document.getElementById('gps-status-label');
+      const headerLocationTextEl = document.getElementById('header-location-text');
+
+      async function reverseGeocode(lat, lng) {
+        function timedFetch(url, opts, ms) {
+          const ctrl = new AbortController();
+          const t = setTimeout(() => ctrl.abort(), ms);
+          return fetch(url, { ...opts, signal: ctrl.signal }).finally(() => clearTimeout(t));
+        }
+
+        function makeResult(parts, municipality, province) {
+          const label = parts.join(', ');
+          return {
+            short: label,
+            full: label,
+            city: municipality || parts[0] || null,
+            province: province || null,
+          };
+        }
+
+        // 1) Try Photon geocoder (OSM-powered, has barangay data, no strict rate limit)
+        try {
+          const res = await timedFetch(
+            `https://photon.komoot.io/reverse?lat=${lat}&lon=${lng}&lang=en`,
+            {}, 5000
+          );
+          if (res.ok) {
+            const data = await res.json();
+            const props = data.features?.[0]?.properties || {};
+            const barangay = props.district || props.locality || null;
+            const municipality = props.city || props.county || null;
+            const province = props.state || null;
+            const parts = [];
+            if (barangay) parts.push(barangay);
+            if (municipality && municipality !== barangay) parts.push(municipality);
+            if (province && province !== municipality && !province.includes('Region')) parts.push(province);
+            if (parts.length > 0) return makeResult(parts, municipality, province);
+          }
+        } catch { }
+
+        // 2) Try Nominatim (has barangay in 'village' field)
+        try {
+          const res = await timedFetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=en`,
+            { headers: { 'User-Agent': 'ARPS-EmergencyApp/1.0' } }, 6000
+          );
+          if (res.ok) {
+            const data = await res.json();
+            const a = data.address || {};
+            const barangay = a.village || a.suburb || a.hamlet || a.quarter || a.neighbourhood || null;
+            const municipality = a.city || a.municipality || a.town || a.city_district || null;
+            const province = a.county || a.province || a.state_district || null;
+            const parts = [];
+            if (barangay) parts.push(barangay);
+            if (municipality && municipality !== barangay) parts.push(municipality);
+            if (province && province !== municipality) parts.push(province);
+            if (parts.length > 0) return makeResult(parts, municipality, province);
+            if (data.display_name) {
+              const fallback = data.display_name.split(',').slice(0, 3).join(',').trim();
+              return { short: fallback, full: data.display_name, city: null, province: null };
+            }
+          }
+        } catch { }
+
+        // 3) Fallback: BigDataCloud (no barangay data but has municipality + province)
+        try {
+          const res = await timedFetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`,
+            {}, 6000
+          );
+          if (res.ok) {
+            const data = await res.json();
+            const adminList = data.localityInfo?.administrative || [];
+            const muniEntry = adminList.find(l =>
+              (l.description || '').toLowerCase().includes('municipality') ||
+              (l.description || '').toLowerCase().includes('city') ||
+              l.adminLevel === 6
+            );
+            // Province = adminLevel 4 ONLY (adminLevel 3 is region)
+            const provEntry = adminList.find(l => l.adminLevel === 4);
+            const municipality = muniEntry?.name || data.city || null;
+            const province = provEntry?.name || null;
+            const parts = [];
+            if (municipality) parts.push(municipality);
+            if (province && province !== municipality) parts.push(province);
+            if (parts.length > 0) return makeResult(parts, municipality, province);
+          }
+        } catch { }
+
+        return null;
+      }
+
+      function setStatusLabel(text) {
+        if (!locationSubEl) return;
+        locationSubEl.innerHTML = '<span class="flex h-1.5 w-1.5 relative"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span><span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span></span>' + text;
+      }
+
+      const GEOCODE_CACHE_KEY = 'arps_last_geocode';
+      localStorage.removeItem(GEOCODE_CACHE_KEY);
+      localStorage.removeItem('arps_location_name');
+      function saveGeocodeCache(place) {
+        try {
+          localStorage.setItem(GEOCODE_CACHE_KEY, JSON.stringify({
+            label: place.short,
+            city: place.city,
+            province: place.province,
+            ts: Date.now(),
+          }));
+        } catch { }
+      }
+
+      function loadGeocodeCache() {
+        try { return JSON.parse(localStorage.getItem(GEOCODE_CACHE_KEY) || 'null'); } catch { return null; }
+      }
+
+      function updateDisplay(lat, lng, place, accuracy) {
+        if (place) {
+          if (latLngEl) latLngEl.textContent = place.short;
+          const accLabel = accuracy ? ` · ±${Math.round(accuracy)}m` : '';
+          setStatusLabel('GPS Active' + accLabel);
+          const headerPlace = [place.city, place.province].filter(Boolean).join(', ');
+          if (headerPlace && headerLocationTextEl) {
+            headerLocationTextEl.textContent = headerPlace;
+          }
+          saveGeocodeCache(place);
+          // Save place name as simple string for offline SOS
+          localStorage.setItem('arps_location_name', place.short);
+        } else {
+          // Never show coordinates — retry geocode after delay
+          if (latLngEl) latLngEl.textContent = 'Resolving address...';
+          setTimeout(async () => {
+            const retryPlace = await reverseGeocode(lat, lng);
+            if (retryPlace) {
+              updateDisplay(lat, lng, retryPlace, accuracy);
+            } else {
+              if (latLngEl) latLngEl.textContent = 'Location detected';
+              setStatusLabel('GPS Active');
+            }
+          }, 3000);
+        }
+      }
+
+      // Show cached address immediately if offline
+      if (!navigator.onLine) {
+        const cached = loadGeocodeCache();
+        if (cached) {
+          if (latLngEl) latLngEl.textContent = cached.label;
+          const headerPlace = [cached.city, cached.province].filter(Boolean).join(', ');
+          if (headerPlace && headerLocationTextEl) headerLocationTextEl.textContent = headerPlace;
+          setStatusLabel('Offline \u2014 last known location');
+        } else {
+          if (latLngEl) latLngEl.textContent = 'Offline';
+          setStatusLabel('No connection');
+        }
+        return;
+      }
+
+      if (navigator.geolocation) {
+        // Quick fix (cached/low accuracy)
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            const { latitude: lat, longitude: lng, accuracy } = pos.coords;
+            // Cache location for SOS fallback when Chrome blocks location on phone
+            try { localStorage.setItem('arps_last_location', JSON.stringify({ lat, lng, accuracy, ts: Date.now() })); } catch { }
+            if (latLngEl) latLngEl.textContent = 'Resolving address...';
+            setStatusLabel('GPS Active · Resolving...');
+            const place = await reverseGeocode(lat, lng);
+            updateDisplay(lat, lng, place, accuracy);
+          },
+          () => {
+            if (latLngEl) latLngEl.textContent = 'Location unavailable';
+            setStatusLabel('GPS Denied or Unavailable');
+          },
+          { enableHighAccuracy: false, timeout: 3000, maximumAge: 60000 }
+        );
+
+        // Then high-accuracy fix to refine
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            const { latitude: lat, longitude: lng, accuracy } = pos.coords;
+            const place = await reverseGeocode(lat, lng);
+            updateDisplay(lat, lng, place, accuracy);
+          },
+          () => { },
+          { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }
+        );
+      } else {
+        if (latLngEl) latLngEl.textContent = 'GPS not supported';
+        setStatusLabel('Not available');
+      }
+    })();
+
+    // ── Live Weather from Open-Meteo using user GPS ──
+    (function initWeather() {
+      const tempEl = document.getElementById('weather-temp');
+      const descEl = document.getElementById('weather-desc');
+      const iconEl = document.getElementById('weather-icon');
+
+      let advisorReady = false;
+
+      function setAdvisorStatus(type, text) {
+        const badge = document.getElementById('advisor-status-badge');
+        if (!badge) return;
+        if (type === 'live') {
+          badge.className = 'inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[9px] font-bold rounded-md border border-emerald-200/50';
+          badge.innerHTML = '<span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span> Live';
+        } else if (type === 'warning') {
+          badge.className = 'inline-flex items-center gap-1 px-2 py-0.5 bg-red-50 text-red-600 text-[9px] font-bold rounded-md border border-red-200/50 animate-pulse';
+          badge.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 9v4m0 4h.01M12 2L2 22h20L12 2z"/></svg> ' + text;
+        } else if (type === 'error') {
+          badge.className = 'inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 text-slate-500 text-[9px] font-bold rounded-md border border-slate-200/50';
+          badge.innerHTML = 'Offline';
+        } else {
+          badge.className = 'inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-600 text-[9px] font-bold rounded-md border border-amber-200/50';
+          badge.innerHTML = '<span class="animate-spin inline-block w-2.5 h-2.5 border-[1.5px] border-current border-t-transparent rounded-full"></span> Checking...';
+        }
+      }
+
+      // WMO weather code to description and icon
+      function weatherFromCode(code) {
+        const map = {
+          0: { desc: 'Clear Sky', icon: '☀️' },
+          1: { desc: 'Mostly Clear', icon: '🌤️' },
+          2: { desc: 'Partly Cloudy', icon: '⛅' },
+          3: { desc: 'Overcast', icon: '☁️' },
+          45: { desc: 'Foggy', icon: '🌫️' },
+          48: { desc: 'Icy Fog', icon: '🌫️' },
+          51: { desc: 'Light Drizzle', icon: '🌦️' },
+          53: { desc: 'Drizzle', icon: '🌦️' },
+          55: { desc: 'Heavy Drizzle', icon: '🌧️' },
+          61: { desc: 'Light Rain', icon: '🌦️' },
+          63: { desc: 'Rain', icon: '🌧️' },
+          65: { desc: 'Heavy Rain', icon: '🌧️' },
+          71: { desc: 'Light Snow', icon: '🌨️' },
+          73: { desc: 'Snow', icon: '🌨️' },
+          75: { desc: 'Heavy Snow', icon: '❄️' },
+          80: { desc: 'Rain Showers', icon: '🌦️' },
+          81: { desc: 'Mod. Showers', icon: '🌧️' },
+          82: { desc: 'Heavy Showers', icon: '🌧️' },
+          95: { desc: 'Thunderstorm', icon: '⛈️' },
+          96: { desc: 'Thunderstorm', icon: '⛈️' },
+          99: { desc: 'Severe Storm', icon: '⛈️' },
+        };
+        return map[code] || { desc: 'Unknown', icon: '🌡️' };
+      }
+
+      let cachedNews = null;
+      let lastNewsFetch = 0;
+
+      // Keywords for Antique province and surrounding region
+      const ANTIQUE_KEYWORDS = ['antique', 'western visayas', 'region vi', 'region 6', 'panay', 'san jose de buenavista', 'culasi', 'tibiao', 'hamtic', 'sibalom', 'pandan', 'bugasong', 'valderrama', 'barbaza', 'belison', 'caluya', 'libertad', 'laua-an', 'patnongon', 'sebaste', 'tobias fornier'];
+
+      function isAntiquerelevant(title) {
+        const lower = title.toLowerCase();
+        return ANTIQUE_KEYWORDS.some(k => lower.includes(k));
+      }
+
+      function isNationalDisaster(title) {
+        const lower = title.toLowerCase();
+        return /typhoon|bagyo|tropical storm|cyclone|earthquake|lindol|tsunami|eruption|erupting|flood|baha/.test(lower);
+      }
+
+      async function fetchPhilippineNews() {
+        // Cache news for 5 minutes to avoid rate limits and speed up subsequent polling
+        if (cachedNews && Date.now() - lastNewsFetch < 300000) return cachedNews;
+
+        try {
+          const [rwRes, gdacsRes] = await Promise.all([
+            fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Freliefweb.int%2Fupdates%2Frss.xml%3Fprimary_country%3D188'),
+            fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.gdacs.org%2Fxml%2Frss.xml')
+          ]);
+          const [rwData, gdacsData] = await Promise.all([rwRes.json(), gdacsRes.json()]);
+
+          let allItems = [];
+          if (gdacsData.items) allItems = [...allItems, ...gdacsData.items.filter(i => i.title.includes('Philippines')).map(i => i.title)];
+          if (rwData.items) allItems = [...allItems, ...rwData.items.map(i => i.title)];
+
+          // Prefer Antique-specific headlines, fall back to national disaster news
+          const antiqueHeadlines = allItems.filter(isAntiquerelevant);
+          const disasterHeadlines = allItems.filter(t => !isAntiquerelevant(t) && isNationalDisaster(t));
+          const combined = [...antiqueHeadlines, ...disasterHeadlines].slice(0, 4);
+
+          cachedNews = combined.join('; ') || "No recent alerts for Antique";
+          lastNewsFetch = Date.now();
+          return cachedNews;
+        } catch (e) {
+          return cachedNews || "No recent alerts for Antique";
+        }
+      }
+
+      async function fetchWeather(lat, lng) {
+        try {
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m&timezone=auto`;
+
+          // Fetch weather and news in parallel to drastically reduce waiting time
+          const [res, newsContext] = await Promise.all([
+            fetch(url),
+            fetchPhilippineNews()
+          ]);
+
+          if (!res.ok) throw new Error('Weather fetch failed');
+          const data = await res.json();
+          const current = data.current;
+
+          const temp = Math.round(current.temperature_2m);
+          const code = current.weather_code;
+          const weather = weatherFromCode(code);
+
+          if (tempEl) tempEl.textContent = temp + '°';
+          if (descEl) descEl.textContent = weather.desc;
+          if (iconEl) iconEl.textContent = weather.icon;
+          iconEl.style.fontSize = '20px';
+
+          generateAdvisorMessage(temp, weather.desc, current.wind_speed_10m, current.relative_humidity_2m, newsContext);
+        } catch {
+          if (tempEl) tempEl.textContent = '--°';
+          if (descEl) descEl.textContent = 'Unavailable';
+          // Still show advisor with offline message
+          const advisorEl = document.getElementById('pagasa-advisor-text');
+          if (advisorEl && !advisorReady) {
+            advisorEl.innerHTML = 'Weather data unavailable. Stay alert sa Antique at monitor PAGASA updates. Prepare your Go Bag just in case.';
+            setAdvisorStatus('error');
+            advisorReady = true;
+          }
+        }
+      }
+
+      async function callGroqChat(payload) {
+        if (!window.arpsGroqChatCallablePromise) {
+          window.arpsGroqChatCallablePromise = Promise.all([
+            import('https://www.gstatic.com/firebasejs/10.12.5/firebase-functions.js'),
+            import('../firebase-config.js')
+          ]).then(([functionsModule, firebaseModule]) => {
+            const functions = functionsModule.getFunctions(firebaseModule.app, 'us-central1');
+            return functionsModule.httpsCallable(functions, 'groqChat');
+          });
+        }
+
+        const groqChat = await window.arpsGroqChatCallablePromise;
+        const result = await groqChat(payload);
+        return result.data;
+      }
+
+      async function generateAdvisorMessage(temp, desc, wind, humidity, newsContext) {
+        const advisorEl = document.getElementById('pagasa-advisor-text');
+        if (!advisorEl) return;
+
+        // Detect if news mentions active typhoon/disaster
+        const newsLower = (newsContext || '').toLowerCase();
+        const hasTyphoon = /typhoon|bagyo|tropical storm|cyclone|signal/.test(newsLower);
+        const hasFlood = /flood|baha|rising water/.test(newsLower);
+        const hasEarthquake = /earthquake|lindol|quake/.test(newsLower);
+        const hasDisaster = hasTyphoon || hasFlood || hasEarthquake;
+
+        // Update badge based on news
+        if (hasDisaster) {
+          const label = hasTyphoon ? 'Typhoon Alert' : hasFlood ? 'Flood Alert' : 'Quake Alert';
+          setAdvisorStatus('warning', label);
+        }
+
+        try {
+          const prompt = `You are a PAGASA Weather Advisor for the Province of Antique, Western Visayas, Philippines.
+
+Current local weather in Antique: ${temp}°C, ${desc}, wind ${wind} km/h, humidity ${humidity}%.
+RECENT ANTIQUE/WESTERN VISAYAS ALERTS: "${newsContext}"
+
+Based on the alerts AND weather:
+- If there's an active typhoon, flood, earthquake, or disaster affecting Antique or Western Visayas — give an URGENT warning with what to do NOW
+- If weather is bad (heavy rain, storm) — warn about potential flooding or danger specific to Antique
+- If calm — give practical preparedness advice for Antique residents
+
+Give a clear, direct advisory in 1-2 sentences. Max 30 words. Taglish OK. No hashtags. Mention Antique or Western Visayas if relevant.`;
+
+          const data = await callGroqChat({
+            model: 'llama-3.3-70b-versatile',
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.6,
+            max_tokens: 80
+          });
+          if (data.choices && data.choices.length > 0) {
+            let msg = data.choices[0].message.content.trim();
+            if (msg.startsWith('"') && msg.endsWith('"')) { msg = msg.substring(1, msg.length - 1); }
+            advisorEl.innerHTML = msg;
+            if (!hasDisaster) setAdvisorStatus('live');
+            advisorReady = true;
+          } else {
+            throw new Error('No response');
+          }
+        } catch (e) {
+          // Fallback: show weather-based advice directly without AI
+          let fallbackMsg = '';
+          if (hasDisaster) {
+            if (hasTyphoon) fallbackMsg = 'May active na typhoon advisory sa Antique/Western Visayas. Secure your home, prepare Go Bag, at monitor PAGASA updates. Evacuate kung nasa danger zone ka.';
+            else if (hasFlood) fallbackMsg = 'Flood alert sa Antique. Iwasan ang flooded roads, move to higher ground kung kinakailangan. Stay safe!';
+            else fallbackMsg = 'May disaster advisory para sa Antique. Stay alert, prepare emergency kit, at sundin ang LGU instructions.';
+          } else if (wind > 40) {
+            fallbackMsg = `Strong winds sa Antique (${Math.round(wind)} km/h). Secure outdoor items at mag-ingat sa labas. Monitor PAGASA updates.`;
+          } else if ([63, 65, 80, 81, 82, 95, 96, 99].includes(parseInt(desc))) {
+            fallbackMsg = `Heavy rain sa Antique — ${desc}. Posibleng mag-flood sa mababang lugar. Iwasan ang risky areas at prepare your Go Bag.`;
+          } else if (temp > 35) {
+            fallbackMsg = `Mainit ngayon sa Antique (${temp}°C). Hydrate often, avoid prolonged sun exposure. Keep emergency water supply ready.`;
+          } else {
+            fallbackMsg = `Weather sa Antique: ${temp}°C, ${desc}. Good time to check your emergency kit and review your family evacuation plan.`;
+          }
+          advisorEl.innerHTML = fallbackMsg;
+          if (!hasDisaster) setAdvisorStatus('live');
+          advisorReady = true;
+        }
+      }
+
+      function initWeatherCycle() {
+        const fallbackLat = 14.5995; // Manila, Philippines fallback
+        const fallbackLng = 120.9842;
+
+        const updateWeather = () => {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+              () => {
+                // Fallback to Manila if GPS fails/denied
+                fetchWeather(fallbackLat, fallbackLng);
+              },
+              { enableHighAccuracy: false, timeout: 5000, maximumAge: 10000 }
+            );
+          } else {
+
+            fetchWeather(fallbackLat, fallbackLng);
+          }
+        };
+
+        updateWeather();
+        setInterval(updateWeather, 10000);
+      }
+
+      initWeatherCycle();
+    })();
+
+    // Home nav stays fixed with safe-area spacing only to avoid scroll-linked jumps on mobile.
+
+    // ── AI Chat Bot Logic ──
+    (function initAIChat() {
+      const homePageShell = document.querySelector('.home-page');
+      const toggleBtn = document.getElementById('aiChatToggleBtn');
+      const chatWindow = document.getElementById('aiChatWindow');
+      const closeBtn = document.getElementById('closeChatBtn');
+      const clearBtn = document.getElementById('clearChatBtn');
+      const chatForm = document.getElementById('aiChatForm');
+      const chatInput = document.getElementById('aiChatInput');
+      const messagesContainer = document.getElementById('aiChatMessages');
+      const unreadDot = toggleBtn.querySelector('.bg-emerald-400');
+
+      let chatHistory = [];
+      let pendingImage = null; // { base64, fileName, dataUrl }
+
+      const assistantIcon = `<img src="../Images/ARPLOGO.png" alt="ARPS logo" class="h-5 w-5 object-contain">`;
+      const defaultAssistantText = "I'm ARPS Assistant — your all-in-one disaster preparedness AI. I can help with typhoons, floods, earthquakes, fire, landslides, and all emergency situations. Upload a photo and I'll analyze it. If you're in danger, tap SOS now!";
+      const quickPrompts = [
+        { label: 'Typhoon prep', prompt: 'How do I prepare for an incoming typhoon?' },
+        { label: 'Flood safety', prompt: 'Give me quick steps to stay safe during a flood.' },
+        { label: 'Earthquake drill', prompt: 'What should I do during an earthquake?' },
+        { label: 'Emergency kit', prompt: 'What should be in my emergency Go Bag?' }
+      ];
+
+      function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+
+      function isChatOpen() {
+        return chatWindow.classList.contains('opacity-100');
+      }
+
+      function setKeyboardOpen(isOpen) {
+        if (!homePageShell) return;
+        homePageShell.classList.toggle('keyboard-open', !!isOpen);
+      }
+
+      function isMobileViewport() {
+        return window.innerWidth < 768;
+      }
+
+      function syncKeyboardState() {
+        if (!isMobileViewport()) {
+          setKeyboardOpen(false);
+          return;
+        }
+
+        const activeInChat = document.activeElement === chatInput;
+        let keyboardVisible = activeInChat;
+
+        if (window.visualViewport) {
+          const heightGap = window.innerHeight - window.visualViewport.height;
+          keyboardVisible = activeInChat && heightGap > 140;
+        }
+
+        setKeyboardOpen(keyboardVisible);
+      }
+
+      function setChatOpen(isOpen) {
+        chatWindow.classList.toggle('pointer-events-auto', isOpen);
+        chatWindow.classList.toggle('visible', isOpen);
+        chatWindow.classList.toggle('opacity-100', isOpen);
+        chatWindow.classList.toggle('translate-y-0', isOpen);
+        chatWindow.classList.toggle('scale-100', isOpen);
+
+        chatWindow.classList.toggle('pointer-events-none', !isOpen);
+        chatWindow.classList.toggle('invisible', !isOpen);
+        chatWindow.classList.toggle('opacity-0', !isOpen);
+        chatWindow.classList.toggle('translate-y-4', !isOpen);
+        chatWindow.classList.toggle('scale-[0.98]', !isOpen);
+
+        toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        if (isOpen) {
+          if (typeof closeMenu === 'function' && menuDrop && !menuDrop.classList.contains('hidden')) {
+            closeMenu();
+          }
+          chatInput.focus();
+          if (unreadDot) unreadDot.classList.add('hidden');
+        } else {
+          setKeyboardOpen(false);
+        }
+      }
+
+      function createAssistantAvatar() {
+        const avatar = document.createElement('div');
+        avatar.className = 'mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl border border-indigo-100 bg-white shadow-sm';
+        avatar.innerHTML = assistantIcon;
+        return avatar;
+      }
+
+      function formatAIText(text) {
+        // Convert numbered lists, bullet points, and newlines to HTML
+        let html = text
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/^\s*(\d+)\.\s+(.+)$/gm, '<div style="display:flex;gap:6px;margin:3px 0"><span style="font-weight:700;color:#4F46E5;flex-shrink:0">$1.</span><span>$2</span></div>')
+          .replace(/^\s*[-•]\s+(.+)$/gm, '<div style="display:flex;gap:6px;margin:2px 0"><span style="color:#4F46E5">•</span><span>$1</span></div>')
+          .replace(/\n/g, '<br>');
+        return html;
+      }
+
+      function createMessageElement(text, role) {
+        const messageRow = document.createElement('div');
+        messageRow.className = role === 'user' ? 'flex self-end' : 'flex gap-2.5 self-start';
+
+        if (role !== 'user') {
+          messageRow.appendChild(createAssistantAvatar());
+        }
+
+        const bubble = document.createElement('div');
+        bubble.className = role === 'user'
+          ? 'max-w-[80%] rounded-[22px] rounded-br-md bg-[linear-gradient(135deg,#4F46E5_0%,#4338CA_55%,#2563EB_100%)] px-4 py-3 text-[14px] font-medium leading-relaxed text-white shadow-[0_12px_24px_-12px_rgba(79,70,229,0.8)] sm:max-w-[78%]'
+          : 'max-w-[84%] rounded-[22px] rounded-tl-md border border-slate-200 bg-white/95 px-4 py-3 text-[14px] leading-relaxed text-slate-700 shadow-sm sm:max-w-[82%]';
+
+        if (role === 'user') {
+          bubble.textContent = text;
+        } else {
+          bubble.innerHTML = formatAIText(text);
+        }
+
+        messageRow.appendChild(bubble);
+        return messageRow;
+      }
+
+      function createQuickActions() {
+        const actionRow = document.createElement('div');
+        actionRow.className = 'chat-quick-actions';
+
+        quickPrompts.forEach(({ label, prompt }) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'chat-quick-action';
+          button.textContent = label;
+          button.addEventListener('click', () => {
+            setChatOpen(true);
+            submitMessage(prompt);
+          });
+          actionRow.appendChild(button);
+        });
+
+        return actionRow;
+      }
+
+      function removeQuickActions() {
+        const quickActionRow = messagesContainer.querySelector('.chat-quick-actions');
+        if (quickActionRow) quickActionRow.remove();
+      }
+
+      function setDefaultConversation() {
+        messagesContainer.innerHTML = '';
+        messagesContainer.appendChild(createMessageElement(defaultAssistantText, 'assistant'));
+        messagesContainer.appendChild(createQuickActions());
+        scrollToBottom();
+      }
+
+      function toggleChat() {
+        setChatOpen(!isChatOpen());
+      }
+
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleChat();
+      });
+      closeBtn.addEventListener('click', () => setChatOpen(false));
+      chatWindow.addEventListener('click', (e) => e.stopPropagation());
+      document.addEventListener('click', (e) => {
+        if (isChatOpen() && !e.target.closest('#aiChatWidget')) {
+          setChatOpen(false);
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isChatOpen()) setChatOpen(false);
+      });
+
+      clearBtn.addEventListener('click', () => {
+        chatHistory = [];
+        setDefaultConversation();
+      });
+
+      // ── Image Upload Handling ──
+      const imageUploadBtn = document.getElementById('imageUploadBtn');
+      const imageUploadInput = document.getElementById('imageUploadInput');
+      const imagePreviewBar = document.getElementById('imagePreviewBar');
+      const imagePreviewThumb = document.getElementById('imagePreviewThumb');
+      const imageFileName = document.getElementById('imageFileName');
+      const removeImageBtn = document.getElementById('removeImageBtn');
+
+      imageUploadBtn.addEventListener('click', () => imageUploadInput.click());
+
+      imageUploadInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) return;
+        // Max 4MB
+        if (file.size > 10 * 1024 * 1024) {
+          alert('Image must be under 10MB');
+          imageUploadInput.value = '';
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const dataUrl = ev.target.result;
+          const base64 = dataUrl.split(',')[1];
+          pendingImage = { base64, fileName: file.name, dataUrl };
+          imagePreviewThumb.src = dataUrl;
+          imageFileName.textContent = file.name;
+          imagePreviewBar.classList.remove('hidden');
+          chatInput.placeholder = 'Describe what you see or just send...';
+          chatInput.focus();
+        };
+        reader.readAsDataURL(file);
+        imageUploadInput.value = '';
+      });
+
+      removeImageBtn.addEventListener('click', () => {
+        pendingImage = null;
+        imagePreviewBar.classList.add('hidden');
+        chatInput.placeholder = 'Ask about disasters, upload a photo...';
+      });
+
+      chatInput.addEventListener('focus', () => {
+        setTimeout(syncKeyboardState, 60);
+      });
+      chatInput.addEventListener('blur', () => {
+        setTimeout(syncKeyboardState, 120);
+      });
+      window.addEventListener('resize', syncKeyboardState);
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', syncKeyboardState);
+      }
+
+      // Auto-resize textarea
+      chatInput.addEventListener('input', function () {
+        this.style.height = '44px';
+        this.style.height = (this.scrollHeight) + 'px';
+      });
+      chatInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          chatForm.dispatchEvent(new Event('submit'));
+        }
+      });
+
+      function addMessage(text, isUser, imageDataUrl) {
+        if (imageDataUrl && isUser) {
+          // Create image message
+          const imgRow = document.createElement('div');
+          imgRow.className = 'flex self-end';
+          const imgBubble = document.createElement('div');
+          imgBubble.className = 'max-w-[80%] sm:max-w-[78%] rounded-[22px] rounded-br-md overflow-hidden shadow-[0_12px_24px_-12px_rgba(79,70,229,0.5)] border border-indigo-200/50';
+          const img = document.createElement('img');
+          img.src = imageDataUrl;
+          img.alt = 'Uploaded photo';
+          img.className = 'w-full max-h-48 object-cover';
+          imgBubble.appendChild(img);
+          if (text) {
+            const caption = document.createElement('div');
+            caption.className = 'bg-[linear-gradient(135deg,#4F46E5_0%,#4338CA_55%,#2563EB_100%)] px-4 py-2 text-[13px] font-medium text-white';
+            caption.textContent = text;
+            imgBubble.appendChild(caption);
+          }
+          imgRow.appendChild(imgBubble);
+          messagesContainer.appendChild(imgRow);
+          scrollToBottom();
+          return;
+        }
+        messagesContainer.appendChild(createMessageElement(text, isUser ? 'user' : 'assistant'));
+        scrollToBottom();
+      }
+
+      function addTypingIndicator() {
+        const msgDiv = document.createElement('div');
+        msgDiv.id = 'aiTypingIndicator';
+        msgDiv.className = 'flex gap-2.5 self-start';
+        const avatar = createAssistantAvatar();
+        const bubble = document.createElement('div');
+        bubble.className = 'flex items-center gap-1 rounded-[22px] rounded-tl-md border border-slate-200 bg-white px-4 py-3 shadow-sm';
+        bubble.innerHTML = `
+        <span class="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce"></span>
+        <span class="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce" style="animation-delay: 0.1s"></span>
+        <span class="h-1.5 w-1.5 rounded-full bg-slate-400 animate-bounce" style="animation-delay: 0.2s"></span>
+      `;
+        msgDiv.appendChild(avatar);
+        msgDiv.appendChild(bubble);
+        messagesContainer.appendChild(msgDiv);
+        scrollToBottom();
+      }
+
+      function removeTypingIndicator() {
+        const ind = document.getElementById('aiTypingIndicator');
+        if (ind) ind.remove();
+      }
+
+      // Build a context summary from conversation history for RAG-like awareness
+      function buildConversationContext() {
+        if (chatHistory.length === 0) return '';
+        const recent = chatHistory.slice(-20);
+        const topics = [];
+        for (const msg of recent) {
+          const t = (typeof msg.content === 'string' ? msg.content : '').toLowerCase();
+          if (/flood|baha|tubig|water level|rising water/i.test(t)) topics.push('floods');
+          if (/typhoon|bagyo|storm|signal|cyclone/i.test(t)) topics.push('typhoons');
+          if (/earthquake|lindol|quake|tremor|aftershock/i.test(t)) topics.push('earthquakes');
+          if (/fire|sunog|blaze|burn|arson/i.test(t)) topics.push('fire');
+          if (/landslide|pagguho|mudslide|erosion/i.test(t)) topics.push('landslides');
+          if (/volcano|bulkan|eruption|lahar|ashfall/i.test(t)) topics.push('volcanic activity');
+          if (/tsunami|storm surge|daluyong/i.test(t)) topics.push('tsunami/storm surge');
+          if (/evac|shelter|center|relief/i.test(t)) topics.push('evacuation');
+          if (/sos|rescue|emergency|danger/i.test(t)) topics.push('emergency response');
+          if (/prepare|kit|bag|supply|go bag/i.test(t)) topics.push('emergency preparedness');
+          if (/safe|protect|step|what.*(do|should)/i.test(t)) topics.push('safety steps');
+          if (/news|update|latest|report/i.test(t)) topics.push('news updates');
+          if (/first aid|medicine|health|injury/i.test(t)) topics.push('first aid');
+          if (/family|children|elderly|pet/i.test(t)) topics.push('family safety');
+        }
+        const unique = [...new Set(topics)];
+        return unique.length > 0 ? `Topics discussed so far: ${unique.join(', ')}.` : '';
+      }
+
+      async function sendToAI(userText) {
+        chatHistory.push({ role: "user", content: userText });
+
+        const contextSummary = buildConversationContext();
+
+        const systemPrompt = `You are ARPS Assistant, an intelligent, all-in-one disaster risk preparedness and emergency response AI for the Antique Risk Prevention System (ARPS) in the Philippines.
+
+YOUR EXPERTISE COVERS ALL NATURAL DISASTERS & RISKS:
+- Typhoons (bagyo) — preparation, signal warnings, evacuation, during & after steps
+- Floods (baha) — flash floods, rising water, urban flooding, safety steps
+- Earthquakes (lindol) — Drop/Cover/Hold, aftershock safety, structural damage assessment
+- Fire (sunog) — fire safety, prevention, escape plans, stop-drop-roll
+- Landslides (pagguho) — warning signs, mudslides, when to evacuate
+- Volcanic eruptions — ashfall protection, lahar awareness, evacuation zones
+- Tsunamis & storm surge — coastal warnings, evacuation to high ground
+- General emergency preparedness — Go Bags, family plans, first aid, emergency kits, survival tips
+- SOS & rescue guidance — when and how to call for help using ARPS
+
+CONVERSATION AWARENESS (RAG):
+- You have FULL access to the conversation history below. Always use it to understand follow-up questions.
+- If the user says "give me steps", "what should I do", "tell me more", "how?", "explain", "ano gagawin ko", etc., look at PREVIOUS messages to understand the topic and give a detailed, helpful answer.
+- Never give a generic rejection when the user is clearly asking a follow-up about an ongoing topic.
+${contextSummary ? '\n' + contextSummary : ''}
+
+RESTRICTIONS:
+- Stay focused on disaster preparedness, risk reduction, and emergency response.
+- If asked about completely unrelated topics (cooking, math, movies, celebrity gossip, etc.), politely redirect: "I specialize in disaster preparedness and emergency safety. Try asking me about typhoons, floods, earthquakes, fire safety, or your emergency kit!"
+
+STYLE:
+- Be warm, smart, and practical. Use plain English or light Taglish.
+- Give actionable step-by-step advice when asked.
+- Use numbered lists for steps. Use bullet points for tips.
+- Keep answers concise but complete (under 150 words unless detailed steps are needed).
+- Sound like a knowledgeable emergency responder, not a robot.
+- If the situation sounds dangerous, always remind them about the SOS button.`;
+
+        try {
+          const data = await callGroqChat({
+            model: 'llama-3.3-70b-versatile',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              ...chatHistory.slice(-20)
+            ],
+            temperature: 0.7,
+            max_tokens: 400
+          });
+          removeTypingIndicator();
+          if (data.choices && data.choices.length > 0) {
+            const aiMsg = data.choices[0].message.content.trim();
+            chatHistory.push({ role: "assistant", content: aiMsg });
+            addMessage(aiMsg, false);
+          } else {
+            await sendToAIFallback(userText);
+          }
+        } catch (e) {
+          removeTypingIndicator();
+          try { await sendToAIFallback(userText); } catch { addMessage(getLocalFallback(userText), false); }
+        }
+      }
+
+      // Fallback to smaller model
+      async function sendToAIFallback(userText) {
+        try {
+          const data = await callGroqChat({
+            model: 'llama3-8b-8192',
+            messages: [
+              { role: 'system', content: 'You are ARPS Assistant, a smart disaster preparedness & emergency AI in the Philippines. You cover ALL disaster types: typhoons, floods, earthquakes, fire, landslides, volcanic eruptions, tsunamis, and all emergencies. Use conversation context for follow-ups. Give step-by-step advice. Use Taglish if appropriate.' },
+              ...chatHistory.slice(-10)
+            ],
+            temperature: 0.7,
+            max_tokens: 300
+          });
+          removeTypingIndicator();
+          if (data.choices && data.choices.length > 0) {
+            const aiMsg = data.choices[0].message.content.trim();
+            chatHistory.push({ role: "assistant", content: aiMsg });
+            addMessage(aiMsg, false);
+          } else {
+            const fb = getLocalFallback(userText);
+            chatHistory.push({ role: "assistant", content: fb });
+            addMessage(fb, false);
+          }
+        } catch {
+          removeTypingIndicator();
+          const fb = getLocalFallback(userText);
+          chatHistory.push({ role: "assistant", content: fb });
+          addMessage(fb, false);
+        }
+      }
+
+      function getLocalFallback(userText) {
+        const text = userText.toLowerCase();
+        if (/\b(hi|hello|hey|good morning|good afternoon|good evening|kamusta)\b/.test(text)) {
+          return "Hello! I'm your ARPS disaster preparedness assistant. I can help with typhoons, floods, earthquakes, fire, landslides, and all emergencies. What do you need?";
+        }
+        if (/\b(typhoon|bagyo|storm|signal)\b/.test(text)) {
+          return "For typhoon safety:\n1. Monitor PAGASA updates & storm signals\n2. Secure your home — board windows, tie down loose items\n3. Stock food, water & medicine for 3 days\n4. Prepare your Go Bag\n5. Know your evacuation center\n6. If Signal #3+, evacuate early!\n\nAsk me for more details on any step.";
+        }
+        if (/\b(flood|baha|tubig|water level|rising water)\b/.test(text)) {
+          return "Flood safety:\n1. Move to higher ground immediately\n2. Never walk or drive through floodwater\n3. Turn off electricity if water enters your home\n4. Monitor ARPS Alerts for updates\n5. Tap SOS if you need rescue\n\nStay safe!";
+        }
+        if (/\b(earthquake|lindol|quake|tremor)\b/.test(text)) {
+          return "During an earthquake:\n1. DROP to the ground\n2. Take COVER under a sturdy table/desk\n3. HOLD ON until shaking stops\n4. Stay away from windows & heavy objects\n5. After shaking: check for injuries, evacuate if building is damaged\n6. Expect aftershocks\n\nNever use elevators during an earthquake!";
+        }
+        if (/\b(fire|sunog|burn|blaze)\b/.test(text)) {
+          return "Fire safety:\n1. GET OUT immediately — don't go back for belongings\n2. Stay LOW — smoke rises, crawl if needed\n3. Feel doors before opening — if hot, use another exit\n4. Stop, Drop, Roll if clothes catch fire\n5. Call BFP (fire dept) or tap SOS\n6. Meet at your designated assembly point";
+        }
+        if (/\b(landslide|pagguho|mudslide|erosion)\b/.test(text)) {
+          return "Landslide safety:\n1. Watch for warning signs: unusual sounds, cracks in ground, tilting trees\n2. Evacuate immediately if you suspect a slide\n3. Move away from the path of the slide\n4. If caught: curl into a ball and protect your head\n5. After: avoid the area — more slides may follow";
+        }
+        if (/\b(evac|shelter|center|relief)\b/.test(text)) {
+          return "Check the Evacuation Centers screen for nearby shelters. Bring IDs, medicines, water, food, and a fully charged phone before evacuating.";
+        }
+        if (/\b(sos|rescue|help|emergency|danger)\b/.test(text)) {
+          return "If you're in immediate danger, tap the SOS button now! Keep your GPS on so rescuers can find you. Move to the safest visible spot while waiting for help.";
+        }
+        if (/\b(prepare|kit|bag|supply|emergency kit|go bag)\b/.test(text)) {
+          return "Your Go Bag checklist:\n1. Water (3-day supply)\n2. Canned food & can opener\n3. Flashlight & extra batteries\n4. First aid kit & medicines\n5. Important documents (in waterproof bag)\n6. Fully charged power bank & phone\n7. Whistle & emergency blanket\n8. Extra clothes & rain gear";
+        }
+        if (/\b(step|how|what|tell me|explain|more|do|ano|paano)\b/.test(text)) {
+          return "I can help with step-by-step guidance for any disaster! Ask me about:\n- Typhoon preparation\n- Flood safety\n- Earthquake response\n- Fire escape plans\n- Landslide warnings\n- Emergency kit preparation\n- Evacuation procedures\n\nWhat specific situation do you need help with?";
+        }
+        return "I'm your ARPS disaster preparedness assistant! I can help with typhoons, floods, earthquakes, fire, landslides, volcanic eruptions, and all emergencies. What do you need help with?";
+      }
+
+      // Compress image to fit API limits (max ~768px, JPEG quality 0.7)
+      function compressImage(dataUrl, maxSize = 768) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width, h = img.height;
+            if (w > h && w > maxSize) { h = Math.round(h * maxSize / w); w = maxSize; }
+            else if (h > maxSize) { w = Math.round(w * maxSize / h); h = maxSize; }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const compressed = canvas.toDataURL('image/jpeg', 0.7);
+            resolve(compressed.split(',')[1]);
+          };
+          img.onerror = () => resolve(null);
+          img.src = dataUrl;
+        });
+      }
+
+      // Analyze image using Groq vision model
+      async function analyzeImage(base64, userCaption, originalDataUrl) {
+        // Compress image first to avoid API payload limits
+        const compressedBase64 = await compressImage(originalDataUrl || ('data:image/jpeg;base64,' + base64));
+        if (!compressedBase64) return null;
+
+        const visionPrompt = `You are ARPS Disaster Analysis AI for the Philippines. Analyze this image carefully for ANY type of disaster or emergency.
+
+1. IDENTIFY: What do you see? Is this a flood, typhoon damage, earthquake damage, fire, landslide, volcanic activity, or any other disaster/emergency? Describe the scene.
+2. SEVERITY: Rate the disaster/emergency level:
+   - SAFE: No immediate danger
+   - CAUTION: Potential risk, monitor the situation
+   - DANGER: Active threat, take action now
+   - CRITICAL: Life-threatening, need immediate rescue
+3. ADVICE: Give 3-4 immediate safety steps the person should take based on what you see.
+4. HELP NEEDED: If this looks like the person needs rescue, tell them to TAP SOS IMMEDIATELY.
+
+If the image is not disaster-related, still describe what you see, then offer to help with disaster preparedness.
+
+${userCaption ? 'User says: "' + userCaption + '"' : 'No caption provided — analyze visually.'}
+
+Be concise, practical, warm, and use Taglish if helpful. Use numbered steps.`;
+
+        // Try multiple vision models in order of capability
+        const visionModels = [
+          'meta-llama/llama-4-scout-17b-16e-instruct',
+          'llama-3.2-11b-vision-preview',
+          'llama-3.2-90b-vision-preview'
+        ];
+
+        for (const model of visionModels) {
+          try {
+            const data = await callGroqChat({
+              model: model,
+              messages: [{
+                role: 'user',
+                content: [
+                  { type: 'text', text: visionPrompt },
+                  { type: 'image_url', image_url: { url: 'data:image/jpeg;base64,' + compressedBase64 } }
+                ]
+              }],
+              temperature: 0.5,
+              max_tokens: 400
+            });
+            if (data.choices && data.choices.length > 0) {
+              return data.choices[0].message.content.trim();
+            }
+            // If model returned error, try next model
+            console.warn('Vision model ' + model + ' failed:', data.error?.message || 'no choices');
+          } catch (e) {
+            console.warn('Vision model ' + model + ' error:', e);
+          }
+        }
+
+        // All vision models failed — use text model to describe based on user caption
+        if (userCaption) {
+          return null; // will fall through to text-based sendToAI
+        }
+        return null;
+      }
+
+      function submitMessage(text) {
+        const cleanText = text.trim();
+        const hasImage = !!pendingImage;
+        const imageData = pendingImage;
+
+        if (!cleanText && !hasImage) return;
+
+        removeQuickActions();
+        chatInput.value = '';
+        chatInput.style.height = '44px';
+
+        // Reset image state
+        if (hasImage) {
+          pendingImage = null;
+          imagePreviewBar.classList.add('hidden');
+          chatInput.placeholder = 'Ask about disasters, upload a photo...';
+        }
+
+        if (hasImage) {
+          // Show user image message
+          addMessage(cleanText || '', true, imageData.dataUrl);
+          addTypingIndicator();
+
+          // Analyze image with vision, then feed result to chat AI
+          analyzeImage(imageData.base64, cleanText, imageData.dataUrl).then(async (analysis) => {
+            if (analysis) {
+              removeTypingIndicator();
+              chatHistory.push({ role: 'user', content: (cleanText ? cleanText + ' ' : '') + '[User uploaded a photo for disaster analysis]' });
+              chatHistory.push({ role: 'assistant', content: analysis });
+              addMessage(analysis, false);
+            } else {
+              // Vision failed — fall back to text AI with description prompt
+              const imgContext = cleanText
+                ? 'The user uploaded a photo and said: "' + cleanText + '". Since the image could not be analyzed visually, help them based on their description. Ask clarifying questions if needed to assess the disaster situation.'
+                : 'The user uploaded a photo for disaster analysis but it could not be processed visually. Ask them to describe what they see in the photo — is there flooding, fire, earthquake damage, a landslide, or any danger? Help them assess the situation.';
+              removeTypingIndicator();
+              addTypingIndicator();
+              await sendToAI(imgContext);
+            }
+          });
+        } else {
+          addMessage(cleanText, true);
+          addTypingIndicator();
+          sendToAI(cleanText);
+        }
+      }
+
+      setDefaultConversation();
+
+      chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        submitMessage(chatInput.value);
+      });
+    })();
+
+    // ── Advisor Eagle Reactions ──
+    (function initAdvisorEagle() {
+      const advHead = document.getElementById('adv-eagle-head');
+      const advPupils = document.getElementById('adv-eagle-pupils');
+      const advEyes = document.getElementById('adv-eagle-eyes');
+      const advLeftWing = document.getElementById('adv-left-wing');
+      const advRightWing = document.getElementById('adv-right-wing');
+      if (!advHead) return;
+
+      // Smooth head/pupil transitions
+      advHead.style.transition = 'transform 0.2s cubic-bezier(0.3,1.2,0.4,1)';
+      advHead.style.transformOrigin = '50px 45px';
+      advPupils.style.transition = 'transform 0.15s ease-out';
+      advEyes.style.transformOrigin = '50px 27px';
+      advLeftWing.style.transformOrigin = '40px 45px';
+      advRightWing.style.transformOrigin = '60px 45px';
+
+      let eagleMouseX = 0, eagleMouseY = 0, eagleStretching = false;
+
+      document.addEventListener('mousemove', (e) => { eagleMouseX = e.clientX; eagleMouseY = e.clientY; });
+
+      // Touch support for mobile
+      document.addEventListener('touchmove', (e) => {
+        if (e.touches.length > 0) { eagleMouseX = e.touches[0].clientX; eagleMouseY = e.touches[0].clientY; }
+      });
+
+      function advEagleLook() {
+        if (eagleStretching) return;
+        const wrap = document.getElementById('advisorEagleWrap');
+        if (!wrap) return;
+        const rect = wrap.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = (eagleMouseX - cx) / (window.innerWidth / 2);
+        const dy = (eagleMouseY - cy) / (window.innerHeight / 2);
+        const clampX = Math.max(-1, Math.min(1, dx));
+        const clampY = Math.max(-1, Math.min(1, dy));
+
+        advHead.style.transform = `translate(${clampX * 3}px, ${clampY * 2}px) rotate(${clampX * 5}deg)`;
+        advPupils.style.transform = `translate(${clampX * 2}px, ${clampY * 1.5}px)`;
+
+        setTimeout(advEagleLook, 500 + Math.random() * 800);
+      }
+      advEagleLook();
+
+      // Blink
+      setInterval(() => {
+        advEyes.style.transition = 'transform 0.08s ease';
+        advEyes.style.transform = 'scaleY(0.1)';
+        setTimeout(() => { advEyes.style.transform = 'scaleY(1)'; }, 100);
+      }, 4000 + Math.random() * 3000);
+
+      // Wing stretch every 5s
+      let advToggle = true;
+      setInterval(() => {
+        eagleStretching = true;
+        const wing = advToggle ? advRightWing : advLeftWing;
+        const dir = advToggle ? 1 : -1;
+        wing.style.transition = 'transform 0.4s ease-in-out';
+        wing.style.transform = `rotate(${dir * 8}deg) scale(1.02) translateX(${dir * 2}px)`;
+        advHead.style.transform = `translate(${dir * 3}px, 1px) rotate(${dir * 12}deg)`;
+        advPupils.style.transform = `translate(${dir * 1.5}px, 1px)`;
+        setTimeout(() => {
+          wing.style.transform = '';
+          eagleStretching = false;
+          advEagleLook();
+        }, 800);
+        advToggle = !advToggle;
+      }, 5000);
+    })();
+  </script>
+
+  <!-- Cache admin contact number for offline SOS -->
+  <script type="module">
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    import { db } from "../firebase-config.js";
+    try {
+      const snap = await getDoc(doc(db, "adminSettings", "contact"));
+      if (snap.exists() && snap.data().phone) {
+        localStorage.setItem('arps_admin_contact', snap.data().phone);
+      }
+    } catch (e) { /* offline — will use cached value */ }
+  </script>
+</body>
+
+</html>

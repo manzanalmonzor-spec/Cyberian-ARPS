@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="../shared.js"></script>
+  <meta name="theme-color" content="#DC2626">
+  <title>ARPS — Emergency Response System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../shared.css">
+</head>
+<body>
+  <div class="fixed inset-0 z-50 flex flex-col items-center justify-center" style="background:linear-gradient(160deg,#DC2626 0%,#991B1B 100%)">
+    <div class="w-20 h-20 rounded-2xl flex items-center justify-center mb-5 animate-scale" style="background:rgba(255,255,255,.15)">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+    </div>
+    <h1 class="text-white text-3xl font-black tracking-tight">ARPS</h1>
+    <p class="text-white/60 text-xs mt-1.5 font-medium tracking-[3px] uppercase">Emergency Response System</p>
+    <div class="mt-10 w-8 h-0.5 rounded-full overflow-hidden" style="background:rgba(255,255,255,.3)">
+      <div class="w-full h-full bg-white rounded-full animate-slide"></div>
+    </div>
+    <p class="absolute bottom-10 text-white/30 text-[10px] tracking-widest uppercase">Installable Progressive Web App</p>
+  </div>
+  <script>setTimeout(()=>{var s=JSON.parse(localStorage.getItem('arps_session')||'null');window.location.href=s&&s.uid?'home.html':'loginpage.html'},2400)</script>
+</body>
+</html>

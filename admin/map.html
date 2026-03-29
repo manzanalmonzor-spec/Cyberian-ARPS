@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <script src="../shared.js"></script>
+  <meta name="theme-color" content="#1E293B" />
+  <title>ARPS — Live Map</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['DM Sans', 'Segoe UI', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+
+  <link rel="stylesheet" href="../shared.css" />
+  <link rel="stylesheet" href="./css/map.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+</head>
+<body class="bg-[#F8FAFC] font-sans">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-[280px] bg-[#0F172A] text-white flex flex-col shrink-0 shadow-2xl z-50">
+      <div class="px-6 py-8 border-b border-white/10">
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-logo">
+            <img src="../Images/ARPLOGO.png" alt="ARPS logo" />
+          </div>
+          <div class="sidebar-brand-copy">
+            <h3>ARPS</h3>
+            <p>Admin Panel</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="px-4 py-6 flex-1 gap-1 flex flex-col">
+        <a href="./dashboard.html" class="sidebar-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+          </svg>
+          Dashboard
+        </a>
+
+        <a href="./map.html" class="sidebar-item active">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+          </svg>
+          Live Map
+        </a>
+
+        <a href="./alerts.html" class="sidebar-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          Alerts
+        </a>
+
+        <a href="./centers.html" class="sidebar-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          </svg>
+          Centers
+        </a>
+
+        <a href="./weather.html" class="sidebar-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+          </svg>
+          Weather
+        </a>
+
+        <a href="./approvals.html" class="sidebar-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          User Approvals
+        </a>
+
+        <a href="./settings.html" class="sidebar-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+          </svg>
+          Settings
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 overflow-auto p-8">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-8">
+        <div>
+          <h1 class="text-3xl font-black text-slate-900 tracking-tight">Live Incident Map</h1>
+          <p class="text-[14px] text-slate-500 font-medium mt-1.5">Geographic incident visibility and evacuation routing</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 bg-white border border-slate-200 px-3.5 py-2 rounded-[12px] shadow-sm">
+            <span class="relative flex h-2.5 w-2.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <span class="text-xs font-semibold text-slate-700">LIVE TRACKING</span>
+          </div>
+
+          <div class="text-[13px] text-slate-400" id="currentDate"></div>
+        </div>
+      </div>
+
+      <!-- Top Stats -->
+      <div class="grid grid-cols-4 gap-4 mb-6" id="mapStatsGrid"></div>
+
+      <!-- Main Grid -->
+      <div class="grid grid-cols-[1fr_360px] gap-5">
+        <!-- Map Card -->
+        <section class="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden">
+          <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-bold">Operational Map</h3>
+              <p class="text-xs text-slate-400 mt-1">Select an incident to load nearby evacuation routes</p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button class="map-filter-btn active" data-filter="all">All</button>
+              <button class="map-filter-btn" data-filter="Pending">Pending</button>
+              <button class="map-filter-btn" data-filter="Responding">Responding</button>
+              <button class="map-filter-btn" data-filter="Resolved">Resolved</button>
+            </div>
+          </div>
+
+          <div class="relative live-map-area" id="mapCanvas" style="height:560px;">
+            <div
+              id="adminLiveMap"
+              aria-label="Interactive admin map showing live incidents"
+              style="height:560px;width:100%;position:relative;z-index:0"
+            ></div>
+
+            <div class="absolute left-4 top-4 bg-white/95 backdrop-blur rounded-2xl shadow-sm border border-slate-200 px-4 py-3">
+              <p class="text-[11px] uppercase tracking-wider font-bold text-slate-400 mb-2">Legend</p>
+              <div class="space-y-2 text-xs text-slate-600">
+                <div class="flex items-center gap-2">
+                   <span class="legend-dot bg-red-600"></span>
+                  Critical
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="legend-dot bg-amber-500"></span>
+                  High
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="legend-dot bg-blue-600"></span>
+                  Medium
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="legend-dot bg-emerald-500"></span>
+                  Low
+                </div>
+              </div>
+            </div>
+
+            <div class="absolute bottom-4 right-4 bg-white/95 backdrop-blur rounded-xl px-4 py-2.5 text-xs text-slate-500 font-semibold border border-slate-200 shadow-sm" id="markerCounter">
+              Live Map — 0 incidents
+            </div>
+          </div>
+        </section>
+
+        <!-- Right Panel -->
+        <aside class="flex flex-col gap-4">
+          <section class="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden">
+            <div class="px-4 py-3.5 border-b border-slate-200">
+              <h3 class="text-sm font-bold">Incident Feed</h3>
+            </div>
+            <div id="mapIncidentList" class="max-h-[350px] overflow-auto"></div>
+          </section>
+
+          <section class="bg-white rounded-3xl border border-slate-200/60 shadow-sm p-5">
+            <h3 class="text-sm font-bold mb-4">Focused Incident</h3>
+
+            <div id="selectedIncidentState" class="hidden">
+              <div class="mb-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <p class="text-sm font-bold text-slate-900" id="selectedIncidentId">INC-001</p>
+                    <p class="text-xs text-slate-400 mt-1" id="selectedIncidentReporter">Maria Santos</p>
+                  </div>
+                  <div id="selectedIncidentBadge"></div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 mb-4">
+                <div>
+                  <p class="map-detail-label">Type</p>
+                  <p class="map-detail-value" id="selectedIncidentType"></p>
+                </div>
+                <div>
+                  <p class="map-detail-label">Severity</p>
+                  <div class="mt-1" id="selectedIncidentSeverity"></div>
+                </div>
+                <div>
+                  <p class="map-detail-label">Status</p>
+                  <p class="map-detail-value" id="selectedIncidentStatus"></p>
+                </div>
+                <div>
+                  <p class="map-detail-label">Time</p>
+                  <p class="map-detail-value" id="selectedIncidentTime"></p>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <p class="map-detail-label">Coordinates</p>
+                <p class="map-detail-value mt-1" id="selectedIncidentCoords"></p>
+              </div>
+
+              <div>
+                <p class="map-detail-label">Description</p>
+                <p class="text-[13px] text-slate-700 leading-relaxed mt-1.5" id="selectedIncidentDesc"></p>
+              </div>
+            </div>
+
+            <div id="emptySelectedState" class="text-sm text-slate-400 leading-relaxed">
+              Select a marker or an incident from the feed to inspect its details.
+            </div>
+          </section>
+
+          <section class="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden">
+            <div class="px-4 py-3.5 border-b border-slate-200">
+              <h3 class="text-sm font-bold">Evacuation Routing</h3>
+            </div>
+            <div class="p-4">
+              <p id="evacuationStatus" class="text-sm text-slate-400 leading-relaxed">
+                Select an incident to calculate nearby evacuation centers and route options.
+              </p>
+              <div id="evacuationOptions" class="mt-4 flex flex-col gap-3"></div>
+            </div>
+          </section>
+
+          <section class="rounded-2xl p-4 border border-blue-300 map-ai-card">
+            <div class="flex items-center gap-2 mb-2.5">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+              </svg>
+              <span class="text-[13px] font-bold text-blue-900">Map Intelligence</span>
+            </div>
+            <p class="text-xs text-blue-800 leading-relaxed" id="mapAiSummary"></p>
+          </section>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script src="../user/js/map-common.js"></script>
+  <script type="module" src="./js/map.js"></script>
+</body>
+</html>

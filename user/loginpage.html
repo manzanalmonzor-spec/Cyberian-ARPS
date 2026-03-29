@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="../shared.js"></script>
+    <title>ARPS | Authentication</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            /* Theme aligned with landing page */
+            --primary: #111827; /* Dark Slate Black */
+            --secondary: #e63946; /* Emergency Red */
+            --warning: #fca311;
+            --bg-color: #fafafa;
+            --white: #ffffff;
+            --text-dark: #1f2937;
+            --text-light: #9ca3af;
+            --input-bg: #f9fafb;
+            --transition: all 0.6s ease-in-out;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 14px 28px rgba(0,0,0,0.05), 0 10px 10px rgba(0,0,0,0.02);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 1000px;
+            min-height: 600px;
+        }
+
+        .form-container {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            transition: var(--transition);
+        }
+
+        .sign-in-container {
+            left: 0;
+            width: 50%;
+            z-index: 2;
+        }
+
+        .container.right-panel-active .sign-in-container {
+            transform: translateX(100%);
+        }
+
+        .sign-up-container {
+            left: 0;
+            width: 50%;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .container.right-panel-active .sign-up-container {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+            animation: show 0.6s;
+        }
+
+        @keyframes show {
+            0%, 49.99% {
+                opacity: 0;
+                z-index: 1;
+            }
+            50%, 100% {
+                opacity: 1;
+                z-index: 5;
+            }
+        }
+
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            transition: transform 0.6s ease-in-out;
+            z-index: 100;
+        }
+
+        .container.right-panel-active .overlay-container {
+            transform: translateX(-100%);
+        }
+
+        .overlay {
+            background: var(--primary);
+            background: linear-gradient(135deg, #111827, #1f2937);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: 0 0;
+            color: #ffffff;
+            position: relative;
+            left: -100%;
+            height: 100%;
+            width: 200%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        /* Subtle overlay pattern */
+        .overlay::before {
+            content: '';
+            position: absolute;
+            top:0; left:0; width:100%; height:100%;
+            background-image: radial-gradient(circle at top right, rgba(230, 57, 70, 0.15) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        .container.right-panel-active .overlay {
+            transform: translateX(50%);
+        }
+
+        .overlay-panel {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 40px;
+            text-align: center;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .overlay-left {
+            transform: translateX(-20%);
+        }
+
+        .container.right-panel-active .overlay-left {
+            transform: translateX(0);
+        }
+
+        .overlay-right {
+            right: 0;
+            transform: translateX(0);
+        }
+
+        .container.right-panel-active .overlay-right {
+            transform: translateX(20%);
+        }
+
+        form {
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 50px;
+            height: 100%;
+            text-align: center;
+            overflow-y: auto;
+        }
+
+        .auth-form {
+            width: 100%;
+        }
+
+        .form-logo {
+            height: 80px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-weight: 800;
+            margin: 0;
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .overlay-panel h1 {
+            color: var(--warning);
+            font-size: 2.8rem;
+            letter-spacing: -1px;
+        }
+
+        p {
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.6;
+            margin: 20px 0 35px;
+            color: #d1d5db;
+        }
+
+        .overlay-panel p {
+            color: #e5e7eb;
+            font-weight: 400;
+        }
+
+        span {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .input-group {
+            width: 100%;
+            position: relative;
+            margin: 8px 0;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .input-group i.toggle-password {
+            left: auto;
+            right: 15px;
+            cursor: pointer;
+        }
+
+        .input-group i.toggle-password:hover {
+            color: var(--primary);
+        }
+
+        input {
+            background-color: var(--input-bg);
+            border: 1px solid transparent;
+            padding: 15px 45px 15px 45px;
+            margin: 0;
+            width: 100%;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            background-color: #fff;
+            border-color: var(--warning);
+            box-shadow: 0 0 0 3px rgba(252, 163, 17, 0.1);
+        }
+
+        input:focus + i {
+            color: var(--warning);
+        }
+
+        .social-container {
+            margin: 0 0 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .social-container a {
+            border: 1px solid #e5e7eb;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 5px;
+            height: 45px;
+            width: 45px;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 1.4rem;
+            transition: all 0.3s;
+        }
+
+        .social-container a:hover {
+            border-color: #d1d5db;
+            background-color: #f9fafb;
+            color: #DB4437; /* Google red */
+            transform: translateY(-2px);
+        }
+
+        button {
+            border-radius: 12px;
+            border: 1px solid var(--secondary);
+            background-color: var(--secondary);
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 700;
+            padding: 15px 45px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: transform 80ms ease-in, box-shadow 0.3s;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.4);
+            width: 100%;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button:focus {
+            outline: none;
+        }
+        
+        button:hover {
+            box-shadow: 0 8px 20px rgba(230, 57, 70, 0.6);
+        }
+
+        button.ghost {
+            background-color: transparent;
+            border-color: #ffffff;
+            color: #ffffff;
+            box-shadow: none;
+            width: auto;
+            border-radius: 100px;
+            border: 2px solid #ffffff;
+        }
+        
+        button.ghost:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        a.forgot {
+            color: var(--text-light);
+            font-size: 13px;
+            text-decoration: none;
+            margin: 15px 0 0;
+            display: inline-block;
+            font-weight: 500;
+        }
+        
+        a.forgot:hover {
+            color: var(--primary);
+        }
+
+        .mobile-toggle {
+            display: none;
+            margin-top: 25px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        .mobile-toggle a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: underline;
+            margin-left: 5px;
+        }
+        
+        /* Responsive adjustments for tablets and smaller screens */
+        @media (max-width: 850px) {
+            body { 
+                padding: 18px; 
+                min-height: 100dvh; 
+                height: auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow-y: auto;
+            }
+            
+            .container { 
+                display: flex; 
+                flex-direction: column; 
+                width: 100%; 
+                max-width: 430px; 
+                min-height: auto; 
+                margin: auto; 
+                height: auto; 
+                border-radius: 28px; 
+                background: rgba(255,255,255,0.96);
+                box-shadow: 0 28px 60px rgba(15, 23, 42, 0.10), 0 8px 20px rgba(15, 23, 42, 0.05);
+            }
+            
+            /* Remove absolute positioning. Forms naturally stack and toggle display. */
+            .form-container { 
+                position: relative; 
+                height: auto; 
+                width: 100%; 
+                padding: 0; 
+                opacity: 1; 
+                transform: none !important; 
+                transition: none; 
+                display: none; 
+                z-index: 1;
+            }
+            
+            .container:not(.right-panel-active) .sign-in-container,
+            .container.right-panel-active .sign-up-container {
+                display: flex; 
+                animation: fade-in 0.4s ease forwards;
+            }
+            
+            .overlay-container { 
+                display: none !important;
+            }
+            
+            .mobile-toggle { 
+                display: block; 
+                margin-bottom: 0; 
+                text-align: center;
+            }
+            
+            @keyframes fade-in {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            /* Adjust typography and form spacing for touch devices to balance width/height */
+            form { 
+                padding: 34px 28px 28px; 
+                overflow-y: visible;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: stretch;
+            }
+            .form-logo { 
+                height: 76px; 
+                width: auto;
+                margin: 0 auto 14px; 
+            }
+            h1 { 
+                font-size: clamp(2rem, 6vw, 2.8rem); 
+                margin-bottom: 18px; 
+                line-height: 1.05;
+                letter-spacing: -0.04em;
+                text-align: center;
+            }
+            .social-container { 
+                margin: 0 0 16px; 
+                justify-content: center;
+            }
+            .social-container a {
+                width: 54px;
+                height: 54px;
+                font-size: 1.55rem;
+                margin: 0;
+            }
+            span { 
+                display: block;
+                margin-bottom: 18px; 
+                font-size: 13px; 
+                line-height: 1.45;
+                text-align: center;
+            }
+            .input-group { 
+                margin: 0 0 12px; 
+            }
+            .input-group i {
+                left: 16px;
+                font-size: 1.15rem;
+            }
+            .input-group i.toggle-password {
+                right: 16px;
+            }
+            input { 
+                min-height: 56px;
+                padding: 15px 48px; 
+                border-radius: 18px;
+                font-size: 1rem;
+                background-color: #f8fafc;
+            }
+            a.forgot {
+                margin: 8px 0 2px;
+                align-self: center;
+                font-size: 14px;
+            }
+            button { 
+                margin-top: 18px; 
+                min-height: 56px;
+                padding: 15px 40px; 
+                border-radius: 16px;
+                font-size: 0.98rem;
+            }
+            p.mobile-toggle { 
+                margin: 18px 0 0; 
+                font-size: 0.95rem;
+            }
+            #signInError,
+            #signInSuccess,
+            #signUpError {
+                width: 100%;
+                text-align: center;
+            }
+            .sign-up-container form {
+                padding-top: 30px;
+                padding-bottom: 24px;
+            }
+            .sign-up-container h1 {
+                font-size: clamp(1.9rem, 5.8vw, 2.5rem);
+                margin-bottom: 16px;
+            }
+            .sign-up-container .form-logo {
+                height: 70px;
+                margin-bottom: 12px;
+            }
+        }
+
+        /* For very small screens (phones) */
+        @media (max-width: 480px) {
+            body { padding: 12px; }
+            .container { max-width: 100%; border-radius: 24px; }
+            form { padding: 30px 18px 24px; }
+            h1 { font-size: clamp(1.85rem, 8vw, 2.35rem); margin-bottom: 16px; }
+            .form-logo { height: 64px; margin-bottom: 12px; }
+            .social-container { margin-bottom: 14px; }
+            .social-container a { width: 50px; height: 50px; font-size: 1.45rem; }
+            span { margin-bottom: 16px; font-size: 12px; }
+            input { min-height: 54px; padding: 14px 46px; border-radius: 16px; }
+            button { min-height: 54px; margin-top: 16px; }
+            .sign-up-container form { padding-top: 26px; }
+            .sign-up-container h1 { font-size: clamp(1.7rem, 7.6vw, 2.15rem); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="container">
+    
+    <!-- Sign Up Form -->
+    <div class="form-container sign-up-container">
+        <form id="signUpForm" class="auth-form auth-form--signup">
+            <img src="../Images/ARPLOGO.png" alt="ARPS Logo" class="form-logo">
+            <h1>Join ARPS</h1>
+            <div class="social-container">
+                <a href="#" class="social" title="Continue with Google" id="googleSignUpBtn"><i class="ph-bold ph-google-logo"></i></a>
+            </div>
+            <span>or use your email for registration</span>
+            <div class="input-group">
+                <input type="text" id="signUpName" placeholder="e.g., Juan Dela Cruz" required />
+                <i class="ph ph-user"></i>
+            </div>
+            <div class="input-group">
+                <input type="email" id="signUpEmail" placeholder="yourname@email.com" required />
+                <i class="ph ph-envelope-simple"></i>
+            </div>
+            <div class="input-group">
+                <input type="password" id="signUpPassword" placeholder="Create Password (min 6 chars)" required minlength="6" />
+                <i class="ph ph-lock-key"></i>
+                <i class="ph ph-eye toggle-password" id="toggleSignUpPassword"></i>
+            </div>
+            <p id="signUpError" style="color:#e63946;font-size:12px;margin-top:8px;display:none;font-weight:600;"></p>
+            <button type="submit" id="signUpBtn">Join the Network</button>
+            <p class="mobile-toggle">Already have an account? <a href="#" onclick="document.getElementById('container').classList.remove('right-panel-active'); return false;">Sign In</a></p>
+        </form>
+    </div>
+
+    <!-- Sign In Form -->
+    <div class="form-container sign-in-container">
+        <form id="signInForm" class="auth-form auth-form--signin">
+            <img src="../Images/ARPLOGO.png" alt="ARPS Logo" class="form-logo">
+            <h1>Welcome to ARPS</h1>
+            <div class="social-container">
+                <a href="#" class="social" title="Continue with Google" id="googleSignInBtn"><i class="ph-bold ph-google-logo"></i></a>
+            </div>
+            <span>or use your account</span>
+            <div class="input-group">
+                <input type="email" id="signInEmail" placeholder="yourname@email.com" required />
+                <i class="ph ph-envelope-simple"></i>
+            </div>
+            <div class="input-group">
+                <input type="password" id="signInPassword" placeholder="Password" required />
+                <i class="ph ph-lock-key"></i>
+                <i class="ph ph-eye toggle-password" id="toggleSignInPassword"></i>
+            </div>
+            <a href="#" class="forgot" id="forgotPasswordLink">Forgot your password?</a>
+            <p id="signInError" style="color:#e63946;font-size:12px;margin-top:8px;display:none;font-weight:600;"></p>
+            <p id="signInSuccess" style="color:#2a9d8f;font-size:12px;margin-top:8px;display:none;font-weight:600;"></p>
+            <button type="submit" id="signInBtn">Sign In</button>
+            <p class="mobile-toggle">Don't have an account? <a href="#" onclick="document.getElementById('container').classList.add('right-panel-active'); return false;">Sign Up</a></p>
+        </form>
+    </div>
+
+    <!-- Animated Overlay Container -->
+    <div class="overlay-container">
+        <div class="overlay">
+            <div class="overlay-panel overlay-left">
+                <h1>Welcome Back!</h1>
+                <p>To keep connected with early warnings and local updates, please login with your personal info.</p>
+                <button class="ghost" id="signIn" type="button">Sign In</button>
+            </div>
+            <div class="overlay-panel overlay-right">
+                <h1>Hello, Citizen!</h1>
+                <p>Enter your details and join the ARPS safety network for immediate disaster early alerts.</p>
+                <button class="ghost" id="signUp" type="button">Sign Up</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+
+<script>
+    // If already logged in, go straight to home
+    (function() {
+        var session = JSON.parse(localStorage.getItem('arps_session') || 'null');
+        if (session && session.uid && session.email) {
+            window.location.href = 'home.html';
+        }
+    })();
+
+    var LOCAL_ACCOUNTS_KEY = 'arps_local_accounts';
+
+    // Firebase config
+    const firebaseConfig = {
+        apiKey: "AIzaSyAIE4y2j-4VfHPepa9wjGHrZ4YlM2SVN1s",
+        authDomain: "hackathon-7955d.firebaseapp.com",
+        projectId: "hackathon-7955d",
+        storageBucket: "hackathon-7955d.firebasestorage.app",
+        messagingSenderId: "257085823212",
+        appId: "1:257085823212:web:39affb5a1459d029b4adc9",
+        measurementId: "G-3NP99K13BE"
+    };
+
+    function getFirebaseContext() {
+        if (!window.firebase || !window.firebase.auth) {
+            return null;
+        }
+
+        try {
+            if (!firebase.apps || !firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+
+            return {
+                auth: firebase.auth(),
+                googleProvider: new firebase.auth.GoogleAuthProvider()
+            };
+        } catch (error) {
+            try {
+                return {
+                    auth: firebase.auth(),
+                    googleProvider: new firebase.auth.GoogleAuthProvider()
+                };
+            } catch (innerError) {
+                console.error('Firebase auth initialization failed.', error, innerError);
+                return null;
+            }
+        }
+    }
+
+    const firebaseContext = getFirebaseContext();
+
+    // Panel toggle
+    const signUpButton = document.getElementById('signUp');
+    const signInButton = document.getElementById('signIn');
+    const container = document.getElementById('container');
+
+    signUpButton.addEventListener('click', () => container.classList.add("right-panel-active"));
+    signInButton.addEventListener('click', () => container.classList.remove("right-panel-active"));
+
+    // Password toggle
+    function setupPasswordToggle(toggleId, inputId) {
+        const toggle = document.getElementById(toggleId);
+        const input = document.getElementById(inputId);
+        if (toggle && input) {
+            toggle.addEventListener('click', function() {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    toggle.classList.remove('ph-eye');
+                    toggle.classList.add('ph-eye-slash');
+                } else {
+                    input.type = 'password';
+                    toggle.classList.remove('ph-eye-slash');
+                    toggle.classList.add('ph-eye');
+                }
+            });
+        }
+    }
+
+    setupPasswordToggle('toggleSignUpPassword', 'signUpPassword');
+    setupPasswordToggle('toggleSignInPassword', 'signInPassword');
+
+    // Helper: save session and redirect
+    function saveSessionAndRedirect(user, displayName, authMode) {
+        const session = {
+            uid: user.uid,
+            email: user.email,
+            name: displayName || user.displayName || 'Resident',
+            loginTime: Date.now(),
+            authMode: authMode || 'local-email'
+        };
+        localStorage.setItem('arps_session', JSON.stringify(session));
+
+        // Initialize per-user profile if not exists
+        var profileKey = 'arps_profile_' + user.uid;
+        if (!localStorage.getItem(profileKey)) {
+            localStorage.setItem(profileKey, JSON.stringify({
+                name: session.name,
+                contact: '',
+                atRisk: 'None'
+            }));
+        }
+
+        window.location.href = 'home.html';
+    }
+
+    function normalizeEmail(email) {
+        return (email || '').trim().toLowerCase();
+    }
+
+    function readLocalAccounts() {
+        try {
+            var accounts = JSON.parse(localStorage.getItem(LOCAL_ACCOUNTS_KEY) || '[]');
+            return Array.isArray(accounts) ? accounts : [];
+        } catch (error) {
+            console.error('Failed to read local accounts.', error);
+            return [];
+        }
+    }
+
+    function writeLocalAccounts(accounts) {
+        localStorage.setItem(LOCAL_ACCOUNTS_KEY, JSON.stringify(accounts));
+    }
+
+    function findLocalAccount(email) {
+        var targetEmail = normalizeEmail(email);
+        var accounts = readLocalAccounts();
+
+        for (var i = 0; i < accounts.length; i += 1) {
+            if (normalizeEmail(accounts[i].email) === targetEmail) {
+                return accounts[i];
+            }
+        }
+
+        return null;
+    }
+
+    async function hashPassword(password) {
+        if (window.crypto && window.crypto.subtle && window.TextEncoder) {
+            var encoded = new TextEncoder().encode(password);
+            var hashBuffer = await window.crypto.subtle.digest('SHA-256', encoded);
+            var hashArray = Array.from(new Uint8Array(hashBuffer));
+            return 'sha256:' + hashArray.map(function(byte) {
+                return byte.toString(16).padStart(2, '0');
+            }).join('');
+        }
+
+        return 'plain:' + btoa(password);
+    }
+
+    async function createLocalAccount(name, email, password) {
+        var accounts = readLocalAccounts();
+        var normalizedEmail = normalizeEmail(email);
+
+        for (var i = 0; i < accounts.length; i += 1) {
+            if (normalizeEmail(accounts[i].email) === normalizedEmail) {
+                throw { code: 'auth/email-already-in-use' };
+            }
+        }
+
+        var account = {
+            uid: 'local_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+            name: name,
+            email: normalizedEmail,
+            passwordHash: await hashPassword(password),
+            createdAt: Date.now()
+        };
+
+        accounts.push(account);
+        writeLocalAccounts(accounts);
+        return account;
+    }
+
+    async function signInLocalAccount(email, password) {
+        var account = findLocalAccount(email);
+
+        if (!account) {
+            throw { code: 'auth/user-not-found' };
+        }
+
+        var suppliedHash = await hashPassword(password);
+        if (account.passwordHash !== suppliedHash) {
+            throw { code: 'auth/wrong-password' };
+        }
+
+        return account;
+    }
+
+    function buildLocalUser(account) {
+        return {
+            uid: account.uid,
+            email: account.email,
+            displayName: account.name || 'Resident'
+        };
+    }
+
+    function shouldFallbackToLocal(error) {
+        var code = error && error.code ? error.code : '';
+        return !firebaseContext || [
+            'auth/app-not-authorized',
+            'auth/configuration-not-found',
+            'auth/internal-error',
+            'auth/invalid-api-key',
+            'auth/network-request-failed',
+            'auth/operation-not-allowed',
+            'auth/operation-not-supported-in-this-environment',
+            'auth/unauthorized-domain',
+            'auth/user-not-found'
+        ].indexOf(code) !== -1;
+    }
+
+    // Helper: show error
+    function showError(elId, msg) {
+        var el = document.getElementById(elId);
+        el.textContent = msg;
+        el.style.display = 'block';
+        setTimeout(function() { el.style.display = 'none'; }, 5000);
+    }
+
+    function showSuccess(elId, msg) {
+        var el = document.getElementById(elId);
+        el.textContent = msg;
+        el.style.display = 'block';
+        setTimeout(function() { el.style.display = 'none'; }, 5000);
+    }
+
+    function clearMessage(elId) {
+        var el = document.getElementById(elId);
+        el.textContent = '';
+        el.style.display = 'none';
+    }
+
+    function clearMessages() {
+        clearMessage('signUpError');
+        clearMessage('signInError');
+        clearMessage('signInSuccess');
+    }
+
+    // Friendly error messages
+    function friendlyError(code) {
+        switch(code) {
+            case 'auth/email-already-in-use': return 'This email is already registered. Please sign in instead.';
+            case 'auth/app-not-authorized': return 'Firebase auth is not configured for this site yet. Use email sign up below.';
+            case 'auth/configuration-not-found': return 'Authentication is not configured in Firebase. Use email sign up below.';
+            case 'auth/invalid-email': return 'Please enter a valid email address.';
+            case 'auth/weak-password': return 'Password must be at least 6 characters.';
+            case 'auth/user-not-found': return 'No account found with this email. Please sign up first.';
+            case 'auth/wrong-password': return 'Incorrect password. Please try again.';
+            case 'auth/invalid-credential': return 'Invalid email or password. Please try again.';
+            case 'auth/invalid-api-key': return 'Firebase auth is misconfigured right now. Use email sign up below.';
+            case 'auth/network-request-failed': return 'Network error. Check your connection and try again.';
+            case 'auth/operation-not-allowed': return 'Firebase email sign-in is disabled right now. Use the local email sign up instead.';
+            case 'auth/operation-not-supported-in-this-environment': return 'This browser environment cannot use Firebase auth. Use email sign up below.';
+            case 'auth/too-many-requests': return 'Too many failed attempts. Please try again later.';
+            case 'auth/popup-closed-by-user': return 'Sign-in popup was closed. Please try again.';
+            case 'auth/unauthorized-domain': return 'This site is not authorized for Firebase popup sign-in yet.';
+            default: return 'Something went wrong. Please try again.';
+        }
+    }
+
+    // --- SIGN UP ---
+    document.getElementById('signUpForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        clearMessages();
+
+        var name = document.getElementById('signUpName').value.trim();
+        var email = normalizeEmail(document.getElementById('signUpEmail').value);
+        var password = document.getElementById('signUpPassword').value;
+
+        if (!name) { showError('signUpError', 'Please enter your full name.'); return; }
+        if (!email) { showError('signUpError', 'Please enter your email.'); return; }
+        if (password.length < 6) { showError('signUpError', 'Password must be at least 6 characters.'); return; }
+
+        var btn = document.getElementById('signUpBtn');
+        btn.textContent = 'Creating account...';
+        btn.disabled = true;
+
+        try {
+            if (firebaseContext) {
+                try {
+                    var firebaseResult = await firebaseContext.auth.createUserWithEmailAndPassword(email, password);
+                    await firebaseResult.user.updateProfile({ displayName: name });
+                    saveSessionAndRedirect(firebaseResult.user, name, 'firebase-email');
+                    return;
+                } catch (firebaseError) {
+                    if (!shouldFallbackToLocal(firebaseError)) {
+                        throw firebaseError;
+                    }
+
+                    console.warn('Falling back to local sign-up.', firebaseError);
+                }
+            }
+
+            var localAccount = await createLocalAccount(name, email, password);
+            saveSessionAndRedirect(buildLocalUser(localAccount), localAccount.name, 'local-email');
+        } catch (error) {
+            btn.textContent = 'Join the Network';
+            btn.disabled = false;
+            showError('signUpError', friendlyError(error.code));
+        }
+    });
+
+    // --- SIGN IN ---
+    document.getElementById('signInForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        clearMessages();
+
+        var email = normalizeEmail(document.getElementById('signInEmail').value);
+        var password = document.getElementById('signInPassword').value;
+
+        if (!email) { showError('signInError', 'Please enter your email.'); return; }
+        if (!password) { showError('signInError', 'Please enter your password.'); return; }
+
+        var btn = document.getElementById('signInBtn');
+        btn.textContent = 'Signing in...';
+        btn.disabled = true;
+
+        try {
+            if (firebaseContext) {
+                try {
+                    var firebaseResult = await firebaseContext.auth.signInWithEmailAndPassword(email, password);
+                    saveSessionAndRedirect(firebaseResult.user, firebaseResult.user.displayName, 'firebase-email');
+                    return;
+                } catch (firebaseError) {
+                    if (!shouldFallbackToLocal(firebaseError)) {
+                        throw firebaseError;
+                    }
+
+                    console.warn('Falling back to local sign-in.', firebaseError);
+                }
+            }
+
+            var localAccount = await signInLocalAccount(email, password);
+            saveSessionAndRedirect(buildLocalUser(localAccount), localAccount.name, 'local-email');
+        } catch (error) {
+            btn.textContent = 'Sign In';
+            btn.disabled = false;
+            showError('signInError', friendlyError(error.code));
+        }
+    });
+
+    // --- GOOGLE SIGN IN ---
+    function handleGoogleSignIn() {
+        clearMessages();
+
+        if (!firebaseContext) {
+            showError('signInError', 'Google sign-in is not available here. Use email sign up or sign in instead.');
+            return;
+        }
+
+        firebaseContext.auth.signInWithPopup(firebaseContext.googleProvider)
+            .then(function(result) {
+                saveSessionAndRedirect(result.user, result.user.displayName, 'firebase-google');
+            })
+            .catch(function(error) {
+                if (shouldFallbackToLocal(error)) {
+                    showError('signInError', 'Google sign-in is not available here. Use email sign up or sign in instead.');
+                    return;
+                }
+
+                showError('signInError', friendlyError(error.code));
+            });
+    }
+
+    document.getElementById('googleSignInBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        handleGoogleSignIn();
+    });
+
+    document.getElementById('googleSignUpBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        handleGoogleSignIn();
+    });
+
+    // --- FORGOT PASSWORD ---
+    document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        clearMessages();
+
+        var email = normalizeEmail(document.getElementById('signInEmail').value);
+        if (!email) {
+            showError('signInError', 'Enter your email above, then click Forgot Password.');
+            return;
+        }
+
+        if (!firebaseContext) {
+            if (findLocalAccount(email)) {
+                showError('signInError', 'Password reset email is unavailable in local mode. Sign in with your existing password.');
+                return;
+            }
+
+            showError('signInError', 'No account found with this email. Please sign up first.');
+            return;
+        }
+
+        firebaseContext.auth.sendPasswordResetEmail(email)
+            .then(function() {
+                showSuccess('signInSuccess', 'Password reset email sent! Check your inbox.');
+            })
+            .catch(function(error) {
+                if (shouldFallbackToLocal(error)) {
+                    if (findLocalAccount(email)) {
+                        showError('signInError', 'Password reset email is unavailable in local mode. Sign in with your existing password.');
+                        return;
+                    }
+
+                    showError('signInError', 'No account found with this email. Please sign up first.');
+                    return;
+                }
+
+                showError('signInError', friendlyError(error.code));
+            });
+    });
+</script>
+
+</body>
+</html>

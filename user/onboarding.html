@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="../shared.js"></script>
+  <meta name="theme-color" content="#1E293B">
+  <title>ARPS — Verification</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      background-color: #f1f5f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .wizard-container {
+      background: #ffffff;
+      width: 100%;
+      max-width: 480px;
+      border-radius: 28px;
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
+      overflow: hidden;
+      position: relative;
+      min-height: 580px;
+      display: flex;
+      flex-direction: column;
+    }
+    .step {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      animation: fadeIn 0.4s ease forwards;
+    }
+    .step.active {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .progress-bar {
+      height: 6px;
+      background: #e2e8f0;
+      width: 100%;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #3b82f6;
+      transition: width 0.4s ease;
+    }
+    .file-input-wrapper {
+      position: relative;
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      padding: 32px 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      background: #f8fafc;
+    }
+    .file-input-wrapper:hover, .file-input-wrapper.dragover {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+    .file-input-wrapper input[type="file"] {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .terms-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 20px;
+      height: 200px;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #475569;
+    }
+    .terms-box::-webkit-scrollbar { width: 6px; }
+    .terms-box::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+
+    /* Form fields */
+    .form-field {
+      width: 100%;
+      margin-bottom: 14px;
+    }
+    .form-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+    .form-field label .required {
+      color: #DC2626;
+      margin-left: 2px;
+    }
+    .form-field input,
+    .form-field select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1e293b;
+      background: #f8fafc;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-field input:focus,
+    .form-field select:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+      background: #fff;
+    }
+    .form-field input::placeholder {
+      color: #94a3b8;
+    }
+
+    /* Gender radio */
+    .gender-group {
+      display: flex;
+      gap: 10px;
+    }
+    .gender-option {
+      flex: 1;
+      position: relative;
+    }
+    .gender-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .gender-option label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #64748B;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: none;
+      letter-spacing: normal;
+      margin-bottom: 0;
+    }
+    .gender-option input:checked + label {
+      border-color: #3b82f6;
+      background: #eff6ff;
+      color: #1d4ed8;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+
+    /* Selfie preview */
+    /* Photo card grid */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .photo-card {
+      border: 2px dashed #cbd5e1;
+      border-radius: 14px;
+      background: #f8fafc;
+      padding: 8px;
+      text-align: center;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .photo-card.captured {
+      border-color: #10b981;
+      border-style: solid;
+      background: #ecfdf5;
+    }
+    .photo-card .photo-label {
+      font-size: 10px;
+      font-weight: 800;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+    .photo-card.captured .photo-label {
+      color: #059669;
+    }
+    .photo-card .photo-preview {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      border-radius: 10px;
+      display: none;
+      border: 1px solid #e2e8f0;
+    }
+    .photo-card.captured .photo-preview {
+      display: block;
+    }
+    .photo-card .photo-placeholder {
+      width: 100%;
+      aspect-ratio: 3/4;
+      border-radius: 10px;
+      background: #f1f5f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+    .photo-card.captured .photo-placeholder {
+      display: none;
+    }
+    .photo-actions {
+      display: flex;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .photo-actions button {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 7px 4px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 700;
+      color: #64748B;
+      margin-top: 0;
+      box-shadow: none;
+      text-transform: none;
+      letter-spacing: normal;
+      width: auto;
+    }
+    .photo-actions button:hover {
+      border-color: #7c3aed;
+      background: #f5f3ff;
+      color: #7c3aed;
+      box-shadow: none;
+    }
+    .photo-card.captured .photo-actions button {
+      border-color: #a7f3d0;
+      color: #059669;
+    }
+
+    /* Step indicator dots */
+    .step-dots {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      padding: 12px 0;
+      background: #fff;
+    }
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      transition: all 0.3s;
+    }
+    .step-dot.active {
+      background: #3b82f6;
+      width: 24px;
+      border-radius: 4px;
+    }
+    .step-dot.done {
+      background: #10b981;
+    }
+  </style>
+</head>
+<body>
+
+<div class="wizard-container">
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width: 20%;"></div>
+  </div>
+
+  <!-- Step dots -->
+  <div class="step-dots" id="stepDots">
+    <div class="step-dot active" data-step="1"></div>
+    <div class="step-dot" data-step="2"></div>
+    <div class="step-dot" data-step="3"></div>
+    <div class="step-dot" data-step="4"></div>
+    <div class="step-dot" data-step="5"></div>
+  </div>
+
+  <!-- Step 1: Personal Information -->
+  <div class="step active" id="step1">
+    <div class="p-6 pb-2 flex-1 flex flex-col" style="overflow-y: auto;">
+      <div class="text-center mb-5">
+        <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+          <i class="ph ph-user-circle text-3xl"></i>
+        </div>
+        <h2 class="text-xl font-extrabold text-slate-800">Personal Information</h2>
+        <p class="text-xs text-slate-500 mt-1">Fill in your details to verify your identity.</p>
+      </div>
+
+      <div class="form-field">
+        <label>Full Name <span class="required">*</span></label>
+        <input type="text" id="regFullName" placeholder="e.g. Juan Dela Cruz" required />
+      </div>
+
+      <div class="flex gap-3">
+        <div class="form-field" style="flex: 1;">
+          <label>Age <span class="required">*</span></label>
+          <input type="number" id="regAge" placeholder="e.g. 28" min="1" max="120" required />
+        </div>
+        <div class="form-field" style="flex: 1.5;">
+          <label>Contact Number <span class="required">*</span></label>
+          <input type="tel" id="regContact" placeholder="e.g. 09171234567" required />
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>Gender <span class="required">*</span></label>
+        <div class="gender-group">
+          <div class="gender-option">
+            <input type="radio" name="gender" id="genderMale" value="Male">
+            <label for="genderMale">
+              <i class="ph ph-gender-male text-lg"></i> Male
+            </label>
+          </div>
+          <div class="gender-option">
+            <input type="radio" name="gender" id="genderFemale" value="Female">
+            <label for="genderFemale">
+              <i class="ph ph-gender-female text-lg"></i> Female
+            </label>
+          </div>
+          <div class="gender-option">
+            <input type="radio" name="gender" id="genderOther" value="Other">
+            <label for="genderOther">
+              <i class="ph ph-gender-nonbinary text-lg"></i> Other
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>Barangay / Address <span class="required">*</span></label>
+        <input type="text" id="regBarangay" placeholder="e.g. Brgy. San Isidro, Legazpi City" required />
+      </div>
+
+      <div class="form-field">
+        <label>At-Risk Category</label>
+        <select id="regAtRisk">
+          <option value="None">None</option>
+          <option value="Senior Citizen">Senior Citizen (60+)</option>
+          <option value="PWD">Person with Disability (PWD)</option>
+          <option value="Pregnant">Pregnant</option>
+          <option value="Solo Parent">Solo Parent</option>
+          <option value="Child">Minor / Child</option>
+          <option value="Elderly with Condition">Elderly with Medical Condition</option>
+        </select>
+      </div>
+
+      <p id="step1Error" class="text-red-500 text-sm font-bold mt-2 text-center hidden">Please fill in all required fields.</p>
+    </div>
+    <div class="p-5 border-t border-slate-100 bg-slate-50 flex justify-end">
+      <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2 w-full justify-center" onclick="nextStep(1)">
+        Continue <i class="ph ph-arrow-right font-bold"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 2: Upload Government ID (Front + Back) -->
+  <div class="step" id="step2">
+    <div class="p-5 pb-2 flex-1 flex flex-col" style="overflow-y:auto;">
+      <div class="text-center mb-4">
+        <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-2">
+          <i class="ph ph-identification-card text-2xl"></i>
+        </div>
+        <h2 class="text-lg font-extrabold text-slate-800">Upload Valid ID</h2>
+        <p class="text-[11px] text-slate-500 mt-1">Upload clear photos of the <strong>front</strong> and <strong>back</strong> of your government ID.</p>
+      </div>
+
+      <!-- Hidden file inputs -->
+      <input type="file" id="idFrontFile" accept="image/png,image/jpeg,image/jpg" class="hidden" />
+      <input type="file" id="idBackFile" accept="image/png,image/jpeg,image/jpg" class="hidden" />
+
+      <!-- 2-card grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <!-- ID Front -->
+        <div class="photo-card" id="card_id_front">
+          <div class="photo-label">🪪 Front</div>
+          <div class="photo-placeholder" id="ph_id_front">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <circle cx="8" cy="11" r="2.5"/>
+              <line x1="14" y1="9" x2="20" y2="9" stroke-linecap="round"/>
+              <line x1="14" y1="12" x2="20" y2="12" stroke-linecap="round"/>
+              <line x1="14" y1="15" x2="18" y2="15" stroke-linecap="round"/>
+            </svg>
+            ID Front
+          </div>
+          <img class="photo-preview" id="prev_id_front" alt="ID Front" />
+          <div class="photo-actions">
+            <button type="button" onclick="document.getElementById('idFrontFile').click()" style="width:100%;">
+              <i class="ph ph-upload-simple"></i> Upload Front
+            </button>
+          </div>
+        </div>
+
+        <!-- ID Back -->
+        <div class="photo-card" id="card_id_back">
+          <div class="photo-label">🔄 Back</div>
+          <div class="photo-placeholder" id="ph_id_back">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <line x1="2" y1="10" x2="22" y2="10" stroke-linecap="round"/>
+              <line x1="6" y1="15" x2="18" y2="15" stroke-linecap="round"/>
+              <line x1="6" y1="17" x2="14" y2="17" stroke-linecap="round"/>
+            </svg>
+            ID Back
+          </div>
+          <img class="photo-preview" id="prev_id_back" alt="ID Back" />
+          <div class="photo-actions">
+            <button type="button" onclick="document.getElementById('idBackFile').click()" style="width:100%;">
+              <i class="ph ph-upload-simple"></i> Upload Back
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-3">
+        <span class="text-[11px] font-bold" id="idCounter" style="color:#94a3b8;">0 / 2 sides uploaded</span>
+      </div>
+
+      <p id="step2Error" class="text-red-500 text-sm font-bold mt-2 text-center hidden">Both front and back of your ID are required.</p>
+    </div>
+    <div class="p-5 border-t border-slate-100 bg-slate-50 flex gap-3">
+      <button class="bg-white hover:bg-slate-100 text-slate-700 font-bold py-3 px-5 rounded-xl border border-slate-200 transition-all w-1/3" onclick="prevStep(2)">Back</button>
+      <button class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex-1 flex justify-center items-center gap-2" onclick="nextStep(2)">
+        Continue <i class="ph ph-arrow-right font-bold"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 3: Selfie Verification (3 photos) -->
+  <div class="step" id="step3">
+    <div class="p-5 pb-2 flex-1 flex flex-col" style="overflow-y:auto;">
+      <div class="text-center mb-3">
+        <div class="w-12 h-12 bg-violet-100 text-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-2">
+          <i class="ph ph-camera text-2xl"></i>
+        </div>
+        <h2 class="text-lg font-extrabold text-slate-800">Photo Verification</h2>
+        <p class="text-[11px] text-slate-500 mt-1">Take or upload <strong>3 photos</strong> while holding your ID. This helps verify your identity.</p>
+      </div>
+
+      <!-- Instructions -->
+      <div class="bg-violet-50 rounded-xl p-3 mb-4 border border-violet-200">
+        <div class="flex items-start gap-3">
+          <div class="shrink-0 w-8 h-8 rounded-lg bg-violet-200 flex items-center justify-center mt-0.5">
+            <i class="ph ph-info text-violet-700 text-lg"></i>
+          </div>
+          <ul class="text-[11px] text-violet-800 space-y-0.5 font-medium">
+            <li>• Hold your ID beside your face in every photo</li>
+            <li>• Front face + Left side + Right side required</li>
+            <li>• Good lighting, no blur — both face & ID visible</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Hidden file inputs -->
+      <input type="file" id="selfie_front_cam" accept="image/*" capture="user" class="hidden" />
+      <input type="file" id="selfie_front_file" accept="image/png,image/jpeg,image/jpg" class="hidden" />
+      <input type="file" id="selfie_left_cam" accept="image/*" capture="user" class="hidden" />
+      <input type="file" id="selfie_left_file" accept="image/png,image/jpeg,image/jpg" class="hidden" />
+      <input type="file" id="selfie_right_cam" accept="image/*" capture="user" class="hidden" />
+      <input type="file" id="selfie_right_file" accept="image/png,image/jpeg,image/jpg" class="hidden" />
+
+      <!-- 3-Photo grid -->
+      <div class="photo-grid">
+        <!-- Front -->
+        <div class="photo-card" id="card_front">
+          <div class="photo-label">👤 Front</div>
+          <div class="photo-placeholder" id="ph_front">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5">
+              <circle cx="12" cy="8" r="4"/>
+              <path d="M4 21v-2a4 4 0 014-4h8a4 4 0 014 4v2"/>
+            </svg>
+            Front face
+          </div>
+          <img class="photo-preview" id="prev_front" alt="Front" />
+          <div class="photo-actions">
+            <button type="button" onclick="document.getElementById('selfie_front_cam').click()">
+              <i class="ph ph-camera"></i> Cam
+            </button>
+            <button type="button" onclick="document.getElementById('selfie_front_file').click()">
+              <i class="ph ph-upload-simple"></i> File
+            </button>
+          </div>
+        </div>
+
+        <!-- Left side -->
+        <div class="photo-card" id="card_left">
+          <div class="photo-label">◀ Left Side</div>
+          <div class="photo-placeholder" id="ph_left">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5">
+              <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/>
+              <polyline points="10 17 5 12 10 7"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Left profile
+          </div>
+          <img class="photo-preview" id="prev_left" alt="Left side" />
+          <div class="photo-actions">
+            <button type="button" onclick="document.getElementById('selfie_left_cam').click()">
+              <i class="ph ph-camera"></i> Cam
+            </button>
+            <button type="button" onclick="document.getElementById('selfie_left_file').click()">
+              <i class="ph ph-upload-simple"></i> File
+            </button>
+          </div>
+        </div>
+
+        <!-- Right side -->
+        <div class="photo-card" id="card_right">
+          <div class="photo-label">Right ▶</div>
+          <div class="photo-placeholder" id="ph_right">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5">
+              <path d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h4"/>
+              <polyline points="14 17 19 12 14 7"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Right profile
+          </div>
+          <img class="photo-preview" id="prev_right" alt="Right side" />
+          <div class="photo-actions">
+            <button type="button" onclick="document.getElementById('selfie_right_cam').click()">
+              <i class="ph ph-camera"></i> Cam
+            </button>
+            <button type="button" onclick="document.getElementById('selfie_right_file').click()">
+              <i class="ph ph-upload-simple"></i> File
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status counter -->
+      <div class="text-center mt-3">
+        <span class="text-[11px] font-bold" id="selfieCounter" style="color:#94a3b8;">0 / 3 photos captured</span>
+      </div>
+
+      <p id="step3Error" class="text-red-500 text-sm font-bold mt-2 text-center hidden">All 3 photos are required to continue.</p>
+    </div>
+    <div class="p-5 border-t border-slate-100 bg-slate-50 flex gap-3">
+      <button class="bg-white hover:bg-slate-100 text-slate-700 font-bold py-3 px-5 rounded-xl border border-slate-200 transition-all w-1/3" onclick="prevStep(3)">Back</button>
+      <button class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-violet-600/30 transition-all flex-1 flex justify-center items-center gap-2" onclick="nextStep(3)">
+        Continue <i class="ph ph-arrow-right font-bold"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 4: Terms & Conditions -->
+  <div class="step" id="step4">
+    <div class="p-6 pb-2 flex-1 flex flex-col">
+      <div class="text-center mb-4">
+        <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3">
+          <i class="ph ph-shield-check text-3xl"></i>
+        </div>
+        <h2 class="text-xl font-extrabold text-slate-800">Terms of Service</h2>
+        <p class="text-xs text-slate-500 mt-1">Read carefully before proceeding.</p>
+      </div>
+
+      <div class="terms-box mb-5 border-emerald-100">
+        <h4 class="font-bold text-slate-800 mb-2 text-base">ARPS User Agreement</h4>
+        <p class="mb-3">Welcome to the <strong>Active Response &amp; Protection System (ARPS)</strong>. By registering, you agree to these terms designed to keep everyone in the community safe and accountable.</p>
+
+        <ol class="list-decimal pl-5 space-y-3 mb-3">
+          <li>
+            <strong>Honest Emergency Reports:</strong> All SOS alerts and incident reports must be truthful and accurate. Sending a false emergency alert is a criminal offense under Philippine law (RA 10639) and will result in immediate account suspension and referral to authorities.
+          </li>
+          <li>
+            <strong>Identity Verification with Valid Government ID:</strong> You must upload a clear photo of your valid government-issued ID. When submitting your selfie for verification, you are required to <strong>hold your ID in your right hand</strong>, clearly visible alongside your face. This confirms you are the rightful owner of the ID presented. Impersonation or submission of falsified documents will be reported to law enforcement.
+          </li>
+          <li>
+            <strong>Right-Hand ID Photo Requirement:</strong> Your selfie verification photo must show you holding your ID with your <strong>right hand raised to chest level</strong>. Photos that do not clearly show the ID held in the right hand will be rejected and you will be asked to re-submit.
+          </li>
+          <li>
+            <strong>Data Privacy (RA 10173):</strong> Your personal information, location data, and uploaded documents are used solely for emergency response, community safety, and identity verification. Your data will never be sold or shared with third parties outside of emergency response operations.
+          </li>
+          <li>
+            <strong>Location Access:</strong> ARPS requires access to your device location for SOS alerts and evacuation routing. Location data is transmitted only during active emergencies and is not stored continuously.
+          </li>
+          <li>
+            <strong>Community Conduct:</strong> Treat all citizens, responders, and administrators on the platform with respect. Harassment, misuse of any feature, or deliberate system abuse is strictly prohibited.
+          </li>
+          <li>
+            <strong>System Limitations:</strong> ARPS provides alerts based on official PAGASA and NDRRMC data. During actual emergencies, always follow instructions from your local government unit (LGU) and MDRRMO.
+          </li>
+        </ol>
+
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mt-3">
+          <p class="text-[12px] text-emerald-800 font-semibold leading-relaxed">
+            <strong>📸 Selfie Reminder:</strong> When taking your verification selfie, hold your valid ID clearly in your <strong>right hand</strong> at chest level, with both your face and the ID visible in the same photo. This is required for approval.
+          </p>
+        </div>
+
+        <p class="mt-3 text-[12px] text-slate-500">Your participation makes our community safer. Thank you for joining ARPS.</p>
+      </div>
+
+      <!-- Custom check icon (no filled box) -->
+      <label class="flex items-start gap-3 cursor-pointer group" for="termsCheck">
+        <div class="shrink-0 mt-0.5">
+          <input type="checkbox" id="termsCheck" class="sr-only" onchange="onTermsToggle()">
+          <div id="termsIcon" class="w-6 h-6 flex items-center justify-center transition-all">
+            <!-- Unchecked: outlined circle -->
+            <svg id="termsUnchecked" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="#CBD5E1" stroke-width="2"/>
+            </svg>
+            <!-- Checked: filled circle with check (hidden by default) -->
+            <svg id="termsChecked" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="hidden">
+              <circle cx="12" cy="12" r="10" fill="#059669"/>
+              <path d="M7.5 12.5l3 3 6-6" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <span class="text-sm font-semibold text-slate-600 select-none leading-relaxed">
+          I have read and understood the ARPS Terms of Service. I agree to hold my valid ID in my <strong class="text-emerald-700">right hand</strong> for the verification selfie, and I confirm all information I provide is truthful and accurate.
+        </span>
+      </label>
+      <p id="step4Error" class="text-red-500 text-xs font-bold mt-3 text-center hidden">✕ You must agree to the terms before you can continue.</p>
+    </div>
+    <div class="p-5 border-t border-slate-100 bg-slate-50 flex gap-3">
+      <button class="bg-white hover:bg-slate-100 text-slate-700 font-bold py-3 px-5 rounded-xl border border-slate-200 transition-all w-1/3" onclick="prevStep(4)">Back</button>
+      <button id="step4Next" disabled
+        class="bg-slate-200 text-slate-400 font-bold py-3 px-6 rounded-xl transition-all flex-1 flex justify-center items-center gap-2 cursor-not-allowed"
+        onclick="nextStep(4)">
+        Continue <i class="ph ph-arrow-right font-bold"></i>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function onTermsToggle() {
+      const checked = document.getElementById('termsCheck').checked;
+      document.getElementById('termsUnchecked').classList.toggle('hidden', checked);
+      document.getElementById('termsChecked').classList.toggle('hidden', !checked);
+      document.getElementById('step4Error').classList.add('hidden');
+
+      const btn = document.getElementById('step4Next');
+      if (checked) {
+        btn.disabled = false;
+        btn.className = 'bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-emerald-600/30 transition-all flex-1 flex justify-center items-center gap-2 cursor-pointer';
+      } else {
+        btn.disabled = true;
+        btn.className = 'bg-slate-200 text-slate-400 font-bold py-3 px-6 rounded-xl transition-all flex-1 flex justify-center items-center gap-2 cursor-not-allowed';
+      }
+    }
+  </script>
+
+  <!-- Step 5: Review & Submit -->
+  <div class="step" id="step5">
+    <div class="p-6 pb-2 flex-1 flex flex-col items-center justify-center text-center">
+      <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-5 shadow-xl shadow-emerald-200/50 relative">
+        <div class="absolute inset-0 border-4 border-emerald-400 rounded-full animate-ping opacity-20"></div>
+        <i class="ph ph-check-circle text-4xl"></i>
+      </div>
+      <h2 class="text-2xl font-extrabold text-slate-800 mb-2">You're All Set!</h2>
+      <p class="text-slate-500 leading-relaxed max-w-sm text-sm">Welcome to ARPS, <strong class="text-slate-700" id="welcomeName">Resident</strong>. Your information will be reviewed by an admin for verification.</p>
+
+      <!-- Summary -->
+      <div class="w-full bg-slate-50 rounded-2xl p-4 mt-5 border border-slate-100 text-left space-y-2">
+        <div class="flex justify-between">
+          <span class="text-xs font-bold text-slate-400 uppercase">Name</span>
+          <span class="text-sm font-bold text-slate-800" id="reviewName">—</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-xs font-bold text-slate-400 uppercase">Age / Gender</span>
+          <span class="text-sm font-bold text-slate-800" id="reviewAgeGender">—</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-xs font-bold text-slate-400 uppercase">Contact</span>
+          <span class="text-sm font-bold text-slate-800" id="reviewContact">—</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-xs font-bold text-slate-400 uppercase">Barangay</span>
+          <span class="text-sm font-bold text-slate-800 text-right max-w-[60%]" id="reviewBarangay">—</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-xs font-bold text-slate-400 uppercase">ID Uploaded</span>
+          <span class="text-xs font-black text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full flex items-center gap-1"><i class="ph-bold ph-check"></i> Yes</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-xs font-bold text-slate-400 uppercase">Selfie with ID</span>
+          <span class="text-xs font-black text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full flex items-center gap-1"><i class="ph-bold ph-check"></i> Yes</span>
+        </div>
+      </div>
+
+      <div class="mt-5 flex flex-wrap justify-center gap-5">
+        <div class="text-center">
+          <div class="w-11 h-11 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-1"><i class="ph ph-bell-ringing text-lg"></i></div>
+          <span class="text-[10px] font-bold text-slate-500">Live Alerts</span>
+        </div>
+        <div class="text-center">
+          <div class="w-11 h-11 bg-red-50 text-red-600 rounded-xl flex items-center justify-center mx-auto mb-1"><i class="ph ph-warning-circle text-lg"></i></div>
+          <span class="text-[10px] font-bold text-slate-500">SOS Ready</span>
+        </div>
+        <div class="text-center">
+          <div class="w-11 h-11 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-1"><i class="ph ph-map-pin text-lg"></i></div>
+          <span class="text-[10px] font-bold text-slate-500">Safe Routes</span>
+        </div>
+      </div>
+    </div>
+    <div class="p-5 bg-slate-50 border-t border-slate-100">
+      <button class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-emerald-600/30 transition-all text-base" id="submitBtn" onclick="finishOnboarding()">
+        Submit for Verification
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+  import { db } from "../firebase-config.js";
+  import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+  // Ensure user is logged in
+  const session = JSON.parse(localStorage.getItem('arps_session') || 'null');
+  if (!session || !session.uid) {
+    window.location.href = 'loginpage.html';
+  }
+
+  // Cross-device sync: Check if already registered in Firestore
+  getDoc(doc(db, "users", session.uid)).then(docSnap => {
+     if (docSnap.exists()) {
+         let data = docSnap.data();
+         let profile = JSON.parse(localStorage.getItem('arps_profile_' + session.uid) || '{}');
+         profile.status = data.status || 'pending';
+         localStorage.setItem('arps_profile_' + session.uid, JSON.stringify(profile));
+         localStorage.setItem('arps_onboarded_' + session.uid, 'true');
+         
+         if (data.status === 'approved') window.location.href = 'home.html';
+         else window.location.href = 'pending.html';
+     }
+  }).catch(e => console.error("Sync error:", e));
+
+  // Pre-fill name from session
+  if (session.name) {
+    document.getElementById('regFullName').value = session.name;
+  }
+  document.getElementById('welcomeName').textContent = session.name || 'Resident';
+
+  let currentStep = 1;
+  const idState = { front: null, back: null };
+  const selfieState = { front: null, left: null, right: null };
+
+  // ── Step dots ──
+  function updateDots(step) {
+    document.querySelectorAll('.step-dot').forEach((dot, i) => {
+      dot.classList.remove('active', 'done');
+      if (i + 1 < step) dot.classList.add('done');
+      else if (i + 1 === step) dot.classList.add('active');
+    });
+  }
+
+  // ── ID Upload Logic (Front + Back) ──
+  function handleIdInput(inputId, side) {
+    const input = document.getElementById(inputId);
+    input.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const file = this.files[0];
+        if (file.size > 5 * 1024 * 1024) {
+          alert('File is too large. Max 5MB allowed.');
+          this.value = '';
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const preview = document.getElementById('prev_id_' + side);
+          preview.src = e.target.result;
+          const card = document.getElementById('card_id_' + side);
+          card.classList.add('captured');
+          idState[side] = file;
+          updateIdCounter();
+          document.getElementById('step2Error').classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  handleIdInput('idFrontFile', 'front');
+  handleIdInput('idBackFile', 'back');
+
+  function updateIdCounter() {
+    const count = [idState.front, idState.back].filter(Boolean).length;
+    const el = document.getElementById('idCounter');
+    el.textContent = `${count} / 2 sides uploaded`;
+    el.style.color = count === 2 ? '#059669' : '#94a3b8';
+  }
+
+  // ── Selfie Upload (3 photos: front, left, right) ──
+  function handleSelfieInput(inputId, side) {
+    const input = document.getElementById(inputId);
+    input.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const file = this.files[0];
+        if (file.size > 10 * 1024 * 1024) {
+          alert('File is too large. Max 10MB allowed.');
+          this.value = '';
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const preview = document.getElementById('prev_' + side);
+          preview.src = e.target.result;
+          const card = document.getElementById('card_' + side);
+          card.classList.add('captured');
+          selfieState[side] = file;
+          updateSelfieCounter();
+          document.getElementById('step3Error').classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  // Wire up all 6 inputs (cam + file for each side)
+  handleSelfieInput('selfie_front_cam', 'front');
+  handleSelfieInput('selfie_front_file', 'front');
+  handleSelfieInput('selfie_left_cam', 'left');
+  handleSelfieInput('selfie_left_file', 'left');
+  handleSelfieInput('selfie_right_cam', 'right');
+  handleSelfieInput('selfie_right_file', 'right');
+
+  function updateSelfieCounter() {
+    const count = [selfieState.front, selfieState.left, selfieState.right].filter(Boolean).length;
+    const el = document.getElementById('selfieCounter');
+    el.textContent = `${count} / 3 photos captured`;
+    el.style.color = count === 3 ? '#059669' : '#94a3b8';
+  }
+
+  function showStep(step) {
+    document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+    document.getElementById('step' + step).classList.add('active');
+    
+    // Update progress bar (5 steps)
+    const progress = (step / 5) * 100;
+    document.getElementById('progressFill').style.width = progress + '%';
+    
+    // Update colors
+    const progressFill = document.getElementById('progressFill');
+    const colors = ['#3b82f6', '#4f46e5', '#7c3aed', '#10b981', '#10b981'];
+    progressFill.style.background = colors[step - 1];
+
+    updateDots(step);
+  }
+
+  function nextStep(step) {
+    if (step === 1) {
+      // Validate personal info
+      const name = document.getElementById('regFullName').value.trim();
+      const age = document.getElementById('regAge').value.trim();
+      const contact = document.getElementById('regContact').value.trim();
+      const gender = document.querySelector('input[name="gender"]:checked');
+      const barangay = document.getElementById('regBarangay').value.trim();
+
+      if (!name || !age || !contact || !gender || !barangay) {
+        document.getElementById('step1Error').classList.remove('hidden');
+        document.getElementById('step1Error').textContent = 'Please fill in all required fields.';
+        return;
+      }
+      if (parseInt(age) < 1 || parseInt(age) > 120) {
+        document.getElementById('step1Error').classList.remove('hidden');
+        document.getElementById('step1Error').textContent = 'Please enter a valid age.';
+        return;
+      }
+      if (contact.length < 10) {
+        document.getElementById('step1Error').classList.remove('hidden');
+        document.getElementById('step1Error').textContent = 'Please enter a valid contact number.';
+        return;
+      }
+
+      document.getElementById('step1Error').classList.add('hidden');
+      currentStep = 2;
+      showStep(2);
+    } else if (step === 2) {
+      if (!idState.front || !idState.back) {
+        document.getElementById('step2Error').classList.remove('hidden');
+        return;
+      }
+      currentStep = 3;
+      showStep(3);
+    } else if (step === 3) {
+      if (!selfieState.front || !selfieState.left || !selfieState.right) {
+        document.getElementById('step3Error').classList.remove('hidden');
+        return;
+      }
+      currentStep = 4;
+      showStep(4);
+    } else if (step === 4) {
+      if (!document.getElementById('termsCheck').checked) {
+        document.getElementById('step4Error').classList.remove('hidden');
+        return;
+      }
+      // Fill review summary
+      const name = document.getElementById('regFullName').value.trim();
+      const age = document.getElementById('regAge').value.trim();
+      const gender = document.querySelector('input[name="gender"]:checked').value;
+      const contact = document.getElementById('regContact').value.trim();
+      const barangay = document.getElementById('regBarangay').value.trim();
+
+      document.getElementById('reviewName').textContent = name;
+      document.getElementById('reviewAgeGender').textContent = `${age} yrs old · ${gender}`;
+      document.getElementById('reviewContact').textContent = contact;
+      document.getElementById('reviewBarangay').textContent = barangay;
+      document.getElementById('welcomeName').textContent = name;
+
+      currentStep = 5;
+      showStep(5);
+    }
+  }
+
+  function prevStep(step) {
+    currentStep = step - 1;
+    showStep(currentStep);
+  }
+
+  // ── Compress image helper ──
+  function compressImage(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64 = e.target.result;
+        if (!file.type.startsWith('image/')) {
+          resolve(base64);
+          return;
+        }
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const MAX = 800;
+          let w = img.width, h = img.height;
+          if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } }
+          else { if (h > MAX) { w *= MAX / h; h = MAX; } }
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          const compressed = canvas.toDataURL('image/jpeg', 0.7);
+          resolve(compressed.length < base64.length ? compressed : base64);
+        };
+        img.onerror = () => resolve(base64);
+        img.src = base64;
+      };
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function finishOnboarding() {
+    const btn = document.getElementById('submitBtn');
+    btn.innerHTML = '<span class="animate-spin inline-block w-5 h-5 border-[3px] border-white border-t-transparent rounded-full mr-2"></span> Submitting...';
+    btn.disabled = true;
+
+    try {
+      if (!idState.front || !idState.back || !selfieState.front || !selfieState.left || !selfieState.right) {
+        alert('Missing files. Please go back and complete all uploads.');
+        btn.innerHTML = 'Submit for Verification';
+        btn.disabled = false;
+        return;
+      }
+
+      // Compress all images in parallel
+      const [idFront, idBack, selfieFront, selfieLeft, selfieRight] = await Promise.all([
+        compressImage(idState.front),
+        compressImage(idState.back),
+        compressImage(selfieState.front),
+        compressImage(selfieState.left),
+        compressImage(selfieState.right)
+      ]);
+
+      const name = document.getElementById('regFullName').value.trim();
+      const age = document.getElementById('regAge').value.trim();
+      const contact = document.getElementById('regContact').value.trim();
+      const gender = document.querySelector('input[name="gender"]:checked').value;
+      const barangay = document.getElementById('regBarangay').value.trim();
+      const atRisk = document.getElementById('regAtRisk').value;
+
+      // Update local profile
+      let profile = JSON.parse(localStorage.getItem('arps_profile_' + session.uid) || '{}');
+      profile.name = name;
+      profile.contact = contact;
+      profile.atRisk = atRisk;
+      profile.status = 'pending';
+      localStorage.setItem('arps_profile_' + session.uid, JSON.stringify(profile));
+      localStorage.setItem('arps_onboarded_' + session.uid, 'true');
+
+      // Update session name
+      session.name = name;
+      localStorage.setItem('arps_session', JSON.stringify(session));
+
+      // Save to Firestore
+      await setDoc(doc(db, "users", session.uid), {
+        uid: session.uid,
+        name: name,
+        email: session.email,
+        age: parseInt(age),
+        contact: contact,
+        gender: gender,
+        barangay: barangay,
+        atRisk: atRisk,
+        id_front: idFront,
+        id_back: idBack,
+        id_image: idFront,
+        selfie_front: selfieFront,
+        selfie_left: selfieLeft,
+        selfie_right: selfieRight,
+        selfie_image: selfieFront,
+        status: 'pending',
+        timestamp: serverTimestamp()
+      });
+
+      window.location.href = 'pending.html';
+    } catch (err) {
+      console.error(err);
+      alert("Database error! Could not save your data. Please try again.");
+      btn.innerHTML = 'Submit for Verification';
+      btn.disabled = false;
+    }
+  }
+  
+  window.nextStep = nextStep;
+  window.prevStep = prevStep;
+  window.finishOnboarding = finishOnboarding;
+</script>
+
+</body>
+</html>

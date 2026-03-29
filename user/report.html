@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="../shared.js"></script>
+  <meta name="theme-color" content="#DC2626">
+  <title>ARPS — My Report Status</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../shared.css">
+  <script>tailwind.config={theme:{extend:{fontFamily:{sans:['DM Sans','Segoe UI','system-ui','sans-serif']}}}}</script>
+  <style>
+    @keyframes pulseRing {
+      0%   { transform: scale(1);   opacity: 0.55; }
+      100% { transform: scale(2);   opacity: 0; }
+    }
+    @keyframes thankIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0)    scale(1);    }
+    }
+    @keyframes tipIn {
+      from { opacity: 0; transform: translateX(-8px); }
+      to   { opacity: 1; transform: translateX(0);    }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position:  200% center; }
+    }
+
+    .pulse-ring { animation: pulseRing 1.8s cubic-bezier(0,0,.2,1) infinite; }
+    .thank-in   { animation: thankIn  0.5s  cubic-bezier(0.16,1,0.3,1) both; }
+    .tip-in     { animation: tipIn    0.35s cubic-bezier(0.16,1,0.3,1) both; }
+
+    .step-dot {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800;
+      border: 2.5px solid #E2E8F0; background: #fff; color: #94A3B8;
+      transition: all 0.45s cubic-bezier(0.16,1,0.3,1); position: relative; z-index: 1;
+    }
+    .step-dot.active { border-color: #3B82F6; background: #EFF6FF; color: #3B82F6; }
+    .step-dot.done   { border-color: #10B981; background: #10B981; color: #fff; }
+
+    .step-line { flex: 1; height: 3px; background: #E2E8F0; border-radius: 99px; overflow: hidden; }
+    .step-line-fill {
+      height: 100%; border-radius: 99px; width: 0%;
+      background: linear-gradient(90deg, #3B82F6, #10B981);
+      transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s ease infinite;
+      border-radius: 10px;
+    }
+
+    .severity-critical { background: #FEE2E2; color: #991B1B; }
+    .severity-high     { background: #FFEDD5; color: #9A3412; }
+    .severity-medium   { background: #FEF3C7; color: #92400E; }
+    .severity-low      { background: #D1FAE5; color: #065F46; }
+
+    .notif-dot {
+      position: absolute; top: -3px; right: -3px;
+      width: 9px; height: 9px; border-radius: 50%;
+      background: #EF4444; border: 2px solid #fff;
+    }
+  </style>
+  <script src="js/auth-guard.js"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+<div class="app-wrapper w-full min-h-screen relative pb-40 md:pb-12">
+<div class="app-container max-w-[480px] md:max-w-none mx-auto w-full">
+
+  <!-- ── Header ───────────────────────────────────────────────────────────── -->
+  <div class="flex items-center gap-3 px-4 md:px-8 pt-6 md:pt-10 pb-4">
+    <a href="home.html" class="w-9 h-9 rounded-[10px] bg-white border border-slate-200 flex items-center justify-center btn-press">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+    </a>
+    <div>
+      <h2 class="text-lg font-bold text-slate-900 leading-tight">My Report Status</h2>
+      <p class="text-[11px] text-slate-400 font-medium">Real-time response tracking</p>
+    </div>
+    <button id="notifBell" onclick="requestNotifPermission()" title="Enable notifications"
+      class="ml-auto w-9 h-9 rounded-[10px] bg-white border border-slate-200 flex items-center justify-center btn-press relative">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+      </svg>
+      <span id="notifDot" class="notif-dot hidden"></span>
+    </button>
+  </div>
+
+  <!-- ── Loading State ─────────────────────────────────────────────────────── -->
+  <div id="loadingState" class="mx-4 md:mx-8 flex flex-col gap-4 mt-2">
+    <div class="bg-white rounded-2xl border border-slate-200 p-5">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="skeleton w-11 h-11 rounded-full"></div>
+        <div class="flex-1 flex flex-col gap-2">
+          <div class="skeleton h-4 w-40"></div>
+          <div class="skeleton h-3 w-28"></div>
+        </div>
+      </div>
+      <div class="skeleton h-3 w-full mb-2"></div>
+      <div class="skeleton h-3 w-3/4"></div>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200 p-5">
+      <div class="skeleton h-4 w-32 mb-4"></div>
+      <div class="flex items-center gap-2 mb-5">
+        <div class="skeleton w-7 h-7 rounded-full"></div>
+        <div class="skeleton flex-1 h-2"></div>
+        <div class="skeleton w-7 h-7 rounded-full"></div>
+        <div class="skeleton flex-1 h-2"></div>
+        <div class="skeleton w-7 h-7 rounded-full"></div>
+      </div>
+      <div class="skeleton h-14 rounded-xl"></div>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200 p-5">
+      <div class="skeleton h-4 w-36 mb-4"></div>
+      <div class="flex flex-col gap-2.5">
+        <div class="skeleton h-3 w-full"></div>
+        <div class="skeleton h-3 w-5/6"></div>
+        <div class="skeleton h-3 w-4/5"></div>
+        <div class="skeleton h-3 w-full"></div>
+        <div class="skeleton h-3 w-3/4"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── No Report State ───────────────────────────────────────────────────── -->
+  <div id="noReportState" class="hidden flex-col items-center justify-center min-h-[65vh] px-6 text-center">
+    <div class="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-5">
+      <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+    </div>
+    <h3 class="text-lg font-extrabold text-slate-900">No Active Report</h3>
+    <p class="text-sm text-slate-500 mt-2 leading-relaxed max-w-xs">
+      You haven't submitted a report from this device. If you're in an emergency, use the SOS button.
+    </p>
+    <a href="sos.html" class="mt-6 bg-red-600 hover:bg-red-700 text-white font-bold text-sm py-3.5 px-8 rounded-xl btn-press no-underline flex items-center gap-2">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01"/></svg>
+      Go to SOS
+    </a>
+    <a href="home.html" class="mt-3 text-sm text-slate-400 font-semibold no-underline hover:text-slate-600">Back to Home</a>
+  </div>
+
+  <!-- ── Tracking State ────────────────────────────────────────────────────── -->
+  <div id="trackingSection" class="hidden flex-col gap-4 mx-4 md:mx-8 mt-2 pb-4">
+
+    <!-- Report summary card -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 animate-fade">
+      <div class="flex items-start gap-3">
+        <div id="typeIcon" class="w-11 h-11 rounded-[12px] bg-red-100 flex items-center justify-center shrink-0"></div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <p class="text-sm font-extrabold text-slate-900" id="reportType">–</p>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md" id="severityBadge">–</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1" id="reportLocation">–</p>
+          <p class="text-[11px] text-slate-400 mt-0.5" id="reportTime">–</p>
+        </div>
+        <span class="text-[10px] font-bold text-slate-400 font-mono shrink-0" id="reportId">–</span>
+      </div>
+      <!-- At-risk indicator (shown only if present) -->
+      <div id="atRiskRow" class="hidden mt-3 flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        <span class="text-[11px] font-bold text-amber-700">At-risk individual present: <span id="atRiskLabel">–</span></span>
+      </div>
+    </div>
+
+    <!-- Status tracker card -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5">
+      <p class="text-[12px] font-bold text-slate-500 uppercase tracking-wide mb-4">Rescue Response</p>
+
+      <!-- Step bar -->
+      <div class="flex items-center gap-2 mb-5 px-1">
+        <div class="flex flex-col items-center gap-1.5">
+          <div class="step-dot done" id="stepSubmitted">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <span class="text-[10px] font-bold text-emerald-600">Received</span>
+        </div>
+        <div class="step-line"><div class="step-line-fill" id="line1"></div></div>
+        <div class="flex flex-col items-center gap-1.5">
+          <div class="step-dot" id="stepResponding">2</div>
+          <span class="text-[10px] font-bold text-slate-400" id="lbl2">Responding</span>
+        </div>
+        <div class="step-line"><div class="step-line-fill" id="line2"></div></div>
+        <div class="flex flex-col items-center gap-1.5">
+          <div class="step-dot" id="stepResolved">3</div>
+          <span class="text-[10px] font-bold text-slate-400" id="lbl3">Resolved</span>
+        </div>
+      </div>
+
+      <!-- Live status pill -->
+      <div class="flex items-start gap-3 rounded-xl p-3.5 border" id="statusPill" style="background:#FFFBEB;border-color:#FDE68A;">
+        <div class="relative mt-0.5 shrink-0">
+          <div class="w-2.5 h-2.5 rounded-full" id="statusDot" style="background:#F59E0B;"></div>
+          <div class="absolute inset-0 rounded-full pulse-ring" id="statusRing" style="background:#F59E0B;"></div>
+        </div>
+        <div>
+          <p class="text-[13px] font-bold text-slate-900 leading-snug" id="statusHeadline">Your report has been received</p>
+          <p class="text-xs text-slate-500 mt-0.5 leading-relaxed" id="statusDetail">Admin has been notified and a response team is being assigned to your location.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contextual AI Tips card -->
+    <div class="bg-white rounded-2xl border border-blue-100 p-5" id="aiTipsCard">
+      <div class="flex items-center gap-2.5 mb-4">
+        <div class="w-8 h-8 rounded-[10px] bg-blue-600 flex items-center justify-center shrink-0">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm font-bold text-slate-900" id="tipsHeadline">What to do right now</p>
+          <p class="text-[11px] text-slate-400">While responders are on their way</p>
+        </div>
+      </div>
+      <div class="flex flex-col gap-3" id="tipsList"></div>
+    </div>
+
+    <!-- Resolved card (hidden until admin marks Resolved) -->
+    <div id="resolvedCard" class="hidden thank-in bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200 p-6">
+      <div class="flex flex-col items-center text-center">
+        <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <h3 class="text-lg font-extrabold text-emerald-700">Incident Resolved</h3>
+        <p class="text-[13px] text-slate-600 mt-2 leading-relaxed">
+          Your report has been handled by the response team. Thank you for reaching out, <strong id="resolvedName"></strong> — your action helped keep the community safe.
+        </p>
+        <div class="mt-4 w-full bg-white/70 rounded-xl p-3.5 border border-emerald-100 text-left">
+          <p class="text-[11px] font-bold text-emerald-700 uppercase tracking-wide mb-1.5">Stay alert</p>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Even after a resolved incident, monitor your surroundings for secondary hazards. If the situation returns or worsens, use the SOS button immediately.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom actions -->
+    <div class="flex gap-3">
+      <a href="home.html" class="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-semibold text-sm py-3.5 rounded-xl btn-press no-underline flex items-center justify-center gap-1.5">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+        Home
+      </a>
+      <a href="sos.html" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold text-sm py-3.5 rounded-xl btn-press no-underline flex items-center justify-center gap-1.5">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01"/></svg>
+        SOS
+      </a>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  </div>
+  <nav class="bottom-nav">
+  <div class="bottom-nav-brand">
+    <img src="../Images/ARPLOGO.png" alt="ARPS logo">
+    <div class="bottom-nav-brand-copy">
+      <strong>ARPS</strong>
+      <span>Response System</span>
+    </div>
+  </div>
+  <a href="home.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg><span>Home</span></a>
+  <a href="report.html" class="nav-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Report</span></a>
+  <a href="sos.html" class="sos-nav-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg><span>SOS</span></a>
+  <a href="evacuation.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg><span>Centers</span></a>
+  <a href="settings.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Settings</span></a>
+</nav>
+</div>
+
+<script type="module">
+  import {
+    collection, query, where, onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+  import { db } from "../firebase-config.js";
+
+  // ── Device ID ─────────────────────────────────────────────────────────────────
+  function getDeviceId() {
+    let id = localStorage.getItem("resq-device-id");
+    if (!id) {
+      id = `device-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      localStorage.setItem("resq-device-id", id);
+    }
+    return id;
+  }
+
+  // ── Toast ─────────────────────────────────────────────────────────────────────
+  function toast(msg, type = "success") {
+    const icons = {
+      success: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>',
+      info:    '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>',
+      error:   '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 9v2m0 4h.01"/></svg>'
+    };
+    const t = document.createElement("div");
+    t.className = `toast toast-${type}`;
+    t.innerHTML = (icons[type] || icons.info) + msg;
+    document.body.appendChild(t);
+    setTimeout(() => { t.classList.add("out"); setTimeout(() => t.remove(), 300); }, 3200);
+  }
+
+  // ── Notifications ─────────────────────────────────────────────────────────────
+  window.requestNotifPermission = async function () {
+    if (!('Notification' in window)) { toast("Notifications not supported", "error"); return; }
+    if (Notification.permission === 'granted') { toast("Notifications already enabled", "info"); return; }
+    const p = await Notification.requestPermission();
+    updateNotifDot();
+    toast(p === 'granted' ? "Notifications enabled" : "Notifications blocked — enable in browser settings", p === 'granted' ? "success" : "error");
+  };
+
+  function sendNotif(title, body) {
+    if (Notification.permission !== 'granted') return;
+    try { new Notification(title, { body, tag: 'resq-status' }); } catch (_) {}
+  }
+
+  function updateNotifDot() {
+    document.getElementById('notifDot').classList.toggle('hidden', Notification.permission !== 'granted');
+  }
+
+  // ── Emergency type icons ──────────────────────────────────────────────────────
+  const TYPE_ICONS = {
+    Medical:    { svg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>', bg: 'bg-red-100' },
+    Fire:       { svg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EA580C" stroke-width="2" stroke-linecap="round"><path d="M12 2c0 0-5.5 6-5.5 10.5a5.5 5.5 0 0011 0C17.5 8 12 2 12 2z"/><path d="M9.5 14.5c0 0 1.5-1 2.5-1s2.5 1 2.5 1"/></svg>', bg: 'bg-orange-100' },
+    Police:     { svg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4M12 16h.01"/></svg>', bg: 'bg-blue-100' },
+    Flood:      { svg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0369A1" stroke-width="2" stroke-linecap="round"><path d="M12 21c3.5 0 6-2.5 6-6.2C18 11 12 3 12 3S6 11 6 14.8C6 18.5 8.5 21 12 21z"/></svg>', bg: 'bg-sky-100' },
+    Earthquake: { svg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#78350F" stroke-width="2" stroke-linecap="round"><path d="M3 20h18M6 20l4-8 3 4 2-3 3 7"/></svg>', bg: 'bg-amber-100' },
+    Typhoon:    { svg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6D28D9" stroke-width="2" stroke-linecap="round"><path d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2"/></svg>', bg: 'bg-violet-100' },
+    Other:      { svg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>', bg: 'bg-slate-100' }
+  };
+
+  // ── Contextual AI Tips ────────────────────────────────────────────────────────
+  // Tips are specific to type + severity + at-risk profile so every tip is
+  // genuinely useful to the person in that exact situation.
+  function getContextualTips(type, severity, atRisk) {
+    const isCritical = severity === 'Critical';
+    const isHigh     = severity === 'High';
+    const isAtLeastHigh = isCritical || isHigh;
+
+    const hasElderly  = atRisk?.includes('Elderly');
+    const hasPregnant = atRisk?.includes('Pregnant');
+    const hasPWD      = atRisk?.includes('Disability');
+    const hasInfant   = atRisk?.includes('Infant');
+    const hasMedCond  = atRisk?.includes('Medical Condition');
+
+    const tip = (icon, text) => ({ icon, text });
+
+    const TIPS = {
+      Medical: () => {
+        const base = [];
+        if (isAtLeastHigh) {
+          base.push(
+            tip('🫀', "If the person is unresponsive and not breathing normally, start CPR: push hard and fast in the center of the chest — 100 compressions per minute. Don't stop until responders arrive."),
+            tip('🩸', "For heavy bleeding: press a clean cloth firmly on the wound. Don't remove it to check — add more cloth on top if it soaks through. Hold constant pressure."),
+            tip('🚫', "Do not give them anything to eat or drink, even if they ask. It can complicate emergency treatment."),
+            tip('🧍', "If spinal injury is possible (fall, vehicle crash, head trauma) — do not move them. Keep their head still until responders take over.")
+          );
+        } else {
+          base.push(
+            tip('🛋️', "Keep the person calm and in the most comfortable position they can manage. Minimize movement."),
+            tip('🩺', "Note their symptoms, when they started, any medications they take, and known allergies — responders will ask."),
+            tip('🚫', "Do not give medications unless you are 100% certain of what they need and why.")
+          );
+        }
+        if (hasPregnant) base.push(tip('🤰', "Have her lie on her LEFT side — this reduces pressure on the main blood vessel and improves blood flow to the baby. Do not let her lie flat on her back."));
+        if (hasElderly)  base.push(tip('👴', "Check for: face drooping on one side, arm weakness, or slurred speech — these are stroke signs. Note the exact time symptoms started and tell responders immediately."));
+        if (hasInfant)   base.push(tip('👶', "Never shake an infant even if unresponsive. Keep their airway clear. For infant CPR: use only 2 fingers on the breastbone and breathe very gently — just enough to see the chest rise."));
+        if (hasPWD)      base.push(tip('♿', "Tell responders about any devices the person depends on (wheelchair, oxygen tank, hearing aid, pacemaker). Do not remove assistive devices without knowing if it's safe to do so."));
+        if (hasMedCond)  base.push(tip('💊', "If the person has a known condition (diabetes, heart disease, epilepsy), find their emergency medication if available and have it ready for responders."));
+        return base;
+      },
+
+      Fire: () => {
+        const base = [];
+        if (isCritical) {
+          base.push(
+            tip('🚪', "Before opening any door, press the back of your hand against it. A hot door means fire is directly behind — do not open it. Find another exit."),
+            tip('💨', "Crawl low to the ground. Smoke and heat rise — the cleaner air is within 30 cm of the floor. Cover your nose and mouth with a damp cloth if available."),
+            tip('🏃', "Evacuate immediately. Do not stop for belongings. Once outside — do NOT go back in for any reason."),
+            tip('🪟', "If exits are blocked: close the door between you and the fire, seal gaps with cloth to block smoke, move to a window and signal loudly for help. Only jump as an absolute last resort.")
+          );
+        } else {
+          base.push(
+            tip('📢', "Alert everyone in the building immediately — knock on doors and shout as you exit."),
+            tip('🚪', "Close doors behind you as you leave. This slows the fire and buys time for others."),
+            tip('🚶', "Use stairs only — never use an elevator during a fire. Stairs may have smoke; stay low."),
+            tip('📍', "Get to the assembly point and stay there. Take a head count and tell responders immediately if anyone is unaccounted for.")
+          );
+        }
+        if (hasElderly || hasPWD || hasMedCond) base.push(tip('🤝', "Assist at-risk individuals out first. Alert responders of their location if you cannot evacuate them yourself — do not leave without telling someone."));
+        if (hasInfant)   base.push(tip('👶', "Carry the infant against your chest with one hand shielding their face from smoke. Crouch low and move quickly toward the nearest safe exit."));
+        return base;
+      },
+
+      Police: () => {
+        const base = [];
+        if (isCritical) {
+          base.push(
+            tip('🏃', "Run if there is a clear and safe escape route. Leave belongings behind. Do not wait for others if they refuse to move — alert them and go."),
+            tip('🚪', "If you cannot run: find a solid room, lock or barricade the door with heavy furniture, turn off the lights, and silence your phone completely."),
+            tip('📱', "Text your exact location to emergency services or a contact if you cannot speak. Keep the line open silently."),
+            tip('🙌', "If police enter: keep your hands visible and empty at all times. Follow every instruction immediately and without argument.")
+          );
+        } else {
+          base.push(
+            tip('🛑', "Stay away from the area of the incident. Do not try to intervene — your safety is the priority."),
+            tip('📝', "Safely note any identifying details (clothing, direction of travel, vehicle plates) to share with responders on arrival."),
+            tip('📵', "Do not share photos or videos of an active situation on social media — it can alert perpetrators and interfere with the police response."),
+            tip('📍', "Stay in your current safe location until police confirm the scene is clear.")
+          );
+        }
+        if (hasElderly || hasPWD || hasInfant) base.push(tip('🤝', "Keep at-risk individuals calm and sheltered. Their safety depends on staying quiet and out of sight — explain this to them clearly."));
+        return base;
+      },
+
+      Flood: () => {
+        const base = [];
+        if (isCritical) {
+          base.push(
+            tip('⬆️', "Move to the highest point of your building NOW — roof if necessary. Do not wait for water to reach your current floor."),
+            tip('🚗', "Do not attempt to drive through floodwater. Just 30 cm of moving water can carry away a car. 15 cm can knock an adult off their feet."),
+            tip('⚡', "Turn off electricity at the main breaker ONLY if you can reach it without stepping into water — electrocution in floodwater is a real risk."),
+            tip('🌊', "If swept into moving water: float on your back, feet pointing downstream. Aim toward the bank at an angle — do not fight the current head-on.")
+          );
+        } else {
+          base.push(
+            tip('🎒', "Prepare a go-bag now: water, food, important documents (IDs, insurance), medication, phone charger, flashlight. Pack for at least 3 days."),
+            tip('🔌', "Unplug electronics and move valuables to a higher level in your home."),
+            tip('🚫', "Avoid all contact with floodwater — it is contaminated with sewage, chemicals, and potentially live electrical currents."),
+            tip('📻', "Monitor PAGASA and NDRRMC updates closely. Know your nearest evacuation center before you need it.")
+          );
+        }
+        if (hasElderly || hasPWD || hasMedCond) base.push(tip('🤝', "At-risk individuals may need physical assistance. Assign a specific person to stay with them and help them move before water rises further."));
+        if (hasInfant) base.push(tip('👶', "Carry infants above shoulder level when wading. If wading is unavoidable, test the depth ahead of each step — floodwater hides holes and drop-offs."));
+        return base;
+      },
+
+      Earthquake: () => {
+        const base = [];
+        if (isAtLeastHigh) {
+          base.push(
+            tip('🦺', "If still shaking: DROP to your hands and knees immediately. COVER your head and neck under a sturdy table or against an interior wall. HOLD ON until fully stopped."),
+            tip('🏃', "Do not run outside during shaking — most injuries happen from falling debris while moving. Stay in place and protect your head."),
+            tip('🔥', "After shaking stops: smell for gas. If you detect any, open windows, do not touch any switches or flames, and leave immediately — gas explosions can follow earthquakes."),
+            tip('⚠️', "Expect aftershocks — some can be nearly as strong as the main quake. Each time one hits, use Drop-Cover-Hold On again.")
+          );
+        } else {
+          base.push(
+            tip('🚶', "Move carefully — check each step before putting your weight on it. Floors and stairs may be structurally weakened even if they look intact."),
+            tip('🚫', "Do not use elevators — they may be damaged or lose power during aftershocks. Use stairs only."),
+            tip('🏚️', "Stay away from damaged or leaning structures. Keep a clear path to an open area in case aftershocks require you to move quickly.")
+          );
+        }
+        base.push(tip('📡', "Keep a battery-powered or hand-crank radio for updates — cell towers are often overwhelmed after an earthquake."));
+        if (hasElderly || hasMedCond || hasPWD) base.push(tip('🤝', "Check at-risk individuals for injuries first. Injury shock can mask pain — look carefully for cuts, bruising, or inability to bear weight before declaring them uninjured."));
+        return base;
+      },
+
+      Typhoon: () => {
+        const base = [];
+        if (isCritical) {
+          base.push(
+            tip('🌊', "If a STORM SURGE warning is active for your area: EVACUATE NOW. Storm surge arrives with almost no warning and can be 5+ meters high. Do not wait."),
+            tip('🪟', "Shelter in the strongest interior room of a sturdy building. Stay away from ALL windows and glass doors — they can shatter at wind speeds you cannot predict."),
+            tip('😶', "If the wind suddenly stops and it becomes calm, you may be in the typhoon's eye. Do NOT go outside — the other side of the eye wall brings equal or stronger winds within minutes."),
+            tip('💧', "Fill all available containers with clean water NOW. Tap water is often contaminated for days after a typhoon makes landfall.")
+          );
+        } else {
+          base.push(
+            tip('🏠', "Stay indoors. Even during lighter wind, flying debris from nearby structures is a major risk."),
+            tip('⚡', "Unplug all electrical appliances. If the roof is damaged or water enters, turn off the main breaker to prevent electrical fire."),
+            tip('📻', "Monitor PAGASA Tropical Cyclone Bulletins every few hours — intensity can change rapidly."),
+            tip('🎒', "Prepare your emergency kit: 3 days of food and water, first aid, flashlight, extra batteries, cash, and important documents in a sealed waterproof bag.")
+          );
+        }
+        if (hasElderly || hasPWD || hasMedCond) base.push(tip('💊', "Ensure at-risk individuals have their medication supply secured and accessible. Identify a safe interior room for them before the worst of the storm arrives."));
+        return base;
+      },
+
+      Other: () => [
+        tip('👀', "Assess your immediate surroundings. Identify the nearest exit or escape route in case the situation escalates."),
+        tip('📞', "Stay on the line with emergency services if connected — do not hang up even if you cannot speak; they can still hear and trace the call."),
+        tip('👥', "Stay with a group if possible. Do not separate from others unless absolutely necessary."),
+        tip('🔋', "Keep your phone charged and accessible. Lower your screen brightness and close unnecessary apps to conserve battery."),
+        tip('🛑', "Follow every instruction from responding officers or rescue personnel exactly as given, even if it seems unusual.")
+      ]
+    };
+
+    const fn = TIPS[type] || TIPS['Other'];
+    return fn();
+  }
+
+  // ── Render tips ───────────────────────────────────────────────────────────────
+  function renderTips(type, severity, atRisk) {
+    const tips = getContextualTips(type, severity, atRisk);
+    const list = document.getElementById('tipsList');
+    list.innerHTML = tips.map((tip, i) => `
+      <div class="flex items-start gap-3 tip-in" style="animation-delay:${i * 0.055}s">
+        <span class="text-base shrink-0 mt-0.5" role="img">${tip.icon}</span>
+        <p class="text-[13px] text-slate-700 leading-relaxed">${tip.text}</p>
+      </div>
+    `).join('');
+
+    // Tips headline changes based on type
+    const headlines = {
+      Medical:    'Medical emergency — do this now',
+      Fire:       'Fire safety — act immediately',
+      Police:     'Security situation — protect yourself',
+      Flood:      'Flood response — every minute counts',
+      Earthquake: 'Earthquake survival — stay safe',
+      Typhoon:    'Typhoon — shelter and protect',
+      Other:      'What to do while you wait'
+    };
+    document.getElementById('tipsHeadline').textContent = headlines[type] || 'What to do right now';
+  }
+
+  // ── Status UI updater ─────────────────────────────────────────────────────────
+  let currentStatus = null;
+
+  const STATUS_CONFIG = {
+    Pending: {
+      pillBg: '#FFFBEB', pillBorder: '#FDE68A',
+      dotColor: '#F59E0B', headline: 'Your report has been received',
+      detail: 'Admin has been notified. A response team is being identified and will be dispatched to your location shortly.'
+    },
+    Responding: {
+      pillBg: '#EFF6FF', pillBorder: '#BFDBFE',
+      dotColor: '#3B82F6', headline: 'Responders are on the way',
+      detail: 'A rescue team has been dispatched and is heading to your location. Stay where you are if it is safe to do so.'
+    },
+    Resolved: {
+      pillBg: '#ECFDF5', pillBorder: '#A7F3D0',
+      dotColor: '#10B981', headline: 'Incident has been resolved',
+      detail: 'The response team has successfully handled the situation. Thank you for reporting — your action made a difference.'
+    }
+  };
+
+  function applyStatusUI(status) {
+    if (status === currentStatus) return;
+    currentStatus = status;
+
+    const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.Pending;
+
+    // Pill
+    const pill = document.getElementById('statusPill');
+    pill.style.background    = cfg.pillBg;
+    pill.style.borderColor   = cfg.pillBorder;
+    document.getElementById('statusDot').style.background  = cfg.dotColor;
+    document.getElementById('statusRing').style.background = cfg.dotColor;
+    document.getElementById('statusHeadline').textContent  = cfg.headline;
+    document.getElementById('statusDetail').textContent    = cfg.detail;
+
+    // Step dots
+    const stepR = document.getElementById('stepResponding');
+    const stepX = document.getElementById('stepResolved');
+    const line1 = document.getElementById('line1');
+    const line2 = document.getElementById('line2');
+    const lbl2  = document.getElementById('lbl2');
+    const lbl3  = document.getElementById('lbl3');
+
+    if (status === 'Responding') {
+      stepR.className = 'step-dot active';
+      stepR.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+      lbl2.className  = 'text-[10px] font-bold text-blue-600';
+      line1.style.width = '100%';
+    }
+
+    if (status === 'Resolved') {
+      stepR.className = 'step-dot done';
+      stepR.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>';
+      lbl2.className  = 'text-[10px] font-bold text-emerald-600';
+      line1.style.width = '100%';
+
+      stepX.className = 'step-dot done';
+      stepX.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>';
+      lbl3.className  = 'text-[10px] font-bold text-emerald-600';
+      line2.style.width = '100%';
+
+      document.getElementById('resolvedCard').classList.remove('hidden');
+      document.getElementById('aiTipsCard').classList.add('hidden');
+    }
+  }
+
+  // ── Show tracking screen ──────────────────────────────────────────────────────
+  function showTracking(data, docId) {
+    document.getElementById('loadingState').classList.add('hidden');
+
+    const type     = data.type     || 'Other';
+    const severity = data.severity || 'High';
+    const atRisk   = data.atRisk   || '';
+    const name     = data.name     || 'Reporter';
+    const msTs     = data.createdAtMs || Date.now();
+
+    // Type icon + severity badge
+    const iconCfg = TYPE_ICONS[type] || TYPE_ICONS.Other;
+    document.getElementById('typeIcon').className = `w-11 h-11 rounded-[12px] ${iconCfg.bg} flex items-center justify-center shrink-0`;
+    document.getElementById('typeIcon').innerHTML = iconCfg.svg;
+    document.getElementById('reportType').textContent = `${type} Emergency`;
+
+    const sevCls = {
+      Critical: 'severity-critical', High: 'severity-high',
+      Medium: 'severity-medium', Low: 'severity-low'
+    };
+    const badge = document.getElementById('severityBadge');
+    badge.textContent = severity;
+    badge.className = `text-[10px] font-bold px-2 py-0.5 rounded-md ${sevCls[severity] || 'severity-high'}`;
+
+    document.getElementById('reportLocation').textContent = data.locationLabel || 'Location not available';
+    document.getElementById('reportTime').textContent = `Reported at ${new Date(msTs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    document.getElementById('reportId').textContent = `#${docId.slice(0, 8).toUpperCase()}`;
+    document.getElementById('resolvedName').textContent = name;
+
+    // At-risk row
+    if (atRisk && atRisk.toLowerCase() !== 'none' && atRisk !== '') {
+      document.getElementById('atRiskRow').classList.remove('hidden');
+      document.getElementById('atRiskLabel').textContent = atRisk;
+    }
+
+    // Render scenario-specific tips
+    renderTips(type, severity, atRisk);
+
+    // Show tracking section
+    const section = document.getElementById('trackingSection');
+    section.classList.remove('hidden');
+    section.classList.add('flex');
+
+    applyStatusUI(data.status || 'Pending');
+  }
+
+  // ── Bootstrap ─────────────────────────────────────────────────────────────────
+  updateNotifDot();
+
+  const deviceId = getDeviceId();
+  // Simple equality query — no composite index needed.
+  // We sort client-side to pick the most recent report.
+  const q = query(
+    collection(db, 'sosAlerts'),
+    where('reporterId', '==', deviceId)
+  );
+
+  let firstLoad = true;
+
+  onSnapshot(q, (snapshot) => {
+    if (snapshot.empty) {
+      document.getElementById('loadingState').classList.add('hidden');
+      const noRpt = document.getElementById('noReportState');
+      noRpt.classList.remove('hidden');
+      noRpt.classList.add('flex');
+      return;
+    }
+
+    // Sort client-side: newest report first
+    const sorted = snapshot.docs.slice().sort((a, b) => {
+      const aMs = a.data().createdAtMs || a.data().createdAt?.toMillis?.() || 0;
+      const bMs = b.data().createdAtMs || b.data().createdAt?.toMillis?.() || 0;
+      return bMs - aMs;
+    });
+
+    const docSnap = sorted[0];
+    const data    = docSnap.data();
+    const status  = data.status || 'Pending';
+
+    if (firstLoad) {
+      firstLoad = false;
+      showTracking(data, docSnap.id);
+      // Auto-request notification permission after first load
+      if ('Notification' in window && Notification.permission === 'default') {
+        setTimeout(() => Notification.requestPermission().then(updateNotifDot), 1200);
+      }
+      return;
+    }
+
+    // Real-time status change (not first load)
+    const prev = currentStatus;
+    applyStatusUI(status);
+
+    if (status === 'Responding' && prev !== 'Responding') {
+      const type = data.type || 'Emergency';
+      sendNotif('🚨 ARPS — Responders Dispatched', `A response team has been sent for your ${type} report. Stay safe and stay in contact.`);
+      toast('Responders have been dispatched to your location!', 'info');
+    }
+
+    if (status === 'Resolved' && prev !== 'Resolved') {
+      const name = data.name || 'Reporter';
+      sendNotif('✅ ARPS — Incident Resolved', `Your report has been resolved. Thank you, ${name} — you helped keep your community safe.`);
+      toast('Incident resolved. Thank you for reporting!', 'success');
+    }
+
+  }, (err) => {
+    console.error('Snapshot error:', err);
+    document.getElementById('loadingState').classList.add('hidden');
+    // Show the no-report state but with a connection error message
+    const noRpt = document.getElementById('noReportState');
+    noRpt.classList.remove('hidden');
+    noRpt.classList.add('flex');
+    // Replace the subtitle text with an error message
+    const subtitle = noRpt.querySelector('p');
+    if (subtitle) subtitle.textContent = 'Could not connect to the server. Please check your internet connection and try again.';
+    const heading = noRpt.querySelector('h3');
+    if (heading) heading.textContent = 'Connection Error';
+    toast("Could not load report status. Check your connection.", "error");
+  });
+</script>
+</body>
+</html>

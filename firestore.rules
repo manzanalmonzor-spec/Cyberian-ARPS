@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // SOS Alerts — anyone can create (user presses emergency)
+    // Admin reads and updates status
+    match /sosAlerts/{alertId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if false;
+    }
+
+    // All other collections — read/write allowed for this hackathon
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

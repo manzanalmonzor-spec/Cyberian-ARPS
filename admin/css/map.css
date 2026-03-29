@@ -1,0 +1,181 @@
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.72);
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+}
+
+.sidebar-item.active {
+  background: #2563EB;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  border: none;
+}
+
+.map-ai-card {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+}
+
+.map-filter-btn {
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.map-filter-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.map-filter-btn.active {
+  background: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff;
+}
+
+.live-map-area {
+  overflow: hidden;
+}
+
+#adminLiveMap {
+  height: 560px;
+  width: 100%;
+  position: relative;
+  z-index: 0;
+  background: #e2e8f0;
+}
+
+#adminLiveMap .leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.map-custom-marker {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 22px 22px 22px 0;
+  transform: translate(-50%, -100%) rotate(-45deg);
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+}
+
+.map-custom-marker::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  inset: 0;
+  margin: auto;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 999px;
+}
+
+.map-custom-marker:hover {
+  transform: translate(-50%, -104%) rotate(-45deg) scale(1.04);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.28);
+}
+
+.map-custom-marker.active {
+  filter: brightness(1.02);
+  box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.12), 0 14px 30px rgba(15, 23, 42, 0.28);
+}
+
+.map-custom-marker.hidden-marker {
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.map-feed-item {
+  padding: 16px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.map-feed-item:hover {
+  background: #f8fafc;
+}
+
+.map-feed-item.active {
+  background: #eff6ff;
+}
+
+.map-feed-item:last-child {
+  border-bottom: none;
+}
+
+.map-detail-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.map-detail-value {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.resq-admin-marker {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 3px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.24);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.resq-admin-marker.active {
+  transform: scale(1.18);
+  box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.14), 0 10px 24px rgba(15, 23, 42, 0.3);
+}
+
+.resq-admin-marker-wrap,
+.leaflet-div-icon {
+  background: transparent;
+  border: 0;
+}
+
+@media (max-width: 1280px) {
+  .map-filter-btn {
+    padding: 7px 10px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .map-custom-marker {
+    width: 20px;
+    height: 20px;
+  }
+}

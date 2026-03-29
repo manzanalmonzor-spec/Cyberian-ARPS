@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="../shared.js"></script>
+  <meta name="theme-color" content="#DC2626">
+  <title>ARPS — Early Warnings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../shared.css">
+  <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['DM Sans', 'Segoe UI', 'system-ui', 'sans-serif'] } } } }</script>
+  <script src="js/auth-guard.js"></script>
+</head>
+
+<body class="bg-slate-100 font-sans">
+  <div class="app-wrapper w-full min-h-screen relative pb-24 md:pb-8">
+    <div class="app-container max-w-[480px] md:max-w-none mx-auto w-full">
+
+      <div class="flex items-center gap-3 px-4 md:px-8 pt-6 md:pt-10 pb-4">
+        <a href="home.html"
+          class="w-9 h-9 rounded-[10px] bg-white border border-slate-200 flex items-center justify-center btn-press"><svg
+            width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 19l-7-7 7-7" />
+          </svg></a>
+        <h2 class="text-lg font-bold text-slate-900">Early Warnings</h2>
+        <span class="ml-auto bg-red-100 text-red-700 text-[11px] font-bold px-2.5 py-1 rounded-full" id="alertCount">3
+          Active</span>
+      </div>
+
+      <div id="alertsList" class="flex flex-col md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 px-4 md:px-8 mt-4">
+      </div>
+
+      <p id="noAlerts" class="hidden text-center text-slate-400 text-sm mt-12">No active alerts. Stay safe!</p>
+
+      <!-- Bottom Nav -->
+    </div>
+    <nav class="bottom-nav">
+      <div class="bottom-nav-brand">
+        <img src="../Images/ARPLOGO.png" alt="ARPS logo">
+        <div class="bottom-nav-brand-copy">
+          <strong>ARPS</strong>
+          <span>Response System</span>
+        </div>
+      </div>
+      <a href="home.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
+        </svg><span>Home</span></a>
+      <a href="report.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg><span>Report</span></a>
+      <a href="sos.html" class="sos-nav-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <path d="M12 8v4" />
+          <path d="M12 16h.01" />
+        </svg><span>SOS</span></a>
+      <a href="evacuation.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg><span>Centers</span></a>
+      <a href="settings.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+        </svg><span>Settings</span></a>
+    </nav>
+  </div>
+
+  <script>
+    function toast(msg, type = 'success') { const t = document.createElement('div'); t.className = 'toast toast-' + type; t.textContent = msg; document.body.appendChild(t); setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300) }, 2500) }
+
+    const alerts = [
+      { type: 'Typhoon Warning', level: 'Critical', levelCls: 'critical', icon: 'wind', borderCls: 'border-red-200', bgCls: 'bg-red-50', color: 'text-red-600', time: '2 hours ago', msg: 'Signal #2 in effect. Seek shelter immediately.', tips: ['Stay indoors and away from windows', 'Prepare emergency supplies', 'Monitor official updates', 'Do not cross flooded areas'] },
+      { type: 'Flood Advisory', level: 'High', levelCls: 'high', icon: 'drop', borderCls: 'border-orange-200', bgCls: 'bg-orange-50', color: 'text-orange-600', time: '4 hours ago', msg: 'Rising water levels in nearby waterways.', tips: ['Move to higher ground if in flood-prone area', 'Avoid walking or driving through floodwater', 'Keep valuables and documents elevated'] },
+      { type: 'Heavy Rainfall', level: 'Medium', levelCls: 'medium', icon: 'cloud', borderCls: 'border-amber-200', bgCls: 'bg-amber-50', color: 'text-amber-600', time: '6 hours ago', msg: 'Continuous rainfall expected for the next 12 hours.', tips: ['Prepare rain gear if travel is necessary', 'Check for road closures', 'Secure outdoor belongings'] },
+    ];
+
+    const iconSvgs = {
+      wind: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2"/></svg>',
+      drop: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21c3.5 0 6-2.5 6-6.2C18 11 12 3 12 3S6 11 6 14.8C6 18.5 8.5 21 12 21z"/></svg>',
+      cloud: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>',
+    };
+
+    function renderAlerts() {
+      const list = document.getElementById('alertsList');
+      list.innerHTML = '';
+      if (alerts.length === 0) { document.getElementById('noAlerts').classList.remove('hidden'); document.getElementById('alertCount').textContent = '0 Active'; return; }
+      document.getElementById('noAlerts').classList.add('hidden');
+      document.getElementById('alertCount').textContent = alerts.length + ' Active';
+
+      alerts.forEach((a, i) => {
+        const tipsHtml = a.tips.map(t => `<div class="flex items-start gap-2"><div class="w-1.5 h-1.5 rounded-full bg-blue-600 mt-1.5 shrink-0"></div><span class="text-xs text-slate-900 leading-relaxed">${t}</span></div>`).join('');
+        list.innerHTML += `
+        <div id="alert-${i}" class="bg-white rounded-2xl border-[1.5px] ${a.borderCls} overflow-hidden animate-fade" style="animation-delay:${i * 0.08}s">
+          <div class="${a.bgCls} px-4 py-3.5 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-[10px] ${a.color} bg-white/50 flex items-center justify-center">${iconSvgs[a.icon]}</div>
+              <div><p class="text-sm font-bold ${a.color}">${a.type}</p><p class="text-[11px] text-slate-400">${a.time}</p></div>
+            </div>
+            <span class="badge badge-${a.levelCls}">${a.level}</span>
+          </div>
+          <div class="px-4 py-4">
+            <p class="text-[13px] text-slate-900 leading-relaxed">${a.msg}</p>
+            <div class="flex gap-2 mt-3">
+              <button onclick="toggleGuidance(${i})" class="bg-transparent border-none text-blue-700 text-[13px] font-semibold cursor-pointer flex items-center gap-1 p-0 font-sans">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                <span id="gbtn-${i}">What should I do?</span>
+              </button>
+              <button onclick="acknowledgeAlert(${i})" class="ml-auto bg-transparent border-none text-slate-400 text-xs font-medium cursor-pointer flex items-center gap-1 p-0 font-sans hover:text-slate-600">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>
+                Acknowledge
+              </button>
+            </div>
+            <div id="guidance-${i}" class="hidden mt-3 bg-slate-50 rounded-[10px] p-3.5 animate-fade">
+              <p class="text-xs font-bold text-blue-900 mb-2">Safety Guidance:</p>
+              <div class="flex flex-col gap-1.5">${tipsHtml}</div>
+            </div>
+          </div>
+        </div>`;
+      });
+    }
+
+    function toggleGuidance(i) {
+      const el = document.getElementById('guidance-' + i);
+      const btn = document.getElementById('gbtn-' + i);
+      if (el.classList.contains('hidden')) { el.classList.remove('hidden'); btn.textContent = 'Hide guidance'; }
+      else { el.classList.add('hidden'); btn.textContent = 'What should I do?'; }
+    }
+
+    function acknowledgeAlert(i) {
+      const el = document.getElementById('alert-' + i);
+      el.style.transition = 'all 0.3s ease'; el.style.opacity = '0'; el.style.transform = 'translateX(-100%)';
+      setTimeout(() => {
+        alerts.splice(i, 1);
+        renderAlerts();
+        toast('Alert acknowledged');
+      }, 300);
+    }
+
+    renderAlerts();
+  </script>
+</body>
+
+</html>

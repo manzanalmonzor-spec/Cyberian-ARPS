@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="../shared.js"></script>
+  <meta name="theme-color" content="#DC2626">
+  <title>ARPS — Weather Monitor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../shared.css">
+  <script>tailwind.config={theme:{extend:{fontFamily:{sans:['DM Sans','Segoe UI','system-ui','sans-serif']}}}}</script>
+  <script src="js/auth-guard.js"></script>
+</head>
+<body class="bg-slate-100 font-sans">
+<div class="app-wrapper w-full min-h-screen relative pb-24 md:pb-8"><div class="app-container max-w-[480px] md:max-w-none mx-auto w-full">
+
+  <div class="flex items-center justify-between px-4 md:px-8 pt-6 md:pt-10 pb-4">
+    <div class="flex items-center gap-3">
+      <a href="home.html" class="w-9 h-9 rounded-[10px] bg-white border border-slate-200 flex items-center justify-center btn-press"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg></a>
+      <h2 class="text-lg font-bold text-slate-900">Weather Monitor</h2>
+    </div>
+    <button id="btnRefresh" class="w-9 h-9 rounded-[10px] bg-white border border-slate-200 flex items-center justify-center btn-press"><svg id="rIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h5M20 20v-5h-5"/><path d="M20.49 9A9 9 0 005.64 5.64L4 4m16 16l-1.64-1.64A9 9 0 013.51 15"/></svg></button>
+  </div>
+
+  <!-- Hero -->
+  <div class="mx-4 md:mx-8 mt-4 md:mt-6 rounded-2xl p-5" style="background:linear-gradient(145deg,#1E40AF 0%,#1D4ED8 50%,#2563EB 100%)">
+    <div class="flex justify-between items-center">
+      <div>
+        <p class="text-white/70 text-[13px]" id="locationName">Locating...</p>
+        <p class="text-white text-5xl font-extrabold leading-tight mt-1" id="tempMain">--°C</p>
+        <p class="text-white/80 text-sm mt-1" id="condMain">Loading...</p>
+        <p class="text-white/50 text-[11px] mt-2" id="updateTime"></p>
+      </div>
+      <span id="heroIcon" style="font-size:56px;line-height:1">🌤️</span>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-3 md:grid-cols-3 gap-4 md:gap-6 px-4 md:px-8 mt-6">
+    <div class="bg-white rounded-2xl p-3.5 border border-slate-200 text-center card-hover cursor-pointer" onclick="showDetail('rainfall')">
+      <div class="w-9 h-9 rounded-[10px] bg-blue-50 flex items-center justify-center mx-auto mb-2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2"><path d="M12 21c3.5 0 6-2.5 6-6.2C18 11 12 3 12 3S6 11 6 14.8C6 18.5 8.5 21 12 21z"/></svg></div>
+      <p class="text-base font-bold text-slate-900" id="statRainfall">--</p>
+      <p class="text-[11px] text-slate-400 mt-0.5">Rainfall</p>
+    </div>
+    <div class="bg-white rounded-2xl p-3.5 border border-slate-200 text-center card-hover cursor-pointer" onclick="showDetail('wind')">
+      <div class="w-9 h-9 rounded-[10px] bg-indigo-50 flex items-center justify-center mx-auto mb-2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2"/></svg></div>
+      <p class="text-base font-bold text-slate-900" id="statWind">--</p>
+      <p class="text-[11px] text-slate-400 mt-0.5">Wind</p>
+    </div>
+    <div class="bg-white rounded-2xl p-3.5 border border-slate-200 text-center card-hover cursor-pointer" onclick="showDetail('humidity')">
+      <div class="w-9 h-9 rounded-[10px] bg-amber-50 flex items-center justify-center mx-auto mb-2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></div>
+      <p class="text-base font-bold text-slate-900" id="statHumidity">--</p>
+      <p class="text-[11px] text-slate-400 mt-0.5">Humidity</p>
+    </div>
+  </div>
+
+  <!-- Severe Warning -->
+  <div id="warningCard" class="mx-4 md:mx-8 mt-5 md:mt-8 rounded-2xl p-4 cursor-pointer card-hover hidden" onclick="window.location.href='alerts.html'">
+    <div class="flex items-center gap-2.5 mb-2.5">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+      <span class="text-sm font-bold" id="warningTitle">Weather Advisory</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-auto"><path d="M9 5l7 7-7 7"/></svg>
+    </div>
+    <p class="text-[13px] leading-relaxed" id="warningText"></p>
+  </div>
+
+  <!-- 24-Hour Forecast -->
+  <h3 class="text-[15px] font-bold text-slate-900 mx-4 md:mx-8 mt-8 mb-4">24-Hour Forecast</h3>
+  <div class="flex gap-2.5 px-4 overflow-x-auto pb-2" id="forecastScroll" style="-webkit-overflow-scrolling:touch">
+  </div>
+
+  <!-- Detail Modal -->
+  <div id="detailModal" class="hidden">
+    <div class="modal-overlay" onclick="closeDetail()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-slate-900" id="detailTitle"></h3>
+          <button onclick="closeDetail()" class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center border-none cursor-pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+        </div>
+        <div id="detailBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  </div>
+  <nav class="bottom-nav">
+  <div class="bottom-nav-brand">
+    <img src="../Images/ARPLOGO.png" alt="ARPS logo">
+    <div class="bottom-nav-brand-copy">
+      <strong>ARPS</strong>
+      <span>Response System</span>
+    </div>
+  </div>
+  <a href="home.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg><span>Home</span></a>
+  <a href="report.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg><span>Report</span></a>
+  <a href="sos.html" class="sos-nav-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg><span>SOS</span></a>
+  <a href="evacuation.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg><span>Centers</span></a>
+  <a href="settings.html" class="nav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Settings</span></a>
+</nav>
+</div>
+
+<script>
+  function toast(msg,type='info'){const t=document.createElement('div');t.className='toast toast-'+type;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),300)},2500)}
+
+  // ── Weather state ──
+  let wxData = null;
+  let wxLat = null, wxLng = null;
+
+  // ── WMO code helpers ──
+  function wmoDesc(code) {
+    const m = {0:'Clear Sky',1:'Mostly Clear',2:'Partly Cloudy',3:'Overcast',45:'Foggy',48:'Icy Fog',51:'Light Drizzle',53:'Drizzle',55:'Heavy Drizzle',61:'Light Rain',63:'Rain',65:'Heavy Rain',71:'Light Snow',73:'Snow',75:'Heavy Snow',80:'Rain Showers',81:'Mod. Showers',82:'Heavy Showers',95:'Thunderstorm',96:'Thunderstorm',99:'Severe Storm'};
+    return m[code] || 'Unknown';
+  }
+  function wmoEmoji(code) {
+    if (code === 0) return '☀️';
+    if (code <= 2) return '⛅';
+    if (code <= 3) return '☁️';
+    if (code <= 48) return '🌫️';
+    if (code <= 57) return '🌦️';
+    if (code <= 65) return '🌧️';
+    if (code <= 77) return '🌨️';
+    if (code <= 82) return '🌧️';
+    return '⛈️';
+  }
+  function wmoSvg(code, color) {
+    if (code === 0) return `<svg class="mx-auto my-1.5" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>`;
+    if (code <= 3 || code <= 48) return `<svg class="mx-auto my-1.5" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2"><path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>`;
+    if (code >= 95) return `<svg class="mx-auto my-1.5" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2"><path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15"/><path d="M13 10l-2 5h4l-2 5"/></svg>`;
+    return `<svg class="mx-auto my-1.5" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2"><path d="M12 21c3.5 0 6-2.5 6-6.2C18 11 12 3 12 3S6 11 6 14.8C6 18.5 8.5 21 12 21z"/></svg>`;
+  }
+
+  // ── Reverse geocode for location name ──
+  async function reverseGeocode(lat, lng) {
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {headers:{'User-Agent':'ARPS-App/1.0'}});
+      if (!res.ok) return null;
+      const d = await res.json();
+      const a = d.address || {};
+      const city = a.city || a.municipality || a.city_district || a.town || a.village || '';
+      const province = a.state || a.province || '';
+      const country = a.country_code ? a.country_code.toUpperCase() : '';
+      return [city, province ? province : country].filter(Boolean).join(', ') || 'Your Location';
+    } catch { return null; }
+  }
+
+  // ── Fetch weather from Open-Meteo ──
+  async function fetchWeather(lat, lng) {
+    const params = [
+      `latitude=${lat}`, `longitude=${lng}`,
+      'current=temperature_2m,apparent_temperature,wind_speed_10m,wind_gusts_10m,precipitation,relative_humidity_2m,surface_pressure,visibility,weather_code',
+      'hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m',
+      'timezone=auto',
+      'forecast_days=2'
+    ].join('&');
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
+    if (!res.ok) throw new Error('API error');
+    return res.json();
+  }
+
+  // ── Render everything with live data ──
+  function renderWeather(data, locationName) {
+    wxData = data;
+    const c = data.current;
+    const h = data.hourly;
+
+    // Hero
+    document.getElementById('locationName').textContent = locationName || 'Your Location';
+    document.getElementById('tempMain').textContent = Math.round(c.temperature_2m) + '°C';
+    document.getElementById('condMain').textContent = wmoDesc(c.weather_code);
+    document.getElementById('heroIcon').textContent = wmoEmoji(c.weather_code);
+    document.getElementById('updateTime').textContent = 'Updated: ' + new Date().toLocaleTimeString();
+
+    // Stats
+    document.getElementById('statRainfall').textContent = c.precipitation.toFixed(1) + 'mm';
+    document.getElementById('statWind').textContent = Math.round(c.wind_speed_10m) + ' km/h';
+    document.getElementById('statHumidity').textContent = c.relative_humidity_2m + '%';
+
+    // Warning card — show based on actual conditions
+    const warningCard = document.getElementById('warningCard');
+    const gustKmh = c.wind_gusts_10m || 0;
+    const precipMm = c.precipitation || 0;
+
+    if (gustKmh >= 60 || precipMm >= 20) {
+      warningCard.classList.remove('hidden');
+      warningCard.className = warningCard.className.replace(/bg-\S+|border-\S+|text-\S+/g, '').trim();
+      warningCard.classList.add('mx-4','md:mx-8','mt-5','md:mt-8','rounded-2xl','p-4','cursor-pointer','card-hover','bg-red-50','border','border-red-200','text-red-900');
+      document.getElementById('warningTitle').textContent = 'Severe Weather Warning';
+      const parts = [];
+      if (gustKmh >= 60) parts.push(`Strong wind gusts up to ${Math.round(gustKmh)} km/h.`);
+      if (precipMm >= 20) parts.push(`Heavy rainfall of ${precipMm.toFixed(1)}mm recorded.`);
+      parts.push('Stay indoors and monitor updates.');
+      document.getElementById('warningText').textContent = parts.join(' ');
+    } else if (gustKmh >= 30 || precipMm >= 5) {
+      warningCard.classList.remove('hidden');
+      warningCard.className = 'mx-4 md:mx-8 mt-5 md:mt-8 rounded-2xl p-4 cursor-pointer card-hover bg-amber-50 border border-amber-200 text-amber-900';
+      document.getElementById('warningTitle').textContent = 'Weather Advisory';
+      const parts = [];
+      if (gustKmh >= 30) parts.push(`Wind gusts of ${Math.round(gustKmh)} km/h expected.`);
+      if (precipMm >= 5) parts.push(`Rainfall of ${precipMm.toFixed(1)}mm.`);
+      parts.push('Exercise caution outdoors.');
+      document.getElementById('warningText').textContent = parts.join(' ');
+    } else {
+      warningCard.classList.add('hidden');
+    }
+
+    // 24-Hour Forecast
+    renderForecast(h);
+
+    // Update detail info with real data
+    updateDetailInfo(c);
+  }
+
+  function renderForecast(hourly) {
+    const fc = document.getElementById('forecastScroll');
+    fc.innerHTML = '';
+    const nowHour = new Date().getHours();
+    const times = hourly.time;
+    let startIdx = times.findIndex(t => new Date(t).getHours() >= nowHour && new Date(t).getDate() === new Date().getDate());
+    if (startIdx === -1) startIdx = 0;
+
+    const slots = [];
+    for (let i = 0; i < 8; i++) {
+      const idx = startIdx + i * 3;
+      if (idx >= times.length) break;
+      const d = new Date(times[idx]);
+      const hr = d.getHours();
+      const label = i === 0 ? 'Now' : (hr === 0 ? '12AM' : hr < 12 ? hr + 'AM' : hr === 12 ? '12PM' : (hr-12) + 'PM');
+      slots.push({
+        label,
+        temp: Math.round(hourly.temperature_2m[idx]),
+        code: hourly.weather_code[idx],
+        wind: Math.round(hourly.wind_speed_10m[idx]),
+        rainProb: hourly.precipitation_probability ? hourly.precipitation_probability[idx] : null,
+        idx
+      });
+    }
+
+    slots.forEach((s, i) => {
+      const isNow = i === 0;
+      const color = isNow ? '#fff' : '#94A3B8';
+      const icon = wmoSvg(s.code, color);
+      fc.innerHTML += `<div class="min-w-[60px] text-center py-3 px-2 rounded-xl shrink-0 cursor-pointer btn-press ${isNow?'bg-blue-900 text-white':'bg-white border border-slate-200 text-slate-900'}" onclick="showForecastSlot(${i})"><p class="text-[11px] ${isNow?'opacity-70':'text-slate-400'}">${s.label}</p>${icon}<p class="text-[13px] font-bold">${s.temp}°</p></div>`;
+    });
+
+    // Store for modal
+    window._forecastSlots = slots;
+  }
+
+  window.showForecastSlot = function(i) {
+    const s = window._forecastSlots[i];
+    if (!s) return;
+    const detailHtml = `<div class="space-y-3">
+      <div class="flex justify-between"><span class="text-sm text-slate-400">Time</span><span class="text-sm font-semibold">${s.label}</span></div>
+      <div class="flex justify-between"><span class="text-sm text-slate-400">Temperature</span><span class="text-sm font-semibold">${s.temp}°C</span></div>
+      <div class="flex justify-between"><span class="text-sm text-slate-400">Condition</span><span class="text-sm font-semibold">${wmoDesc(s.code)}</span></div>
+      ${s.rainProb != null ? `<div class="flex justify-between"><span class="text-sm text-slate-400">Rain Chance</span><span class="text-sm font-semibold">${s.rainProb}%</span></div>` : ''}
+      <div class="flex justify-between"><span class="text-sm text-slate-400">Wind</span><span class="text-sm font-semibold">${s.wind} km/h</span></div>
+    </div>`;
+    document.getElementById('detailTitle').textContent = s.label + ' Forecast';
+    document.getElementById('detailBody').innerHTML = detailHtml;
+    document.getElementById('detailModal').classList.remove('hidden');
+  };
+
+  function updateDetailInfo(c) {
+    const visMm = c.visibility;
+    const visLabel = visMm >= 1000 ? (visMm/1000).toFixed(1) + ' km' : Math.round(visMm) + ' m';
+
+    window._detailInfo = {
+      rainfall: {title:'Rainfall Details', body:`<div class="space-y-3">
+        <div class="flex justify-between"><span class="text-sm text-slate-400">Current</span><span class="text-sm font-semibold">${c.precipitation.toFixed(1)}mm</span></div>
+        <div class="flex justify-between"><span class="text-sm text-slate-400">Condition</span><span class="text-sm font-semibold">${wmoDesc(c.weather_code)}</span></div>
+        ${c.precipitation >= 10 ? '<div class="mt-3 bg-amber-50 rounded-xl p-3 text-xs text-amber-800">Warning: Heavy rainfall. Risk of localized flooding.</div>' : '<div class="mt-3 bg-emerald-50 rounded-xl p-3 text-xs text-emerald-800">Rainfall is within normal levels.</div>'}
+      </div>`},
+      wind: {title:'Wind Details', body:`<div class="space-y-3">
+        <div class="flex justify-between"><span class="text-sm text-slate-400">Speed</span><span class="text-sm font-semibold">${Math.round(c.wind_speed_10m)} km/h</span></div>
+        <div class="flex justify-between"><span class="text-sm text-slate-400">Gusts</span><span class="text-sm font-semibold ${c.wind_gusts_10m >= 60 ? 'text-red-600' : ''}">${Math.round(c.wind_gusts_10m)} km/h</span></div>
+        ${c.wind_gusts_10m >= 60 ? '<div class="mt-3 bg-red-50 rounded-xl p-3 text-xs text-red-800">Strong gusts may cause damage. Secure loose items.</div>' : '<div class="mt-3 bg-emerald-50 rounded-xl p-3 text-xs text-emerald-800">Wind conditions are normal.</div>'}
+      </div>`},
+      humidity: {title:'Humidity & More', body:`<div class="space-y-3">
+        <div class="flex justify-between"><span class="text-sm text-slate-400">Relative Humidity</span><span class="text-sm font-semibold">${c.relative_humidity_2m}%</span></div>
+        <div class="flex justify-between"><span class="text-sm text-slate-400">Feels Like</span><span class="text-sm font-semibold">${Math.round(c.apparent_temperature)}°C</span></div>
+        <div class="flex justify-between"><span class="text-sm text-slate-400">Visibility</span><span class="text-sm font-semibold">${visLabel}</span></div>
+        <div class="flex justify-between"><span class="text-sm text-slate-400">Pressure</span><span class="text-sm font-semibold">${Math.round(c.surface_pressure)} hPa</span></div>
+      </div>`},
+    };
+  }
+
+  function showDetail(key) {
+    const info = window._detailInfo && window._detailInfo[key];
+    if (!info) return;
+    document.getElementById('detailTitle').textContent = info.title;
+    document.getElementById('detailBody').innerHTML = info.body;
+    document.getElementById('detailModal').classList.remove('hidden');
+  }
+  function closeDetail(){ document.getElementById('detailModal').classList.add('hidden'); }
+
+  // ── Load weather using GPS ──
+  async function loadWeather() {
+    if (!navigator.geolocation) {
+      document.getElementById('condMain').textContent = 'GPS not available';
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        wxLat = lat; wxLng = lng;
+
+        try {
+          const [data, locName] = await Promise.all([
+            fetchWeather(lat, lng),
+            reverseGeocode(lat, lng)
+          ]);
+          renderWeather(data, locName);
+        } catch {
+          document.getElementById('condMain').textContent = 'Failed to load weather';
+          toast('Weather data unavailable', 'warning');
+        }
+      },
+      () => {
+        document.getElementById('locationName').textContent = 'Location unavailable';
+        document.getElementById('condMain').textContent = 'Enable GPS to see weather';
+        toast('Enable location to get weather', 'warning');
+      },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
+    );
+  }
+
+  // ── Refresh button ──
+  document.getElementById('btnRefresh').addEventListener('click', () => {
+    const icon = document.getElementById('rIcon');
+    icon.style.animation='spin 0.6s linear'; setTimeout(()=>icon.style.animation='',600);
+    loadWeather();
+    toast('Refreshing weather...');
+  });
+
+  // ── Init ──
+  loadWeather();
+</script>
+</body>
+</html>

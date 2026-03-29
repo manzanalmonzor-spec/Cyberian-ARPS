@@ -1,0 +1,36 @@
+/* Settings page styles */
+#adminPhone:focus {
+  border-color: #3B82F6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+#btnSavePhone:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(29, 78, 216, 0.3);
+}
+
+#btnSavePhone:active {
+  transform: scale(0.98) translateY(0);
+}
+
+/* Save status animation */
+#saveStatus {
+  transition: all 0.3s ease;
+}
+
+#saveStatus.status-success {
+  background-color: #F0FDF4;
+  color: #15803D;
+  border: 1px solid #BBF7D0;
+}
+
+#saveStatus.status-error {
+  background-color: #FEF2F2;
+  color: #B91C1C;
+  border: 1px solid #FECACA;
+}
+
+/* Current date */
+#currentDate {
+  white-space: nowrap;
+}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#DC2626">
+  <title>ARPS — Antique Risk Prevention System</title>
+  <meta http-equiv="refresh" content="0;url=user/index.html">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(160deg,#DC2626 0%,#991B1B 100%)}
+    .loader{text-align:center;color:#fff}
+    .loader h1{font-size:2rem;font-weight:900;letter-spacing:-0.5px;margin-bottom:6px}
+    .loader p{font-size:12px;opacity:.6;font-weight:600;letter-spacing:3px;text-transform:uppercase}
+    .bar{margin-top:24px;width:60px;height:3px;border-radius:4px;background:rgba(255,255,255,.3);overflow:hidden;margin-inline:auto}
+    .bar span{display:block;width:100%;height:100%;background:#fff;border-radius:4px;animation:slideRight 1.2s ease infinite}
+    @keyframes slideRight{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+  </style>
+</head>
+<body>
+  <div class="loader">
+    <h1>ARPS</h1>
+    <p>Emergency Response System</p>
+    <div class="bar"><span></span></div>
+  </div>
+  <script>window.location.href="user/index.html";</script>
+</body>
+</html>

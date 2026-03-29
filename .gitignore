@@ -2,6 +2,7 @@ functions/node_modules/
 node_modules/
 .firebase/
 .firebase-cache/
+.vercel/
 .vscode/
 .claude/
 _diag_out.txt

@@ -1,22 +1,52 @@
-# ARPS GitHub Pages Deployment
+# ARPS Vercel Frontend + Firebase Backend
 
-This repository can be deployed to GitHub Pages for the static frontend.
+This repository is set up for:
+
+- Vercel hosting the static frontend
+- Firebase Auth and Firestore
+- Firebase Functions handling SMS and AI chat
 
 Important:
-- GitHub Pages only hosts the static site.
-- Firebase Auth, Firestore, and Cloud Functions still run on Firebase.
-- AI chat and SMS now call Firebase Functions, so deploy those functions before using those features on the Pages site.
 
-## Firebase setup
+- The PhilSMS and Groq secrets are no longer stored in browser code.
+- You do not need Vercel environment variables for SMS/chat in this setup.
+- Those secrets now belong in Firebase Functions secrets.
 
-Set the required function secrets:
+## 1. Deploy the frontend on Vercel
+
+Import the GitHub repo into Vercel and use:
+
+- Framework Preset: `Other`
+- Root Directory: `.`
+- Build Command: leave empty
+- Output Directory: `.`
+
+After deploy, you will get a Vercel domain such as:
+
+- `your-project.vercel.app`
+
+## 2. Allow the Vercel domain in Firebase Auth
+
+In Firebase Console:
+
+1. Open `Authentication`
+2. Open `Settings`
+3. Add your Vercel domain to `Authorized domains`
+
+Examples:
+
+- `your-project.vercel.app`
+- your custom domain if you attach one later
+
+## 3. Set Firebase Function secrets
 
 ```powershell
+firebase use hackathon-7955d
 firebase functions:secrets:set PHILSMS_TOKEN
 firebase functions:secrets:set GROQ_API_KEY
 ```
 
-Deploy the backend:
+## 4. Deploy Firebase Functions
 
 ```powershell
 cd functions
@@ -25,28 +55,20 @@ cd ..
 firebase deploy --only functions
 ```
 
-Add your GitHub Pages host to Firebase Authentication authorized domains:
+## 5. What Vercel is doing here
 
-- `YOUR_USERNAME.github.io`
+Vercel only serves the frontend.
 
-If you use a repo site, the app URL will look like:
+The app still depends on Firebase for:
 
-- `https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/`
+- sign in
+- Firestore data
+- SMS sending
+- AI chat
 
-## GitHub Pages setup
+If SMS or chat is failing after the Vercel deploy, the usual causes are:
 
-1. Push the repo to GitHub.
-2. Open `Settings > Pages`.
-3. Set `Source` to `GitHub Actions`.
-4. Push to `main` or `master`.
-5. Wait for the `Deploy GitHub Pages` workflow to finish.
-
-## Recommended git cleanup
-
-This repo previously tracked `functions/node_modules`. Remove it from the git index before pushing:
-
-```powershell
-git rm -r --cached functions/node_modules
-git add .
-git commit -m "Prepare ARPS for GitHub Pages"
-```
+- the Vercel domain is not added to Firebase Auth authorized domains
+- Firebase Functions were not deployed
+- `PHILSMS_TOKEN` or `GROQ_API_KEY` was not set
+- the user is not authenticated, because the callable functions require login

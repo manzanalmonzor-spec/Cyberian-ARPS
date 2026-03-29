@@ -1597,7 +1597,7 @@ STYLE:
       async function sendToAIFallback(userText) {
         try {
           const data = await callGroqChat({
-            model: 'llama3-8b-8192',
+            model: 'llama-3.1-8b-instant',
             messages: [
               { role: 'system', content: 'You are ARPS Assistant, a smart disaster preparedness & emergency AI in the Philippines. You cover ALL disaster types: typhoons, floods, earthquakes, fire, landslides, volcanic eruptions, tsunamis, and all emergencies. Use conversation context for follow-ups. Give step-by-step advice. Use Taglish if appropriate.' },
               ...chatHistory.slice(-10)
@@ -1704,9 +1704,7 @@ Be concise, practical, warm, and use Taglish if helpful. Use numbered steps.`;
 
         // Try multiple vision models in order of capability
         const visionModels = [
-          'meta-llama/llama-4-scout-17b-16e-instruct',
-          'llama-3.2-11b-vision-preview',
-          'llama-3.2-90b-vision-preview'
+          'meta-llama/llama-4-scout-17b-16e-instruct'
         ];
 
         for (const model of visionModels) {

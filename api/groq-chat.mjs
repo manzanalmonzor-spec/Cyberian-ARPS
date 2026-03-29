@@ -16,6 +16,16 @@ async function getBody(request) {
   }
 }
 
+const MODEL_ALIASES = {
+  'llama3-8b-8192': 'llama-3.1-8b-instant',
+  'llama-3.2-11b-vision-preview': 'meta-llama/llama-4-scout-17b-16e-instruct',
+  'llama-3.2-90b-vision-preview': 'meta-llama/llama-4-scout-17b-16e-instruct'
+};
+
+function normalizeModel(model) {
+  return MODEL_ALIASES[model] || model;
+}
+
 export function GET() {
   return json({ error: 'Method not allowed' }, 405, { Allow: 'POST, OPTIONS' });
 }
@@ -38,6 +48,8 @@ export async function POST(request) {
     return json({ error: 'model and messages are required' }, 400);
   }
 
+  const resolvedModel = normalizeModel(model);
+
   try {
     const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -46,7 +58,7 @@ export async function POST(request) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model,
+        model: resolvedModel,
         messages,
         temperature,
         max_tokens

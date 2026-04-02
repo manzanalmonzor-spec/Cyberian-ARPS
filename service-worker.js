@@ -1,4 +1,4 @@
-const CACHE_NAME = 'arps-cache-v5';
+const CACHE_NAME = 'arps-cache-v6';
 
 const PRECACHE_URLS = [
   'manifest.json',
@@ -96,7 +96,13 @@ self.addEventListener('fetch', event => {
       caches.open(CACHE_NAME).then(async cache => {
         const cached = await cache.match(req);
         const networkFetch = fetch(req)
-          .then(res => { if (res.ok) cache.put(req, res.clone()); return res; })
+          .then(res => {
+            if (res.ok) {
+              const responseToCache = res.clone();
+              cache.put(req, responseToCache);
+            }
+            return res;
+          })
           .catch(() => cached);
         return cached || networkFetch;
       })
@@ -110,7 +116,8 @@ self.addEventListener('fetch', event => {
     fetch(req)
       .then(res => {
         if (res.ok) {
-          caches.open(CACHE_NAME).then(cache => cache.put(req, res.clone()));
+          const responseToCache = res.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(req, responseToCache));
         }
         return res;
       })

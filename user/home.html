@@ -1656,7 +1656,13 @@ STYLE:
         } catch (e) {
           console.error('Primary ARPS chat request failed:', e);
           removeTypingIndicator();
-          try { await sendToAIFallback(userText); } catch { addMessage(getLocalFallback(userText), false); }
+          try {
+            await sendToAIFallback(userText);
+          } catch {
+            const fallbackMsg = !navigator.onLine ? getOfflineFallback(userText) : getUnavailableMessage();
+            chatHistory.push({ role: "assistant", content: fallbackMsg });
+            addMessage(fallbackMsg, false);
+          }
         }
       }
 
@@ -1680,20 +1686,20 @@ STYLE:
             addMessage(aiMsg, false);
           } else {
             console.warn('Fallback ARPS chat returned no displayable text:', data);
-            const fb = getLocalFallback(userText);
+            const fb = !navigator.onLine ? getOfflineFallback(userText) : getUnavailableMessage();
             chatHistory.push({ role: "assistant", content: fb });
             addMessage(fb, false);
           }
         } catch (e) {
           console.error('Fallback ARPS chat request failed:', e);
           removeTypingIndicator();
-          const fb = getLocalFallback(userText);
+          const fb = !navigator.onLine ? getOfflineFallback(userText) : getUnavailableMessage();
           chatHistory.push({ role: "assistant", content: fb });
           addMessage(fb, false);
         }
       }
 
-      function getLocalFallback(userText) {
+      function getOfflineFallback(userText) {
         const text = userText.toLowerCase();
         if (/\b(hi|hello|hey|good morning|good afternoon|good evening|kamusta)\b/.test(text)) {
           return "Hello! I'm your ARPS disaster preparedness assistant. I can help with typhoons, floods, earthquakes, fire, landslides, and all emergencies. What do you need?";
@@ -1732,6 +1738,14 @@ STYLE:
           return "I can help with step-by-step guidance for any disaster! Ask me about:\n- Typhoon preparation\n- Flood safety\n- Earthquake response\n- Fire escape plans\n- Landslide warnings\n- Emergency kit preparation\n- Evacuation procedures\n\nWhat specific situation do you need help with?";
         }
         return "I'm your ARPS disaster preparedness assistant! I can help with typhoons, floods, earthquakes, fire, landslides, volcanic eruptions, and all emergencies. What do you need help with?";
+      }
+
+      function getUnavailableMessage() {
+        if (!navigator.onLine) {
+          return "You're offline right now, so live AI chat isn't available. I can still give offline emergency guidance if you ask again, or you can use SOS if you're in danger.";
+        }
+
+        return "The live AI reply did not load this time. Please tap send again in a moment. If this keeps happening, refresh the page once.";
       }
 
       // Compress image to fit API limits (max ~768px, JPEG quality 0.7)

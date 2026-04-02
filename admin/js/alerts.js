@@ -38,6 +38,7 @@ let firestoreAlerts   = [];
 let currentFilter     = 'all';
 let selectedAlertId   = null;
 let selectedAlertIndex = null;
+let adminLocation     = null; // { lat, lng } — populated by geolocation
 
 // ── DOM refs ─────────────────────────────────────────────────────────────────
 const alertsStatsGrid    = document.getElementById('alertsStatsGrid');
@@ -120,6 +121,8 @@ function sosToAlert(docSnap) {
     status:      d.status   || 'Pending',
     urgency:     urgencyMap[d.severity] || 'High',
     area:        d.locationLabel || 'Unknown Location',
+    lat:         d.latitude  || null,
+    lng:         d.longitude || null,
     issued:      `Reported ${ago}`,
     contact:     d.contact || '',
     reporterName: d.name   || 'Resident',
@@ -213,8 +216,24 @@ function buildBarangayHotspots(alertList) {
   return map;
 }
 
+// Haversine distance in kilometers between two lat/lng points
+function haversineKm(lat1, lng1, lat2, lng2) {
+  const toRad = v => (v * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// Get distance from admin to alert (null if either has no coords)
+function distanceToAdmin(alert) {
+  if (!adminLocation || !alert.lat || !alert.lng) return null;
+  return haversineKm(adminLocation.lat, adminLocation.lng, alert.lat, alert.lng);
+}
+
 // Compute priority score for sorting. Higher = more urgent.
-// Factors: severity, SOS cluster count in same barangay, status
+// Factors: severity, cluster count, status, proximity to admin
 function computePriority(alert, hotspotMap) {
   const severityScore = { Critical: 400, High: 300, Medium: 200, Low: 100 };
   const statusScore   = { Pending: 50, Responding: 30, Active: 20, Resolved: 0 };
@@ -226,9 +245,16 @@ function computePriority(alert, hotspotMap) {
     const brgy = extractBarangay(alert.area);
     const cluster = hotspotMap[brgy];
     if (cluster && cluster.count > 1) {
-      // Bonus: 60 points per additional SOS in the same area (capped at 300)
       score += Math.min(300, (cluster.count - 1) * 60);
     }
+  }
+
+  // Proximity bonus: closer to admin = higher priority
+  // Max +200 for <1km, scaling down to +0 at 50km+
+  const dist = distanceToAdmin(alert);
+  if (dist !== null) {
+    const proximityBonus = Math.max(0, Math.round(200 * (1 - dist / 50)));
+    score += proximityBonus;
   }
 
   return score;
@@ -345,10 +371,11 @@ function renderAlertsList(hotspotMap) {
                   ${badge(alert.severity)}
                 </div>
               </div>
-              <div class="mt-3 flex items-center gap-2 text-[11px] text-slate-500 font-semibold uppercase tracking-wide">
+              <div class="mt-3 flex items-center gap-2 text-[11px] text-slate-500 font-semibold uppercase tracking-wide flex-wrap">
                 <span>${alert.category}</span>
                 <span>•</span>
                 <span>${alert.area}</span>
+                ${(() => { const d = distanceToAdmin(alert); return d !== null ? `<span>•</span><span class="${d < 5 ? 'text-red-600' : d < 15 ? 'text-orange-500' : 'text-slate-400'}">${d < 1 ? Math.round(d * 1000) + 'm away' : d.toFixed(1) + 'km away'}</span>` : ''; })()}
               </div>
               <p class="text-xs text-slate-600 mt-3 leading-relaxed alert-summary-line">${alert.summary}</p>
             </div>
@@ -387,13 +414,17 @@ function renderSelectedAlert(hotspotMap) {
   selectedAlertStatus.textContent   = alert.status;
   selectedAlertUrgency.textContent  = alert.urgency;
 
-  // Show cluster info in area field if hotspot
+  // Show cluster info + distance in area field
   const brgy = extractBarangay(alert.area);
   const cluster = hotspotMap[brgy];
+  const dist = distanceToAdmin(alert);
+  const distText = dist !== null
+    ? `<span class="block text-[10px] mt-1 ${dist < 5 ? 'text-red-600 font-bold' : 'text-slate-400'}">${dist < 1 ? Math.round(dist * 1000) + 'm' : dist.toFixed(1) + 'km'} from your location</span>`
+    : '';
   if (alert.firestoreId && cluster && cluster.count > 1) {
-    selectedAlertArea.innerHTML = `${alert.area} <span class="cluster-badge-detail">${cluster.count} SOS in this area — PRIORITY</span>`;
+    selectedAlertArea.innerHTML = `${alert.area} <span class="cluster-badge-detail">${cluster.count} SOS in this area — PRIORITY</span>${distText}`;
   } else {
-    selectedAlertArea.textContent = alert.area;
+    selectedAlertArea.innerHTML = `${alert.area}${distText}`;
   }
   selectedAlertSummary.textContent  = alert.summary;
   selectedAlertAction.textContent   = alert.action;
@@ -526,8 +557,9 @@ function updateReadinessMetrics() {
 function selectAlert(index) {
   selectedAlertIndex = index;
   selectedAlertId    = alerts[index]?.firestoreId || alerts[index]?.id || null;
-  renderAlertsList();
-  renderSelectedAlert();
+  const hotspotMap = buildBarangayHotspots(firestoreAlerts);
+  renderAlertsList(hotspotMap);
+  renderSelectedAlert(hotspotMap);
 }
 
 function setFilter(filter) {
@@ -616,6 +648,27 @@ function showToast(msg, type) {
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
 setCurrentDate();
+
+// 0. Get admin location for proximity-based priority
+(function initAdminLocation() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      adminLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      refreshAlerts(); // re-sort with proximity data
+    },
+    () => {} // silently ignore if denied
+  );
+  // Keep updating as admin moves
+  navigator.geolocation.watchPosition(
+    (pos) => {
+      adminLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      // Don't re-render on every GPS tick — only on next alert update
+    },
+    () => {},
+    { enableHighAccuracy: false, maximumAge: 60000 }
+  );
+})();
 
 // 1. Subscribe to Firebase SOS alerts (real-time)
 const sosQuery = query(collection(db, 'sosAlerts'), orderBy('createdAt', 'desc'), limit(50));

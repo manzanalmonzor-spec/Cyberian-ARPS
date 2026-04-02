@@ -82,7 +82,9 @@ async function sendViaPhilSms(url, token, payload) {
     body: JSON.stringify(payload)
   });
 
-  const data = await smsResponse.json().catch(() => ({}));
+  const rawText = await smsResponse.text().catch(() => '');
+  let data;
+  try { data = JSON.parse(rawText); } catch { data = { rawBody: rawText }; }
   return {
     ok: smsResponse.ok && data.status !== 'error',
     status: smsResponse.status,
@@ -91,15 +93,39 @@ async function sendViaPhilSms(url, token, payload) {
   };
 }
 
-export function GET(request) {
+export async function GET(request) {
   const raw = process.env.PHILSMS_TOKEN || '';
   const token = normalizeSecret(raw);
+  const url = new URL(request.url);
+
+  // ?test=1 → actually call PhilSMS with a test payload and return the raw response
+  if (url.searchParams.get('test') === '1' && token) {
+    try {
+      const testPayload = {
+        recipient: '639170000000',
+        sender_id: 'PhilSMS',
+        type: 'plain',
+        message: 'ARPS API test — please ignore.'
+      };
+      const result = await sendViaPhilSms(PHILSMS_ENDPOINTS[0], token, testPayload);
+      // Also try endpoint 2
+      const result2 = await sendViaPhilSms(PHILSMS_ENDPOINTS[1], token, testPayload);
+      return json(request, {
+        endpoint1: { url: result.url, status: result.status, ok: result.ok, response: result.data },
+        endpoint2: { url: result2.url, status: result2.status, ok: result2.ok, response: result2.data },
+        tokenLength: token.length
+      });
+    } catch (err) {
+      return json(request, { error: err.message }, 500);
+    }
+  }
+
   return json(request, {
     status: 'SMS endpoint active',
     tokenConfigured: Boolean(token),
     rawStartsWithBearer: raw.trimStart().toLowerCase().startsWith('bearer'),
     rawHasQuotes: raw.includes('"') || raw.includes("'"),
-    hint: !token ? 'PHILSMS_TOKEN env var is missing or empty. Add it in Vercel Settings > Environment Variables, then REDEPLOY.' : 'Token is loaded. If still failing, verify the token value at dashboard.philsms.com > API settings.'
+    hint: !token ? 'PHILSMS_TOKEN env var is missing or empty. Add it in Vercel Settings > Environment Variables, then REDEPLOY.' : 'Token is loaded. Add ?test=1 to this URL to test the PhilSMS connection.'
   });
 }
 

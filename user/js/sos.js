@@ -25,23 +25,52 @@ const AGENCY_DISPLAY_NAME = {
   Typhoon:    'MDRRMO',
 };
 
+let adminContactCachePromise = null;
+
+function readCachedSmsTargets(type) {
+  return {
+    adminPhone: localStorage.getItem('arps_admin_contact'),
+    agencyPhone: localStorage.getItem(AGENCY_STORAGE_KEY[type] || '') || null
+  };
+}
+
 // ── Cache admin contact + agency numbers from Firestore into localStorage ─────
-async function cacheAdminContact() {
-  try {
-    const snap = await getDoc(doc(db, "adminSettings", "contact"));
-    if (!snap.exists()) return;
-    const data = snap.data();
-    if (data.phone) localStorage.setItem('arps_admin_contact', data.phone);
-    for (const [type, key] of Object.entries(AGENCY_STORAGE_KEY)) {
-      const num = data[`agency${type}`];
-      if (num) localStorage.setItem(key, num);
-      else localStorage.removeItem(key);
-    }
-  } catch (err) {
-    console.warn('Could not fetch admin contact (offline?):', err.message);
+async function cacheAdminContact(forceRefresh = false) {
+  if (adminContactCachePromise && !forceRefresh) {
+    return adminContactCachePromise;
   }
+
+  adminContactCachePromise = (async () => {
+    try {
+      const snap = await getDoc(doc(db, "adminSettings", "contact"));
+      if (!snap.exists()) return null;
+      const data = snap.data();
+      if (data.phone) localStorage.setItem('arps_admin_contact', data.phone);
+      else localStorage.removeItem('arps_admin_contact');
+      for (const [type, key] of Object.entries(AGENCY_STORAGE_KEY)) {
+        const num = data[`agency${type}`];
+        if (num) localStorage.setItem(key, num);
+        else localStorage.removeItem(key);
+      }
+      return data;
+    } catch (err) {
+      console.warn('Could not fetch admin contact (offline?):', err.message);
+      return null;
+    }
+  })();
+
+  return adminContactCachePromise;
 }
 cacheAdminContact();
+
+async function getSmsTargets(type) {
+  if (navigator.onLine) {
+    await cacheAdminContact(true);
+  } else {
+    await cacheAdminContact().catch(() => null);
+  }
+  return readCachedSmsTargets(type);
+}
 
 // ── Pre-geocode on page load: save location name to localStorage ──────────────
 (async function preGeocode() {
@@ -483,8 +512,7 @@ async function sendSosAlert(type) {
   setVisible(3);
 
   const { ecName, ecNumber } = getSosProfile();
-  const adminPhone  = localStorage.getItem('arps_admin_contact');
-  const agencyPhone = localStorage.getItem(AGENCY_STORAGE_KEY[type] || '') || null;
+  const { adminPhone, agencyPhone } = await getSmsTargets(type);
   const agencyName  = AGENCY_DISPLAY_NAME[type] || 'Agency';
 
   const time = new Date(createdAtMs).toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' });

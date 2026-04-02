@@ -92,7 +92,15 @@ async function sendViaPhilSms(url, token, payload) {
 }
 
 export function GET(request) {
-  return json(request, { error: 'Method not allowed' }, 405, { Allow: 'POST, OPTIONS' });
+  const raw = process.env.PHILSMS_TOKEN || '';
+  const token = normalizeSecret(raw);
+  return json(request, {
+    status: 'SMS endpoint active',
+    tokenConfigured: Boolean(token),
+    rawStartsWithBearer: raw.trimStart().toLowerCase().startsWith('bearer'),
+    rawHasQuotes: raw.includes('"') || raw.includes("'"),
+    hint: !token ? 'PHILSMS_TOKEN env var is missing or empty. Add it in Vercel Settings > Environment Variables, then REDEPLOY.' : 'Token is loaded. If still failing, verify the token value at dashboard.philsms.com > API settings.'
+  });
 }
 
 export function OPTIONS(request) {

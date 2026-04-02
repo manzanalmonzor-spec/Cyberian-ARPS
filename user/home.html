@@ -1119,33 +1119,44 @@
         return data;
       }
 
-      function extractAssistantText(data) {
-        const choice = data?.choices?.[0];
-        const content = choice?.message?.content;
-
-        if (typeof content === 'string') {
-          return content.trim();
+      function collectAssistantText(value) {
+        if (typeof value === 'string') {
+          return value;
         }
 
-        if (Array.isArray(content)) {
-          const text = content
-            .map((part) => {
-              if (typeof part === 'string') return part;
-              if (part && typeof part.text === 'string') return part.text;
-              if (part && typeof part.content === 'string') return part.content;
-              return '';
-            })
-            .join('')
-            .trim();
-
-          if (text) return text;
+        if (Array.isArray(value)) {
+          return value.map(collectAssistantText).join('');
         }
 
-        if (typeof choice?.text === 'string') {
-          return choice.text.trim();
+        if (!value || typeof value !== 'object') {
+          return '';
+        }
+
+        const directFields = ['text', 'content', 'output_text', 'value'];
+        for (const field of directFields) {
+          if (typeof value[field] === 'string' && value[field].trim()) {
+            return value[field];
+          }
+        }
+
+        for (const field of directFields) {
+          if (value[field]) {
+            const nested = collectAssistantText(value[field]);
+            if (nested.trim()) return nested;
+          }
+        }
+
+        for (const nestedValue of Object.values(value)) {
+          const nested = collectAssistantText(nestedValue);
+          if (nested.trim()) return nested;
         }
 
         return '';
+      }
+
+      function extractAssistantText(data) {
+        const choice = data?.choices?.[0];
+        return collectAssistantText(choice?.message?.content || choice?.message || choice || data).trim();
       }
 
       async function generateAdvisorMessage(temp, desc, wind, humidity, newsContext) {
@@ -1238,7 +1249,7 @@ Give a clear, direct advisory in 1-2 sentences. Max 30 words. Taglish OK. No has
         };
 
         updateWeather();
-        setInterval(updateWeather, 10000);
+        setInterval(updateWeather, 300000);
       }
 
       initWeatherCycle();

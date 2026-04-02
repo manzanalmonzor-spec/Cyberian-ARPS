@@ -967,6 +967,68 @@
       }
     })();
 
+    // ── Shared Groq Chat helper (used by weather advisor + AI chat) ──
+    async function callGroqChat(payload) {
+      const url = window.getArpsApiUrl('api/groq-chat');
+      console.log('[ARPS Chat] Calling:', url, 'model:', payload.model);
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        });
+        clearTimeout(timeout);
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          console.error('[ARPS Chat] API error:', response.status, data);
+          throw new Error(data.error || `HTTP ${response.status}`);
+        }
+
+        console.log('[ARPS Chat] Success:', data.choices?.[0]?.message?.content?.slice(0, 60));
+        return data;
+      } catch (err) {
+        clearTimeout(timeout);
+        if (err.name === 'AbortError') {
+          console.error('[ARPS Chat] Request timed out after 15s');
+          throw new Error('Request timed out');
+        }
+        console.error('[ARPS Chat] Fetch failed:', err.message);
+        throw err;
+      }
+    }
+
+    function collectAssistantText(value) {
+      if (typeof value === 'string') return value;
+      if (Array.isArray(value)) return value.map(collectAssistantText).join('');
+      if (!value || typeof value !== 'object') return '';
+      const directFields = ['content', 'text', 'message', 'response', 'answer', 'output', 'result', 'generated_text'];
+      for (const field of directFields) {
+        if (typeof value[field] === 'string' && value[field].trim()) return value[field];
+      }
+      for (const field of directFields) {
+        if (value[field]) {
+          const nested = collectAssistantText(value[field]);
+          if (nested.trim()) return nested;
+        }
+      }
+      for (const nestedValue of Object.values(value)) {
+        const nested = collectAssistantText(nestedValue);
+        if (nested.trim()) return nested;
+      }
+      return '';
+    }
+
+    function extractAssistantText(data) {
+      const choice = data?.choices?.[0];
+      return collectAssistantText(choice?.message?.content || choice?.message || choice || data).trim();
+    }
+
     // ── Live Weather from Open-Meteo using user GPS ──
     (function initWeather() {
       const tempEl = document.getElementById('weather-temp');
@@ -1100,81 +1162,6 @@
             advisorReady = true;
           }
         }
-      }
-
-      async function callGroqChat(payload) {
-        const url = window.getArpsApiUrl('api/groq-chat');
-        console.log('[ARPS Chat] Calling:', url, 'model:', payload.model);
-
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 15000);
-
-        try {
-          const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            signal: controller.signal
-          });
-          clearTimeout(timeout);
-
-          const data = await response.json().catch(() => ({}));
-          if (!response.ok) {
-            console.error('[ARPS Chat] API error:', response.status, data);
-            throw new Error(data.error || `HTTP ${response.status}`);
-          }
-
-          console.log('[ARPS Chat] Success:', data.choices?.[0]?.message?.content?.slice(0, 60));
-          return data;
-        } catch (err) {
-          clearTimeout(timeout);
-          if (err.name === 'AbortError') {
-            console.error('[ARPS Chat] Request timed out after 15s');
-            throw new Error('Request timed out');
-          }
-          console.error('[ARPS Chat] Fetch failed:', err.message);
-          throw err;
-        }
-      }
-
-      function collectAssistantText(value) {
-        if (typeof value === 'string') {
-          return value;
-        }
-
-        if (Array.isArray(value)) {
-          return value.map(collectAssistantText).join('');
-        }
-
-        if (!value || typeof value !== 'object') {
-          return '';
-        }
-
-        const directFields = ['text', 'content', 'output_text', 'value'];
-        for (const field of directFields) {
-          if (typeof value[field] === 'string' && value[field].trim()) {
-            return value[field];
-          }
-        }
-
-        for (const field of directFields) {
-          if (value[field]) {
-            const nested = collectAssistantText(value[field]);
-            if (nested.trim()) return nested;
-          }
-        }
-
-        for (const nestedValue of Object.values(value)) {
-          const nested = collectAssistantText(nestedValue);
-          if (nested.trim()) return nested;
-        }
-
-        return '';
-      }
-
-      function extractAssistantText(data) {
-        const choice = data?.choices?.[0];
-        return collectAssistantText(choice?.message?.content || choice?.message || choice || data).trim();
       }
 
       async function generateAdvisorMessage(temp, desc, wind, humidity, newsContext) {

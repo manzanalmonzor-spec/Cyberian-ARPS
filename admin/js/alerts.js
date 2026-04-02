@@ -190,10 +190,60 @@ async function fetchWeatherAlerts() {
   refreshAlerts();
 }
 
+// ── Barangay Priority Algorithm ───────────────────────────────────────────────
+// Extracts barangay/area name from locationLabel (first segment before comma)
+function extractBarangay(locationLabel) {
+  if (!locationLabel || locationLabel === 'Unknown Location') return 'Unknown';
+  return locationLabel.split(',')[0].trim();
+}
+
+// Build a map of barangay → { count, alerts, severity }
+function buildBarangayHotspots(alertList) {
+  const map = {};
+  for (const a of alertList) {
+    if (!a.firestoreId) continue; // skip weather alerts
+    const active = a.status === 'Pending' || a.status === 'Responding';
+    if (!active) continue;
+    const brgy = extractBarangay(a.area);
+    if (!map[brgy]) map[brgy] = { count: 0, critical: 0, pending: 0 };
+    map[brgy].count++;
+    if (a.severity === 'Critical') map[brgy].critical++;
+    if (a.status === 'Pending') map[brgy].pending++;
+  }
+  return map;
+}
+
+// Compute priority score for sorting. Higher = more urgent.
+// Factors: severity, SOS cluster count in same barangay, status
+function computePriority(alert, hotspotMap) {
+  const severityScore = { Critical: 400, High: 300, Medium: 200, Low: 100 };
+  const statusScore   = { Pending: 50, Responding: 30, Active: 20, Resolved: 0 };
+
+  let score = (severityScore[alert.severity] || 100) + (statusScore[alert.status] || 0);
+
+  // Cluster bonus: each additional SOS from the same barangay adds priority
+  if (alert.firestoreId) {
+    const brgy = extractBarangay(alert.area);
+    const cluster = hotspotMap[brgy];
+    if (cluster && cluster.count > 1) {
+      // Bonus: 60 points per additional SOS in the same area (capped at 300)
+      score += Math.min(300, (cluster.count - 1) * 60);
+    }
+  }
+
+  return score;
+}
+
 // ── Merge and re-render ───────────────────────────────────────────────────────
 function refreshAlerts() {
   const prevId = selectedAlertId;
+
+  // Build hotspot map from firestore alerts
+  const hotspotMap = buildBarangayHotspots(firestoreAlerts);
+
+  // Merge weather + firestore, then sort by priority score (descending)
   alerts = [...weatherAlerts, ...firestoreAlerts];
+  alerts.sort((a, b) => computePriority(b, hotspotMap) - computePriority(a, hotspotMap));
 
   const newIdx = prevId ? alerts.findIndex(a => a.id === prevId || a.firestoreId === prevId) : -1;
   selectedAlertIndex = newIdx >= 0 ? newIdx : null;
@@ -205,9 +255,10 @@ function refreshAlerts() {
   }
 
   renderStats();
-  renderAlertsList();
-  renderSelectedAlert();
-  renderAiSummary();
+  renderAlertsList(hotspotMap);
+  renderSelectedAlert(hotspotMap);
+  renderAiSummary(hotspotMap);
+  renderHotspots(hotspotMap);
   updateReadinessMetrics();
 }
 
@@ -244,8 +295,9 @@ function getFilteredAlerts() {
   return alerts.filter(a => a.severity === currentFilter);
 }
 
-function renderAlertsList() {
+function renderAlertsList(hotspotMap) {
   const filtered = getFilteredAlerts();
+  hotspotMap = hotspotMap || {};
 
   if (alerts.length === 0) {
     alertsList.innerHTML = `
@@ -268,6 +320,13 @@ function renderAlertsList() {
     const cfg       = severityConfig[alert.severity] || severityConfig.Low;
     const isActive  = realIndex === selectedAlertIndex;
 
+    // Cluster badge: show if 2+ SOS from same barangay
+    const brgy = extractBarangay(alert.area);
+    const cluster = hotspotMap[brgy];
+    const clusterBadge = (alert.firestoreId && cluster && cluster.count > 1)
+      ? `<span class="cluster-badge" title="${cluster.count} SOS alerts from ${brgy}">HOTSPOT x${cluster.count}</span>`
+      : '';
+
     return `
       <div class="alert-card ${isActive ? 'active' : ''}" data-index="${realIndex}">
         <div class="rounded-2xl border ${cfg.border} ${cfg.bg} p-4">
@@ -281,7 +340,10 @@ function renderAlertsList() {
                   <p class="text-sm font-bold ${cfg.title}">${alert.title}</p>
                   <p class="text-xs ${cfg.text} mt-1">${alert.issued}</p>
                 </div>
-                ${badge(alert.severity)}
+                <div class="flex items-center gap-1.5 flex-shrink-0">
+                  ${clusterBadge}
+                  ${badge(alert.severity)}
+                </div>
               </div>
               <div class="mt-3 flex items-center gap-2 text-[11px] text-slate-500 font-semibold uppercase tracking-wide">
                 <span>${alert.category}</span>
@@ -297,7 +359,9 @@ function renderAlertsList() {
   }).join('');
 }
 
-function renderSelectedAlert() {
+function renderSelectedAlert(hotspotMap) {
+  hotspotMap = hotspotMap || {};
+
   if (selectedAlertIndex === null) {
     emptyAlertState.classList.remove('hidden');
     selectedAlertState.classList.add('hidden');
@@ -321,8 +385,16 @@ function renderSelectedAlert() {
   selectedAlertSeverity.innerHTML   = badge(alert.severity);
   selectedAlertCategory.textContent = alert.category;
   selectedAlertStatus.textContent   = alert.status;
-  selectedAlertArea.textContent     = alert.area;
   selectedAlertUrgency.textContent  = alert.urgency;
+
+  // Show cluster info in area field if hotspot
+  const brgy = extractBarangay(alert.area);
+  const cluster = hotspotMap[brgy];
+  if (alert.firestoreId && cluster && cluster.count > 1) {
+    selectedAlertArea.innerHTML = `${alert.area} <span class="cluster-badge-detail">${cluster.count} SOS in this area — PRIORITY</span>`;
+  } else {
+    selectedAlertArea.textContent = alert.area;
+  }
   selectedAlertSummary.textContent  = alert.summary;
   selectedAlertAction.textContent   = alert.action;
 
@@ -351,7 +423,8 @@ function renderSelectedAlert() {
   }
 }
 
-function renderAiSummary() {
+function renderAiSummary(hotspotMap) {
+  hotspotMap = hotspotMap || {};
   const critical   = alerts.filter(a => a.severity === 'Critical').length;
   const pending    = alerts.filter(a => a.status   === 'Pending').length;
   const responding = alerts.filter(a => a.status   === 'Responding').length;
@@ -369,9 +442,54 @@ function renderAiSummary() {
   if (critical > 0)  text += `${critical} critical level — priority response required. `;
   if (pending > 0)   text += `${pending} unacknowledged alert${pending !== 1 ? 's' : ''} awaiting dispatch. `;
   if (responding > 0) text += `${responding} incident${responding !== 1 ? 's' : ''} currently being responded to. `;
-  text += 'Field teams should stay aligned with barangay communications and active hazard zones.';
 
+  // Add hotspot clusters to summary
+  const hotspots = Object.entries(hotspotMap).filter(([, v]) => v.count > 1).sort((a, b) => b[1].count - a[1].count);
+  if (hotspots.length > 0) {
+    const names = hotspots.map(([brgy, v]) => `${brgy} (${v.count} SOS)`).join(', ');
+    text += `PRIORITY ZONES: ${names} — multiple distress signals indicate concentrated emergency, prioritize dispatch to these areas. `;
+  }
+
+  text += 'Field teams should stay aligned with barangay communications and active hazard zones.';
   alertsAiSummary.textContent = text;
+}
+
+// ── Render Barangay Hotspots panel ───────────────────────────────────────────
+function renderHotspots(hotspotMap) {
+  const panel = document.getElementById('hotspotPanel');
+  if (!panel) return;
+
+  const entries = Object.entries(hotspotMap)
+    .sort((a, b) => b[1].count - a[1].count);
+
+  if (entries.length === 0) {
+    panel.innerHTML = '<p class="text-xs text-slate-400">No active SOS incidents to analyze.</p>';
+    return;
+  }
+
+  const maxCount = entries[0][1].count;
+
+  panel.innerHTML = entries.map(([brgy, data]) => {
+    const pct = Math.round((data.count / maxCount) * 100);
+    const isHot = data.count > 1;
+    const barColor = data.count >= 3 ? 'bg-red-500' : data.count === 2 ? 'bg-orange-500' : 'bg-blue-500';
+    const labelColor = isHot ? 'text-red-700 font-bold' : 'text-slate-700 font-semibold';
+    const hotLabel = data.count >= 3 ? '<span class="hotspot-tag critical">CRITICAL CLUSTER</span>'
+                   : data.count === 2 ? '<span class="hotspot-tag elevated">ELEVATED</span>'
+                   : '';
+
+    return `
+      <div class="mb-3">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs ${labelColor} truncate">${brgy} ${hotLabel}</span>
+          <span class="text-xs font-bold text-slate-500">${data.count} SOS${data.pending > 0 ? ` (${data.pending} pending)` : ''}</span>
+        </div>
+        <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div class="h-full rounded-full ${barColor} transition-all duration-500" style="width:${pct}%"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 function updateReadinessMetrics() {

@@ -1607,6 +1607,16 @@ STYLE:
 - If the situation sounds dangerous or life-threatening, tell the user to seek emergency help or use the SOS button immediately.`;
       }
 
+      function buildSimpleChatPrompt() {
+        return `You are ARPS Assistant for disaster preparedness and emergency safety in the Philippines.
+
+Reply naturally and helpfully.
+- Answer in the same language as the user when possible.
+- Give direct practical advice.
+- Use numbered steps for safety guidance.
+- Keep replies concise unless the user asks for more detail.`;
+      }
+
       async function sendToAI(userText) {
         chatHistory.push({ role: "user", content: userText });
 
@@ -1677,6 +1687,26 @@ STYLE:
         }
       }
 
+      async function sendToAISimple(userText) {
+        const data = await callGroqChat({
+          model: 'llama-3.1-8b-instant',
+          messages: [
+            { role: 'system', content: buildSimpleChatPrompt() },
+            { role: 'user', content: userText }
+          ],
+          temperature: 0.3,
+          max_tokens: 220
+        });
+
+        const aiMsg = extractAssistantText(data);
+        if (!aiMsg) {
+          console.warn('Simple ARPS chat returned no displayable text:', data);
+          return '';
+        }
+
+        return aiMsg;
+      }
+
       // Fallback to smaller model
       async function sendToAIFallback(userText) {
         const contextSummary = buildConversationContext();
@@ -1697,13 +1727,30 @@ STYLE:
             addMessage(aiMsg, false);
           } else {
             console.warn('Fallback ARPS chat returned no displayable text:', data);
-            const fb = !navigator.onLine ? getOfflineFallback(userText) : getUnavailableMessage();
-            chatHistory.push({ role: "assistant", content: fb });
-            addMessage(fb, false);
+            const simpleMsg = await sendToAISimple(userText);
+            if (simpleMsg) {
+              chatHistory.push({ role: "assistant", content: simpleMsg });
+              addMessage(simpleMsg, false);
+            } else {
+              const fb = !navigator.onLine ? getOfflineFallback(userText) : getUnavailableMessage();
+              chatHistory.push({ role: "assistant", content: fb });
+              addMessage(fb, false);
+            }
           }
         } catch (e) {
           console.error('Fallback ARPS chat request failed:', e);
           removeTypingIndicator();
+          try {
+            const simpleMsg = await sendToAISimple(userText);
+            if (simpleMsg) {
+              chatHistory.push({ role: "assistant", content: simpleMsg });
+              addMessage(simpleMsg, false);
+              return;
+            }
+          } catch (simpleError) {
+            console.error('Simple ARPS chat request failed:', simpleError);
+          }
+
           const fb = !navigator.onLine ? getOfflineFallback(userText) : getUnavailableMessage();
           chatHistory.push({ role: "assistant", content: fb });
           addMessage(fb, false);

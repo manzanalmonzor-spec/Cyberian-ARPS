@@ -1103,20 +1103,38 @@
       }
 
       async function callGroqChat(payload) {
-        const response = await fetch(window.getArpsApiUrl('api/groq-chat'), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
+        const url = window.getArpsApiUrl('api/groq-chat');
+        console.log('[ARPS Chat] Calling:', url, 'model:', payload.model);
 
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok) {
-          throw new Error(data.error || `HTTP ${response.status}`);
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
+
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+          });
+          clearTimeout(timeout);
+
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            console.error('[ARPS Chat] API error:', response.status, data);
+            throw new Error(data.error || `HTTP ${response.status}`);
+          }
+
+          console.log('[ARPS Chat] Success:', data.choices?.[0]?.message?.content?.slice(0, 60));
+          return data;
+        } catch (err) {
+          clearTimeout(timeout);
+          if (err.name === 'AbortError') {
+            console.error('[ARPS Chat] Request timed out after 15s');
+            throw new Error('Request timed out');
+          }
+          console.error('[ARPS Chat] Fetch failed:', err.message);
+          throw err;
         }
-
-        return data;
       }
 
       function collectAssistantText(value) {

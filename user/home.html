@@ -1119,6 +1119,35 @@
         return data;
       }
 
+      function extractAssistantText(data) {
+        const choice = data?.choices?.[0];
+        const content = choice?.message?.content;
+
+        if (typeof content === 'string') {
+          return content.trim();
+        }
+
+        if (Array.isArray(content)) {
+          const text = content
+            .map((part) => {
+              if (typeof part === 'string') return part;
+              if (part && typeof part.text === 'string') return part.text;
+              if (part && typeof part.content === 'string') return part.content;
+              return '';
+            })
+            .join('')
+            .trim();
+
+          if (text) return text;
+        }
+
+        if (typeof choice?.text === 'string') {
+          return choice.text.trim();
+        }
+
+        return '';
+      }
+
       async function generateAdvisorMessage(temp, desc, wind, humidity, newsContext) {
         const advisorEl = document.getElementById('pagasa-advisor-text');
         if (!advisorEl) return;
@@ -1155,13 +1184,15 @@ Give a clear, direct advisory in 1-2 sentences. Max 30 words. Taglish OK. No has
             temperature: 0.6,
             max_tokens: 80
           });
-          if (data.choices && data.choices.length > 0) {
-            let msg = data.choices[0].message.content.trim();
+          const aiText = extractAssistantText(data);
+          if (aiText) {
+            let msg = aiText;
             if (msg.startsWith('"') && msg.endsWith('"')) { msg = msg.substring(1, msg.length - 1); }
             advisorEl.innerHTML = msg;
             if (!hasDisaster) setAdvisorStatus('live');
             advisorReady = true;
           } else {
+            console.warn('Advisor AI returned no displayable text:', data);
             throw new Error('No response');
           }
         } catch (e) {
@@ -1614,11 +1645,12 @@ STYLE:
             max_tokens: 420
           });
           removeTypingIndicator();
-          if (data.choices && data.choices.length > 0) {
-            const aiMsg = data.choices[0].message.content.trim();
+          const aiMsg = extractAssistantText(data);
+          if (aiMsg) {
             chatHistory.push({ role: "assistant", content: aiMsg });
             addMessage(aiMsg, false);
           } else {
+            console.warn('Primary ARPS chat returned no displayable text:', data);
             await sendToAIFallback(userText);
           }
         } catch (e) {
@@ -1642,11 +1674,12 @@ STYLE:
             max_tokens: 360
           });
           removeTypingIndicator();
-          if (data.choices && data.choices.length > 0) {
-            const aiMsg = data.choices[0].message.content.trim();
+          const aiMsg = extractAssistantText(data);
+          if (aiMsg) {
             chatHistory.push({ role: "assistant", content: aiMsg });
             addMessage(aiMsg, false);
           } else {
+            console.warn('Fallback ARPS chat returned no displayable text:', data);
             const fb = getLocalFallback(userText);
             chatHistory.push({ role: "assistant", content: fb });
             addMessage(fb, false);
@@ -1764,8 +1797,9 @@ Be concise, practical, warm, and use Taglish if helpful. Use numbered steps.`;
               temperature: 0.5,
               max_tokens: 400
             });
-            if (data.choices && data.choices.length > 0) {
-              return data.choices[0].message.content.trim();
+            const analysis = extractAssistantText(data);
+            if (analysis) {
+              return analysis;
             }
             // If model returned error, try next model
             console.warn('Vision model ' + model + ' failed:', data.error?.message || 'no choices');

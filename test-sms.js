@@ -7,7 +7,7 @@ async function test() {
     throw new Error('Set PHILSMS_TOKEN before running this script.');
   }
 
-  const res = await fetch('https://app.philsms.com/api/v3/sms/send', {
+  const res = await fetch('https://dashboard.philsms.com/api/v3/sms/send', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,

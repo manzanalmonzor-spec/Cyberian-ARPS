@@ -19,7 +19,7 @@ exports.sendSms = onCall({ cors: true, secrets: [PHILSMS_TOKEN] }, async (reques
     throw new HttpsError('invalid-argument', 'recipient and message are required');
   }
 
-  const res = await fetch('https://app.philsms.com/api/v3/sms/send', {
+  const res = await fetch('https://dashboard.philsms.com/api/v3/sms/send', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${PHILSMS_TOKEN.value()}`,

@@ -64,7 +64,7 @@ export async function POST(request) {
   }
 
   try {
-    const smsResponse = await fetch('https://app.philsms.com/api/v3/sms/send', {
+    const smsResponse = await fetch('https://dashboard.philsms.com/api/v3/sms/send', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,

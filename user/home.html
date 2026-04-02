@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="../runtime-config.js"></script>
   <script src="../shared.js"></script>
   <meta name="theme-color" content="#DC2626">
   <title>ARPS — Home</title>
@@ -1102,7 +1103,7 @@
       }
 
       async function callGroqChat(payload) {
-        const response = await fetch('/api/groq-chat', {
+        const response = await fetch(window.getArpsApiUrl('api/groq-chat'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -1621,6 +1622,7 @@ STYLE:
             await sendToAIFallback(userText);
           }
         } catch (e) {
+          console.error('Primary ARPS chat request failed:', e);
           removeTypingIndicator();
           try { await sendToAIFallback(userText); } catch { addMessage(getLocalFallback(userText), false); }
         }
@@ -1649,7 +1651,8 @@ STYLE:
             chatHistory.push({ role: "assistant", content: fb });
             addMessage(fb, false);
           }
-        } catch {
+        } catch (e) {
+          console.error('Fallback ARPS chat request failed:', e);
           removeTypingIndicator();
           const fb = getLocalFallback(userText);
           chatHistory.push({ role: "assistant", content: fb });

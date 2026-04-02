@@ -59,7 +59,7 @@ cacheAdminContact();
 })();
 
 async function callPhilSMS(recipient, message) {
-  const response = await fetch('/api/send-sms', {
+  const response = await fetch(window.getArpsApiUrl('api/send-sms'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

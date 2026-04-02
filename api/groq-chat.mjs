@@ -1,12 +1,23 @@
 export const config = { runtime: 'edge' };
 
-function json(data, status = 200, headers = {}) {
+function corsHeaders(request, headers = {}) {
+  const origin = request.headers.get('origin');
+  return {
+    'Access-Control-Allow-Origin': origin || '*',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    Vary: 'Origin',
+    ...headers
+  };
+}
+
+function json(request, data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: {
+    headers: corsHeaders(request, {
       'Content-Type': 'application/json',
       ...headers
-    }
+    })
   });
 }
 
@@ -28,26 +39,26 @@ function normalizeModel(model) {
   return MODEL_ALIASES[model] || model;
 }
 
-export function GET() {
-  return json({ error: 'Method not allowed' }, 405, { Allow: 'POST, OPTIONS' });
+export function GET(request) {
+  return json(request, { error: 'Method not allowed' }, 405, { Allow: 'POST, OPTIONS' });
 }
 
-export function OPTIONS() {
+export function OPTIONS(request) {
   return new Response(null, {
     status: 204,
-    headers: { Allow: 'POST, OPTIONS' }
+    headers: corsHeaders(request, { Allow: 'POST, OPTIONS' })
   });
 }
 
 export async function POST(request) {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
-    return json({ error: 'GROQ_API_KEY is not configured' }, 500);
+    return json(request, { error: 'GROQ_API_KEY is not configured' }, 500);
   }
 
   const { model, messages, temperature, max_tokens } = await getBody(request);
   if (!model || !Array.isArray(messages) || messages.length === 0) {
-    return json({ error: 'model and messages are required' }, 400);
+    return json(request, { error: 'model and messages are required' }, 400);
   }
 
   const resolvedModel = normalizeModel(model);
@@ -70,6 +81,7 @@ export async function POST(request) {
     const data = await groqResponse.json().catch(() => ({}));
     if (!groqResponse.ok) {
       return json(
+        request,
         {
           error:
             data.error?.message ||
@@ -80,8 +92,8 @@ export async function POST(request) {
       );
     }
 
-    return json(data, 200);
+    return json(request, data, 200);
   } catch (error) {
-    return json({ error: error.message || 'Failed to call Groq' }, 500);
+    return json(request, { error: error.message || 'Failed to call Groq' }, 500);
   }
 }

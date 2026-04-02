@@ -126,6 +126,64 @@ var ARPS_BASE_PATH = getArpsBasePath(window.location.pathname);
 var ARPS_IS_ADMIN_PAGE = window.location.pathname.indexOf("/admin/") !== -1;
 var ARPS_LOGO_PATH = getArpsAppPath("Images/ARPLOGO.png");
 
+function normalizeArpsApiBaseUrl(value) {
+  var normalized = String(value || "").trim();
+  if (!normalized) {
+    return "";
+  }
+  return normalized.replace(/\/+$/, "");
+}
+
+function readArpsApiBaseUrl() {
+  var sources = [];
+
+  if (window.ARPS_CONFIG && window.ARPS_CONFIG.apiBaseUrl) {
+    sources.push(window.ARPS_CONFIG.apiBaseUrl);
+  }
+
+  if (window.ARPS_API_BASE_URL) {
+    sources.push(window.ARPS_API_BASE_URL);
+  }
+
+  var meta = document.querySelector('meta[name="arps-api-base"]');
+  if (meta && meta.content) {
+    sources.push(meta.content);
+  }
+
+  try {
+    var stored = window.localStorage.getItem("arps_api_base_url");
+    if (stored) {
+      sources.push(stored);
+    }
+  } catch (_) {}
+
+  for (var i = 0; i < sources.length; i += 1) {
+    var normalized = normalizeArpsApiBaseUrl(sources[i]);
+    if (normalized) {
+      return normalized;
+    }
+  }
+
+  return "";
+}
+
+var ARPS_API_BASE_URL = readArpsApiBaseUrl();
+
+function getArpsApiUrl(relativePath) {
+  var cleanPath = "/" + String(relativePath || "").replace(/^\/+/, "");
+  if (ARPS_API_BASE_URL) {
+    return ARPS_API_BASE_URL + cleanPath;
+  }
+  return cleanPath;
+}
+
+window.ARPS_API_BASE_URL = ARPS_API_BASE_URL;
+window.getArpsApiUrl = getArpsApiUrl;
+
+if (!ARPS_API_BASE_URL && window.location.hostname.indexOf("github.io") !== -1) {
+  console.warn('ARPS API base URL is not configured. Set it in runtime-config.js or localStorage key "arps_api_base_url".');
+}
+
 // ── PWA (user pages only — skip /admin/) ─────────────────────────────────────
 if (!ARPS_IS_ADMIN_PAGE) {
 

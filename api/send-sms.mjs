@@ -98,19 +98,20 @@ export async function GET(request) {
   const token = normalizeSecret(raw);
   const url = new URL(request.url);
 
-  // ?test=1 → actually call PhilSMS with a test payload and return the raw response
+  const testPayload = {
+    recipient: '639170000000',
+    sender_id: 'PhilSMS',
+    type: 'plain',
+    message: 'ARPS API test — please ignore.'
+  };
+
+  // ?test=1 → test with env var token
   if (url.searchParams.get('test') === '1' && token) {
     try {
-      const testPayload = {
-        recipient: '639170000000',
-        sender_id: 'PhilSMS',
-        type: 'plain',
-        message: 'ARPS API test — please ignore.'
-      };
       const result = await sendViaPhilSms(PHILSMS_ENDPOINTS[0], token, testPayload);
-      // Also try endpoint 2
       const result2 = await sendViaPhilSms(PHILSMS_ENDPOINTS[1], token, testPayload);
       return json(request, {
+        mode: 'env_var_token',
         endpoint1: { url: result.url, status: result.status, ok: result.ok, response: result.data },
         endpoint2: { url: result2.url, status: result2.status, ok: result2.ok, response: result2.data },
         tokenLength: token.length

@@ -65,7 +65,13 @@ cacheAdminContact();
 
 async function getSmsTargets(type) {
   if (navigator.onLine) {
-    await cacheAdminContact(true);
+    const data = await cacheAdminContact(true);
+    if (data) {
+      return {
+        adminPhone: data.phone || null,
+        agencyPhone: data[`agency${type}`] || null
+      };
+    }
   } else {
     await cacheAdminContact().catch(() => null);
   }

@@ -45,8 +45,9 @@ async function loadSettings() {
     if (snap.exists()) {
       const data = snap.data();
 
-      phoneInput.value = data.phone || "";
-      savedPhoneDisp.textContent = data.phone || "Not set";
+      const savedPhone = formatPhoneForStorage(data.phone);
+      phoneInput.value = savedPhone || data.phone || "";
+      savedPhoneDisp.textContent = savedPhone || data.phone || "Not set";
 
       if (data.updatedAt) {
         const ts = data.updatedAt.toDate();
@@ -58,7 +59,7 @@ async function loadSettings() {
       }
 
       for (const [key, el] of Object.entries(agencyInputs)) {
-        el.value = data[`agency${key}`] || "";
+        el.value = formatPhoneForStorage(data[`agency${key}`]) || data[`agency${key}`] || "";
       }
     } else {
       savedPhoneDisp.textContent = "Not set";
@@ -72,11 +73,13 @@ async function loadSettings() {
 
 // ── Save admin phone number ───────────────────────────────────────────────────
 btnSave.addEventListener("click", async () => {
-  const phone = phoneInput.value.trim();
+  const phone = formatPhoneForStorage(phoneInput.value);
   if (!phone) {
-    showStatus(saveStatus, "Please enter a phone number.", "error");
+    showStatus(saveStatus, "Enter a valid PH mobile number like 09XXXXXXXXX or +639XXXXXXXXX.", "error");
     return;
   }
+
+  phoneInput.value = phone;
 
   btnSave.disabled = true;
   btnSave.innerHTML = `
@@ -110,8 +113,24 @@ btnSave.addEventListener("click", async () => {
 // ── Save agency numbers ───────────────────────────────────────────────────────
 btnSaveAgency.addEventListener("click", async () => {
   const updates = {};
+  const invalidLabels = [];
   for (const [key, el] of Object.entries(agencyInputs)) {
-    updates[`agency${key}`] = el.value.trim();
+    const rawValue = el.value.trim();
+    const formatted = formatPhoneForStorage(rawValue);
+    if (rawValue && !formatted) {
+      invalidLabels.push(key);
+    }
+    updates[`agency${key}`] = formatted;
+    el.value = formatted;
+  }
+
+  if (invalidLabels.length > 0) {
+    showStatus(
+      agencyStatus,
+      `Enter valid PH mobile numbers for: ${invalidLabels.join(", ")}.`,
+      "error"
+    );
+    return;
   }
 
   btnSaveAgency.disabled = true;
@@ -157,6 +176,30 @@ function showToast(label) {
   t.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>' + label;
   document.body.appendChild(t);
   setTimeout(() => { t.classList.add("out"); setTimeout(() => t.remove(), 300); }, 2500);
+}
+
+function extractPhilippineMobileNumber(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+
+  const matches = text.match(/(?:\+?63|0)?9\d{9}/g) || [];
+  for (const match of matches) {
+    const digits = match.replace(/\D/g, "");
+    if (/^09\d{9}$/.test(digits)) return "63" + digits.slice(1);
+    if (/^639\d{9}$/.test(digits)) return digits;
+    if (/^9\d{9}$/.test(digits)) return "63" + digits;
+  }
+
+  const digitsOnly = text.replace(/\D/g, "");
+  if (/^09\d{9}$/.test(digitsOnly)) return "63" + digitsOnly.slice(1);
+  if (/^639\d{9}$/.test(digitsOnly)) return digitsOnly;
+  if (/^9\d{9}$/.test(digitsOnly)) return "63" + digitsOnly;
+  return "";
+}
+
+function formatPhoneForStorage(value) {
+  const normalized = extractPhilippineMobileNumber(value);
+  return normalized ? `+${normalized}` : "";
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────

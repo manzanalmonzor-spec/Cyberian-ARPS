@@ -592,9 +592,22 @@ document.addEventListener('click', (e) => {
 
 // ── Respond / Resolve actions ─────────────────────────────────────────────────
 function normalizePhone(num) {
-  let n = (num || '').replace(/[\s\-().+]/g, '');
-  if (n.startsWith('0') && n.length === 11) n = '63' + n.slice(1); // 09... → 639...
-  return n; // already 639... or +63 stripped to 639...
+  const text = String(num || '').trim();
+  if (!text) return '';
+
+  const matches = text.match(/(?:\+?63|0)?9\d{9}/g) || [];
+  for (const match of matches) {
+    const digits = match.replace(/\D/g, '');
+    if (/^09\d{9}$/.test(digits)) return '63' + digits.slice(1);
+    if (/^639\d{9}$/.test(digits)) return digits;
+    if (/^9\d{9}$/.test(digits)) return '63' + digits;
+  }
+
+  const digitsOnly = text.replace(/\D/g, '');
+  if (/^09\d{9}$/.test(digitsOnly)) return '63' + digitsOnly.slice(1);
+  if (/^639\d{9}$/.test(digitsOnly)) return digitsOnly;
+  if (/^9\d{9}$/.test(digitsOnly)) return '63' + digitsOnly;
+  return '';
 }
 
 async function respondToAlert(btn) {

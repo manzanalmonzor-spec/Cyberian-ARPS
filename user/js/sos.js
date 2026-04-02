@@ -486,28 +486,37 @@ async function sendSosAlert(type) {
 
   const time = new Date(createdAtMs).toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' });
   const dateStr = new Date(createdAtMs).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
-  const atRiskNote = userAtRisk && userAtRisk !== 'None' ? ` [At-Risk: ${userAtRisk}]` : '';
-  const descLine = locationDesc ? `Landmark: ${locationDesc}\n` : '';
-  const coordsLine = (lat && lng && lat !== 14.6507) ? `GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}\n` : '';
-  const mapLink = (lat && lng && lat !== 14.6507) ? `Map: https://maps.google.com/?q=${lat},${lng}\n` : '';
-  const message =
-    `[ARPS EMERGENCY ALERT]\n` +
-    `${userName}${atRiskNote} has triggered a ${type} Emergency SOS.\n` +
-    `Location: ${locationLabel}\n` +
-    `${descLine}` +
-    `${coordsLine}` +
-    `${mapLink}` +
-    `Time: ${time}, ${dateStr}\n\n` +
-    `Please respond immediately.\n` +
-    `- ARPS Emergency Response System`;
+  const message = buildSosSmsMessage({
+    userName,
+    userAtRisk,
+    type,
+    locationLabel,
+    locationDesc,
+    lat,
+    lng,
+    time,
+    dateStr
+  });
 
   const phoneUser   = ecNumber    ? normalizePhone(ecNumber)    : null;
   const phoneAdmin  = adminPhone  ? normalizePhone(adminPhone)  : null;
   const phoneAgency = agencyPhone ? normalizePhone(agencyPhone) : null;
+  const hasAgencySetting = Boolean(agencyPhone);
+
+  if (adminPhone && !phoneAdmin) {
+    console.warn('Admin phone is not a valid PH mobile number:', adminPhone);
+  }
+  if (agencyPhone && !phoneAgency) {
+    console.warn(`Agency phone for ${type} is not a valid PH mobile number:`, agencyPhone);
+  }
 
   if (!phoneAgency) {
     // Warn in console so admin knows to configure it — not fatal
-    console.warn(`Agency number for ${type} not configured. Only admin will be notified.`);
+    console.warn(
+      hasAgencySetting
+        ? `Agency number for ${type} is invalid. Only admin will be notified.`
+        : `Agency number for ${type} not configured. Only admin will be notified.`
+    );
   }
 
   if (!navigator.onLine) {
@@ -553,7 +562,11 @@ async function sendSosAlert(type) {
       }
     } else {
       // Agency number not configured — show non-blocking warning after step completes
-      console.warn(`No ${agencyName} number configured by admin.`);
+      console.warn(
+        hasAgencySetting
+          ? `${agencyName} number saved by admin is invalid for PhilSMS.`
+          : `No ${agencyName} number configured by admin.`
+      );
     }
 
     if (sentTo.length === 0 && (phoneUser || phoneAdmin || phoneAgency)) {
@@ -573,7 +586,9 @@ async function sendSosAlert(type) {
     if (!phoneAgency) {
       const warnEl = document.createElement('p');
       warnEl.className = 'text-[11px] text-amber-600 font-medium mt-1 text-center';
-      warnEl.textContent = `⚠ ${agencyName} number not set by admin — only admin was notified.`;
+      warnEl.textContent = hasAgencySetting
+        ? `Warning: ${agencyName} number saved by admin is invalid. Only admin was notified.`
+        : `Warning: ${agencyName} number not set by admin. Only admin was notified.`;
       document.getElementById('s3')?.after(warnEl);
     }
   }
@@ -600,9 +615,59 @@ function getSosProfile() {
 }
 
 function normalizePhone(num) {
-  let n = (num || '').replace(/[\s\-().+]/g, '');
-  if (n.startsWith('0') && n.length === 11) n = '63' + n.slice(1); // 09... → 639...
-  return n; // already 639... or +63 stripped to 639...
+  const text = String(num || '').trim();
+  if (!text) return '';
+
+  const matches = text.match(/(?:\+?63|0)?9\d{9}/g) || [];
+  for (const match of matches) {
+    const digits = match.replace(/\D/g, '');
+    if (/^09\d{9}$/.test(digits)) return '63' + digits.slice(1);
+    if (/^639\d{9}$/.test(digits)) return digits;
+    if (/^9\d{9}$/.test(digits)) return '63' + digits;
+  }
+
+  const digitsOnly = text.replace(/\D/g, '');
+  if (/^09\d{9}$/.test(digitsOnly)) return '63' + digitsOnly.slice(1);
+  if (/^639\d{9}$/.test(digitsOnly)) return digitsOnly;
+  if (/^9\d{9}$/.test(digitsOnly)) return '63' + digitsOnly;
+  return '';
+}
+
+function truncateText(text, maxLength) {
+  const value = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!value || value.length <= maxLength) {
+    return value;
+  }
+  return value.slice(0, Math.max(0, maxLength - 3)).trimEnd() + '...';
+}
+
+function pushSmsLine(lines, line, maxLength) {
+  if (!line) return;
+  const next = lines.concat(line).join('\n');
+  if (next.length <= maxLength) {
+    lines.push(line);
+  }
+}
+
+function buildSosSmsMessage(details) {
+  const maxLength = 320;
+  const hasGps = details.lat && details.lng && details.lat !== 14.6507;
+  const atRiskNote = details.userAtRisk && details.userAtRisk !== 'None'
+    ? ` [At-Risk: ${truncateText(details.userAtRisk, 28)}]`
+    : '';
+  const lines = [
+    '[ARPS SOS]',
+    `${truncateText(details.userName, 32)}${atRiskNote} needs ${details.type} help.`,
+    `Loc: ${truncateText(details.locationLabel, 72)}`,
+    `Time: ${details.time}, ${details.dateStr}`
+  ];
+
+  pushSmsLine(lines, details.locationDesc ? `Landmark: ${truncateText(details.locationDesc, 64)}` : '', maxLength);
+  pushSmsLine(lines, hasGps ? `GPS: ${details.lat.toFixed(5)}, ${details.lng.toFixed(5)}` : '', maxLength);
+  pushSmsLine(lines, hasGps ? `Map: https://maps.google.com/?q=${details.lat},${details.lng}` : '', maxLength);
+  pushSmsLine(lines, 'Please respond immediately. - ARPS', maxLength);
+
+  return lines.join('\n');
 }
 
 // ── Send Another ──────────────────────────────────────────────────────────────

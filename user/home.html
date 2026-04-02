@@ -1617,53 +1617,27 @@ Reply naturally and helpfully.
 - Keep replies concise unless the user asks for more detail.`;
       }
 
+      function buildSimpleChatMessages(maxItems = 8) {
+        const history = chatHistory
+          .slice(-maxItems)
+          .filter((msg) => msg && (msg.role === 'user' || msg.role === 'assistant') && typeof msg.content === 'string' && msg.content.trim())
+          .map((msg) => ({ role: msg.role, content: msg.content }));
+
+        return [
+          { role: 'system', content: buildSimpleChatPrompt() },
+          ...history
+        ];
+      }
+
       async function sendToAI(userText) {
         chatHistory.push({ role: "user", content: userText });
 
-        const contextSummary = buildConversationContext();
-
-        const legacySystemPrompt = `You are ARPS Assistant, an intelligent, all-in-one disaster risk preparedness and emergency response AI for the Antique Risk Prevention System (ARPS) in the Philippines.
-
-YOUR EXPERTISE COVERS ALL NATURAL DISASTERS & RISKS:
-- Typhoons (bagyo) — preparation, signal warnings, evacuation, during & after steps
-- Floods (baha) — flash floods, rising water, urban flooding, safety steps
-- Earthquakes (lindol) — Drop/Cover/Hold, aftershock safety, structural damage assessment
-- Fire (sunog) — fire safety, prevention, escape plans, stop-drop-roll
-- Landslides (pagguho) — warning signs, mudslides, when to evacuate
-- Volcanic eruptions — ashfall protection, lahar awareness, evacuation zones
-- Tsunamis & storm surge — coastal warnings, evacuation to high ground
-- General emergency preparedness — Go Bags, family plans, first aid, emergency kits, survival tips
-- SOS & rescue guidance — when and how to call for help using ARPS
-
-CONVERSATION AWARENESS (RAG):
-- You have FULL access to the conversation history below. Always use it to understand follow-up questions.
-- If the user says "give me steps", "what should I do", "tell me more", "how?", "explain", "ano gagawin ko", etc., look at PREVIOUS messages to understand the topic and give a detailed, helpful answer.
-- Never give a generic rejection when the user is clearly asking a follow-up about an ongoing topic.
-${contextSummary ? '\n' + contextSummary : ''}
-
-RESTRICTIONS:
-- Stay focused on disaster preparedness, risk reduction, and emergency response.
-- If asked about completely unrelated topics (cooking, math, movies, celebrity gossip, etc.), politely redirect: "I specialize in disaster preparedness and emergency safety. Try asking me about typhoons, floods, earthquakes, fire safety, or your emergency kit!"
-
-STYLE:
-- Be warm, smart, and practical. Use plain English or light Taglish.
-- Give actionable step-by-step advice when asked.
-- Use numbered lists for steps. Use bullet points for tips.
-- Keep answers concise but complete (under 150 words unless detailed steps are needed).
-- Sound like a knowledgeable emergency responder, not a robot.
-- If the situation sounds dangerous, always remind them about the SOS button.`;
-
-        const systemPrompt = buildChatSystemPrompt(contextSummary);
-
         try {
           const data = await callGroqChat({
-            model: 'llama-3.3-70b-versatile',
-            messages: [
-              { role: 'system', content: systemPrompt },
-              ...chatHistory.slice(-20)
-            ],
-            temperature: 0.4,
-            max_tokens: 420
+            model: 'llama-3.1-8b-instant',
+            messages: buildSimpleChatMessages(8),
+            temperature: 0.3,
+            max_tokens: 220
           });
           removeTypingIndicator();
           const aiMsg = extractAssistantText(data);
@@ -1689,7 +1663,7 @@ STYLE:
 
       async function sendToAISimple(userText) {
         const data = await callGroqChat({
-          model: 'llama-3.1-8b-instant',
+          model: 'llama-3.3-70b-versatile',
           messages: [
             { role: 'system', content: buildSimpleChatPrompt() },
             { role: 'user', content: userText }
@@ -1709,16 +1683,12 @@ STYLE:
 
       // Fallback to smaller model
       async function sendToAIFallback(userText) {
-        const contextSummary = buildConversationContext();
         try {
           const data = await callGroqChat({
-            model: 'llama-3.1-8b-instant',
-            messages: [
-              { role: 'system', content: buildChatSystemPrompt(contextSummary) },
-              ...chatHistory.slice(-10)
-            ],
-            temperature: 0.4,
-            max_tokens: 360
+            model: 'llama-3.3-70b-versatile',
+            messages: buildSimpleChatMessages(6),
+            temperature: 0.3,
+            max_tokens: 220
           });
           removeTypingIndicator();
           const aiMsg = extractAssistantText(data);

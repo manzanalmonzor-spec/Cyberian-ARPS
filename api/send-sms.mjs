@@ -31,15 +31,7 @@ function normalizeSecret(value) {
 }
 
 export function GET() {
-  const raw = process.env.PHILSMS_TOKEN || '';
-  const token = normalizeSecret(raw);
-  return json({
-    tokenExists: !!raw,
-    tokenLength: raw.length,
-    normalizedLength: token.length,
-    firstChars: token.slice(0, 6) + '***',
-    hasPipe: raw.includes('|')
-  });
+  return json({ error: 'Method not allowed' }, 405, { Allow: 'POST, OPTIONS' });
 }
 
 export function OPTIONS() {

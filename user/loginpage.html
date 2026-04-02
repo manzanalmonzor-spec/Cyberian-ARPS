@@ -889,6 +889,12 @@
         if (!email) { showError('signUpError', 'Please enter your email.'); return; }
         if (password.length < 6) { showError('signUpError', 'Password must be at least 6 characters.'); return; }
 
+        // Block duplicate email in local accounts before anything else
+        if (findLocalAccount(email)) {
+            showError('signUpError', 'This email is already registered. Please sign in instead.');
+            return;
+        }
+
         var btn = document.getElementById('signUpBtn');
         btn.textContent = 'Creating account...';
         btn.disabled = true;
@@ -896,15 +902,19 @@
         try {
             if (firebaseContext) {
                 try {
+                    // Firebase also rejects duplicates with auth/email-already-in-use
                     var firebaseResult = await firebaseContext.auth.createUserWithEmailAndPassword(email, password);
                     await firebaseResult.user.updateProfile({ displayName: name });
                     saveSessionAndRedirect(firebaseResult.user, name, 'firebase-email');
                     return;
                 } catch (firebaseError) {
+                    // If email already exists in Firebase, stop — don't create local duplicate
+                    if (firebaseError.code === 'auth/email-already-in-use') {
+                        throw firebaseError;
+                    }
                     if (!shouldFallbackToLocal(firebaseError)) {
                         throw firebaseError;
                     }
-
                     console.warn('Falling back to local sign-up.', firebaseError);
                 }
             }
@@ -933,28 +943,35 @@
         btn.textContent = 'Signing in...';
         btn.disabled = true;
 
-        try {
-            if (firebaseContext) {
-                try {
-                    var firebaseResult = await firebaseContext.auth.signInWithEmailAndPassword(email, password);
-                    saveSessionAndRedirect(firebaseResult.user, firebaseResult.user.displayName, 'firebase-email');
-                    return;
-                } catch (firebaseError) {
-                    if (!shouldFallbackToLocal(firebaseError)) {
-                        throw firebaseError;
-                    }
+        var firebaseError = null;
+        var localError = null;
 
-                    console.warn('Falling back to local sign-in.', firebaseError);
-                }
+        // 1) Try Firebase first
+        if (firebaseContext) {
+            try {
+                var firebaseResult = await firebaseContext.auth.signInWithEmailAndPassword(email, password);
+                saveSessionAndRedirect(firebaseResult.user, firebaseResult.user.displayName, 'firebase-email');
+                return;
+            } catch (err) {
+                firebaseError = err;
+                console.warn('Firebase sign-in failed, trying local.', err.code);
             }
+        }
 
+        // 2) Always try local account as fallback
+        try {
             var localAccount = await signInLocalAccount(email, password);
             saveSessionAndRedirect(buildLocalUser(localAccount), localAccount.name, 'local-email');
-        } catch (error) {
-            btn.textContent = 'Sign In';
-            btn.disabled = false;
-            showError('signInError', friendlyError(error.code));
+            return;
+        } catch (err) {
+            localError = err;
         }
+
+        // 3) Both failed — show the most relevant error
+        btn.textContent = 'Sign In';
+        btn.disabled = false;
+        var bestError = localError || firebaseError || { code: 'auth/user-not-found' };
+        showError('signInError', friendlyError(bestError.code));
     });
 
     // --- GOOGLE SIGN IN ---

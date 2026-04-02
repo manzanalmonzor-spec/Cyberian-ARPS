@@ -1,5 +1,10 @@
 export const config = { runtime: 'edge' };
 
+const PHILSMS_ENDPOINTS = [
+  'https://dashboard.philsms.com/api/v3/sms/send',
+  'https://app.philsms.com/api/v3/sms/send'
+];
+
 function corsHeaders(request, headers = {}) {
   const origin = request.headers.get('origin');
   return {
@@ -66,6 +71,26 @@ function normalizeMessage(value) {
   return String(value || '').replace(/\r\n?/g, '\n').trim();
 }
 
+async function sendViaPhilSms(url, token, payload) {
+  const smsResponse = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await smsResponse.json().catch(() => ({}));
+  return {
+    ok: smsResponse.ok && data.status !== 'error',
+    status: smsResponse.status,
+    data,
+    url
+  };
+}
+
 export function GET(request) {
   return json(request, { error: 'Method not allowed' }, 405, { Allow: 'POST, OPTIONS' });
 }
@@ -95,35 +120,48 @@ export async function POST(request) {
   }
 
   try {
-    const smsResponse = await fetch('https://dashboard.philsms.com/api/v3/sms/send', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      },
-      body: JSON.stringify({
-        recipient: normalizedRecipient,
-        sender_id: 'PhilSMS',
-        type: 'plain',
-        message: normalizedMessage
-      })
-    });
+    const payload = {
+      recipient: normalizedRecipient,
+      sender_id: 'PhilSMS',
+      type: 'plain',
+      message: normalizedMessage
+    };
 
-    const data = await smsResponse.json().catch(() => ({}));
-    if (!smsResponse.ok || data.status === 'error') {
-      const status = data.message === 'Unauthenticated.' ? 401 : smsResponse.status || 400;
-      return json(
-        request,
-        {
-          error: data.message || `PhilSMS error: HTTP ${smsResponse.status}`,
-          provider: data
-        },
-        status
-      );
+    let lastAttempt = null;
+
+    for (const url of PHILSMS_ENDPOINTS) {
+      const attempt = await sendViaPhilSms(url, token, payload);
+      lastAttempt = attempt;
+
+      if (attempt.ok) {
+        return json(request, { success: true, data: attempt.data, providerUrl: attempt.url }, 200);
+      }
+
+      const isAuthError = attempt.data?.message === 'Unauthenticated.' || attempt.status === 401;
+      if (!isAuthError) {
+        const status = attempt.status || 400;
+        return json(
+          request,
+          {
+            error: attempt.data?.message || `PhilSMS error: HTTP ${attempt.status}`,
+            provider: attempt.data,
+            providerUrl: attempt.url
+          },
+          status
+        );
+      }
     }
 
-    return json(request, { success: true, data }, 200);
+    const status = lastAttempt?.data?.message === 'Unauthenticated.' ? 401 : (lastAttempt?.status || 400);
+    return json(
+      request,
+      {
+        error: lastAttempt?.data?.message || `PhilSMS error: HTTP ${lastAttempt?.status || 400}`,
+        provider: lastAttempt?.data || {},
+        providerUrl: lastAttempt?.url || PHILSMS_ENDPOINTS[0]
+      },
+      status
+    );
   } catch (error) {
     return json(request, { error: error.message || 'Failed to send SMS' }, 500);
   }

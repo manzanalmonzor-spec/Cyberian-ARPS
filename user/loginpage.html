@@ -719,6 +719,12 @@
             }));
         }
 
+        // Auto-mark as onboarded — signup already collected the name,
+        // and contact/atRisk have defaults. Skip forcing onboarding.
+        if (localStorage.getItem('arps_onboarded_' + user.uid) !== 'true') {
+            localStorage.setItem('arps_onboarded_' + user.uid, 'true');
+        }
+
         window.location.href = 'home.html';
     }
 

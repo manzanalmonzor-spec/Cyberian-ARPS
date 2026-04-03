@@ -114,7 +114,8 @@ export async function GET(request) {
         mode: 'env_var_token',
         endpoint1: { url: result.url, status: result.status, ok: result.ok, response: result.data },
         endpoint2: { url: result2.url, status: result2.status, ok: result2.ok, response: result2.data },
-        tokenLength: token.length
+        tokenLength: token.length,
+        tokenStart: token.slice(0, 8) + '***'
       });
     } catch (err) {
       return json(request, { error: err.message }, 500);

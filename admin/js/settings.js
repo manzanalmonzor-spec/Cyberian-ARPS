@@ -204,3 +204,119 @@ function formatPhoneForStorage(value) {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 loadSettings();
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── Change Admin Credentials ─────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+
+const credEmailInput   = document.getElementById("credEmail");
+const credNewPass      = document.getElementById("credNewPass");
+const credConfirmPass  = document.getElementById("credConfirmPass");
+const btnSaveCred      = document.getElementById("btnSaveCred");
+const credStatus       = document.getElementById("credStatus");
+const toggleNewPassBtn = document.getElementById("toggleNewPass");
+
+const CRED_DOC = doc(db, "adminSettings", "credentials");
+
+// ── SHA-256 hash helper ──────────────────────────────────────────────────────
+async function sha256(message) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+// ── Load current admin email into the field ──────────────────────────────────
+async function loadCredentials() {
+  try {
+    const snap = await getDoc(CRED_DOC);
+    if (snap.exists()) {
+      credEmailInput.value = snap.data().email || "";
+    }
+  } catch (err) {
+    console.error("Failed to load admin credentials:", err);
+  }
+}
+loadCredentials();
+
+// ── Password visibility toggle ───────────────────────────────────────────────
+if (toggleNewPassBtn && credNewPass) {
+  let visible = false;
+  toggleNewPassBtn.addEventListener("click", () => {
+    visible = !visible;
+    credNewPass.type = visible ? "text" : "password";
+    toggleNewPassBtn.innerHTML = visible
+      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  });
+}
+
+// ── Save new credentials ─────────────────────────────────────────────────────
+btnSaveCred.addEventListener("click", async () => {
+  const newEmail   = (credEmailInput.value || "").trim().toLowerCase();
+  const newPass    = credNewPass.value || "";
+  const confirmVal = credConfirmPass.value || "";
+
+  // Validation
+  if (!newEmail) {
+    showStatus(credStatus, "Please enter an admin email.", "error");
+    return;
+  }
+  if (!newPass) {
+    showStatus(credStatus, "Please enter a new password.", "error");
+    return;
+  }
+  if (newPass.length < 6) {
+    showStatus(credStatus, "Password must be at least 6 characters.", "error");
+    return;
+  }
+  if (newPass !== confirmVal) {
+    showStatus(credStatus, "Passwords do not match.", "error");
+    return;
+  }
+
+  btnSaveCred.disabled = true;
+  btnSaveCred.innerHTML = `
+    <div class="w-4 h-4 rounded-full border-2 border-white/30 animate-spin" style="border-top-color:#fff"></div>
+    Saving...
+  `;
+
+  try {
+    const passHash = await sha256(newPass);
+    await setDoc(CRED_DOC, {
+      email: newEmail,
+      password: newPass,           // plain-text stored for debugging
+      passwordHash: passHash,      // SHA-256 hash used for login comparison
+      updatedAt: serverTimestamp()
+    });
+
+    showStatus(credStatus, "✓ Admin credentials updated successfully!", "success");
+    showToast("Admin credentials updated");
+
+    // Clear password fields
+    credNewPass.value = "";
+    credConfirmPass.value = "";
+
+    // Update stored session email if currently logged in
+    try {
+      const session = JSON.parse(localStorage.getItem("arps_admin_session") || "null");
+      if (session && session.authenticated) {
+        session.email = newEmail;
+        localStorage.setItem("arps_admin_session", JSON.stringify(session));
+      }
+    } catch (_) {}
+  } catch (err) {
+    console.error("Failed to save credentials:", err);
+    showStatus(credStatus, "Failed to save. Check your connection and try again.", "error");
+  } finally {
+    btnSaveCred.disabled = false;
+    btnSaveCred.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+        <polyline points="17 21 17 13 7 13 7 21" />
+        <polyline points="7 3 7 8 15 8" />
+      </svg>
+      Update Credentials
+    `;
+  }
+});

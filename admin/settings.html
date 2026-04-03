@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <script src="../shared.js"></script>
+  <script src="./js/auth-guard.js"></script>
   <meta name="theme-color" content="#1E293B" />
   <title>ARPS — Settings</title>
 
@@ -197,6 +198,87 @@
                     <polyline points="7 3 7 8 15 8" />
                   </svg>
                   Save Contact Number
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Change Admin Credentials Card -->
+          <section class="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-violet-50 flex items-center justify-center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0110 0v4" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-base font-bold text-slate-900">Change Admin Credentials</h3>
+                  <p class="text-xs text-slate-400 mt-0.5">Update your admin login email and password</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                  <label for="credEmail" class="text-xs font-bold text-slate-600 uppercase tracking-wide">Admin Email</label>
+                  <div class="relative">
+                    <div class="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                        <polyline points="22,6 12,13 2,6" />
+                      </svg>
+                    </div>
+                    <input id="credEmail" type="email" placeholder="admin@gmail.com"
+                      class="w-full pl-10 pr-4 py-3.5 text-sm font-medium border-[1.5px] border-slate-200 rounded-xl outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 transition-all bg-slate-50 focus:bg-white" />
+                  </div>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                  <label for="credNewPass" class="text-xs font-bold text-slate-600 uppercase tracking-wide">New Password</label>
+                  <div class="relative">
+                    <div class="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0110 0v4" />
+                      </svg>
+                    </div>
+                    <input id="credNewPass" type="password" placeholder="Enter new password (min 6 chars)"
+                      class="w-full pl-10 pr-10 py-3.5 text-sm font-medium border-[1.5px] border-slate-200 rounded-xl outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 transition-all bg-slate-50 focus:bg-white" />
+                    <button type="button" id="toggleNewPass" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors bg-transparent border-none cursor-pointer p-0">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                  <label for="credConfirmPass" class="text-xs font-bold text-slate-600 uppercase tracking-wide">Confirm Password</label>
+                  <div class="relative">
+                    <div class="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                      </svg>
+                    </div>
+                    <input id="credConfirmPass" type="password" placeholder="Re-enter new password"
+                      class="w-full pl-10 pr-4 py-3.5 text-sm font-medium border-[1.5px] border-slate-200 rounded-xl outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 transition-all bg-slate-50 focus:bg-white" />
+                  </div>
+                </div>
+
+                <div id="credStatus" class="hidden text-xs font-medium bg-slate-50 px-3 py-2 rounded-[8px]"></div>
+
+                <button id="btnSaveCred"
+                  class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm py-3.5 rounded-xl border-none cursor-pointer font-sans transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-600/20 active:scale-[0.98]">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+                    <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+                    <polyline points="17 21 17 13 7 13 7 21" />
+                    <polyline points="7 3 7 8 15 8" />
+                  </svg>
+                  Update Credentials
                 </button>
               </div>
             </div>

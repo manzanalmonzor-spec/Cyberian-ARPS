@@ -752,10 +752,28 @@
             }));
         }
 
-        // Auto-mark as onboarded — signup already collected the name,
-        // and contact/atRisk have defaults. Skip forcing onboarding.
-        if (localStorage.getItem('arps_onboarded_' + user.uid) !== 'true') {
+        // Google sign-in: new users must go through onboarding (ID + photo → admin approval).
+        // Returning Google users who already completed onboarding skip straight to home.
+        // Email sign-up/sign-in: auto-mark onboarded since name was collected at registration.
+        var isGoogleAuth = authMode === 'firebase-google';
+        var alreadyOnboarded = localStorage.getItem('arps_onboarded_' + user.uid) === 'true';
+
+        if (!isGoogleAuth && !alreadyOnboarded) {
             localStorage.setItem('arps_onboarded_' + user.uid, 'true');
+        }
+
+        // For returning Google users check Firestore status in case admin approved/revoked
+        // while they were away — sync it to localStorage before redirecting.
+        if (isGoogleAuth && alreadyOnboarded) {
+            // Already went through onboarding — go home; pending.html guard handles status
+            window.location.href = 'home.html';
+            return;
+        }
+
+        if (isGoogleAuth && !alreadyOnboarded) {
+            // Brand-new Google user — send to onboarding to fill ID + photo
+            window.location.href = 'onboarding.html';
+            return;
         }
 
         window.location.href = 'home.html';

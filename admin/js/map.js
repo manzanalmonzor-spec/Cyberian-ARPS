@@ -1,4 +1,4 @@
-import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { collection, onSnapshot, doc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 import { db } from "../../firebase-config.js";
 
 const {
@@ -137,6 +137,8 @@ function mapLiveIncident(snapshotDoc) {
     lng: Number(data.longitude || DEFAULT_LOCATION.lng),
     locationLabel: data.locationLabel || null,
     locationDesc: data.locationDesc || null,
+    uid: data.uid || null,
+    selfieUrl: null,
     sortTime: timestampMs
   };
 }
@@ -167,16 +169,44 @@ function getActiveCenter() {
 }
 
 function createIncidentIcon(incident, active) {
+  const borderColor = markerColors[incident.severity] || "#64748B";
+  const size = active ? 44 : 36;
+
+  if (incident.selfieUrl) {
+    return window.L.divIcon({
+      className: "resq-admin-marker-wrap",
+      html: `
+        <div style="
+          width:${size}px; height:${size}px; border-radius:50%;
+          border:3px solid ${borderColor};
+          box-shadow:0 2px 8px rgba(0,0,0,0.3);
+          overflow:hidden; background:#fff;
+          ${active ? "ring:2px solid #fff;" : ""}
+        ">
+          <img src="${incident.selfieUrl}" style="width:100%; height:100%; object-fit:cover; display:block;" />
+        </div>
+      `,
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2]
+    });
+  }
+
+  // Fallback: name initials
+  const initials = (incident.name || "?").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
   return window.L.divIcon({
     className: "resq-admin-marker-wrap",
     html: `
-      <div
-        class="resq-admin-marker${active ? " active" : ""}"
-        style="background:${markerColors[incident.severity] || "#64748B"}"
-      ></div>
+      <div style="
+        width:${size}px; height:${size}px; border-radius:50%;
+        border:3px solid ${borderColor};
+        box-shadow:0 2px 8px rgba(0,0,0,0.3);
+        background:#fff; display:flex; align-items:center; justify-content:center;
+        font-size:${active ? 14 : 12}px; font-weight:800; color:${borderColor};
+        font-family:'Inter',sans-serif;
+      ">${initials}</div>
     `,
-    iconSize: [20, 20],
-    iconAnchor: [10, 10]
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2]
   });
 }
 
@@ -193,9 +223,12 @@ function ensureMap() {
   try {
     state.map = window.L.map("adminLiveMap", {
       preferCanvas: true,
-      zoomControl: true,
+      zoomControl: false,
       scrollWheelZoom: true
     }).setView([14.6507, 121.0497], 13);
+
+    // Add zoom controls at top-right so they don't overlap the legend
+    window.L.control.zoom({ position: "topright" }).addTo(state.map);
 
     window.L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
@@ -828,6 +861,64 @@ function renderAll() {
   syncMapViewport();
 }
 
+// Cache all users' selfies from Firestore
+const userSelfieByUid = new Map();
+const userSelfieByName = new Map();
+let usersLoadedOnce = false;
+
+async function loadAllUserSelfies(forceRefresh) {
+  if (usersLoadedOnce && !forceRefresh) return;
+  try {
+    const snapshot = await getDocs(collection(db, "users"));
+    userSelfieByUid.clear();
+    userSelfieByName.clear();
+    snapshot.forEach(userDoc => {
+      const data = userDoc.data();
+      const selfie = data.selfie_front || data.selfie_image || null;
+      if (selfie) {
+        userSelfieByUid.set(userDoc.id, selfie);
+        if (data.name) userSelfieByName.set(data.name.trim().toLowerCase(), selfie);
+      }
+    });
+    usersLoadedOnce = true;
+  } catch (e) {
+    console.error("Failed to load user selfies:", e);
+  }
+}
+
+function applySelfies() {
+  let changed = false;
+  state.incidents.forEach(incident => {
+    if (incident.selfieUrl) return;
+    // Try by uid first, then by name
+    let selfie = incident.uid ? userSelfieByUid.get(incident.uid) : null;
+    if (!selfie && incident.name) {
+      selfie = userSelfieByName.get(incident.name.trim().toLowerCase());
+    }
+    if (selfie) {
+      incident.selfieUrl = selfie;
+      changed = true;
+    }
+  });
+  return changed;
+}
+
+async function loadSelfiesForIncidents() {
+  await loadAllUserSelfies(false);
+  const changed = applySelfies();
+
+  // If some incidents still have no selfie and we haven't retried, refresh user list
+  const missing = state.incidents.some(i => !i.selfieUrl);
+  if (missing && usersLoadedOnce) {
+    await loadAllUserSelfies(true);
+    applySelfies();
+  }
+
+  if (changed || missing) {
+    renderIncidentMarkers();
+  }
+}
+
 function startLiveSubscription() {
   onSnapshot(collection(db, "sosAlerts"), (snapshot) => {
     state.liveIncidents = snapshot.docs
@@ -845,6 +936,7 @@ function startLiveSubscription() {
     }
 
     renderAll();
+    loadSelfiesForIncidents();
   }, () => {
     mergeIncidents();
     renderAll();

@@ -474,9 +474,11 @@ async function sendSosAlert(type) {
   // Step 2 — Write to Firestore
   setVisible(2);
   const { userName, userContact, userAtRisk } = getSosProfile();
+  const session = window.arpsUser;
   const payload = {
     source:       "user-sos",
     reporterId:   getDeviceId(),
+    uid:          session ? session.uid : null,
     name:         userName,
     contact:      userContact,
     type,

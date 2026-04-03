@@ -36,7 +36,7 @@
           </div>
           <div class="bg-red-50/50 rounded-xl p-3 border border-red-100 mt-1">
             <p class="text-[10px] text-red-600 uppercase tracking-wider font-bold flex items-center gap-1 mb-1">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
               At-Risk Status
             </p>
             <p id="dispAtRisk" class="text-[13px] font-bold text-slate-900">None</p>
@@ -59,7 +59,11 @@
             <h3 class="text-sm font-bold text-slate-900">Location Sharing</h3>
             <p class="text-xs text-slate-400 mt-1">Allow responders to use your live location during SOS events.</p>
           </div>
-          <span class="badge badge-responding">On</span>
+          <button id="toggleLocation" role="switch" aria-checked="true"
+            class="relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 bg-blue-600"
+          >
+            <span class="pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out translate-x-5"></span>
+          </button>
         </div>
       </section>
 
@@ -341,7 +345,14 @@
     const contactModalContent = document.getElementById('contactModalContent');
 
     function loadContact() {
-      const ec = JSON.parse(localStorage.getItem(contactKey) || '{}');
+      let ec = JSON.parse(localStorage.getItem(contactKey) || '{}');
+      // Fallback: if no separate emergency contact saved, use profile data from onboarding
+      if (!ec.name && !ec.number) {
+        const profile = JSON.parse(localStorage.getItem(profileKey) || '{}');
+        if (profile.emergencyContact || profile.contact) {
+          ec = { name: profile.emergencyContact || '', number: profile.contact || '' };
+        }
+      }
       dispEcName.textContent = ec.name || 'Not set';
       dispEcNumber.textContent = ec.number || '—';
       inputEcName.value = ec.name || '';
@@ -378,6 +389,41 @@
       const t = document.createElement('div');
       t.className = 'toast toast-success';
       t.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>Emergency contact updated';
+      document.body.appendChild(t);
+      setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, 2500);
+    });
+
+    // Location Sharing Toggle
+    const locationKey = 'arps_location_sharing_' + (session ? session.uid : 'guest');
+    const toggleBtn = document.getElementById('toggleLocation');
+    const toggleKnob = toggleBtn.querySelector('span');
+
+    function setLocationToggle(enabled) {
+      localStorage.setItem(locationKey, JSON.stringify(enabled));
+      toggleBtn.setAttribute('aria-checked', enabled);
+      if (enabled) {
+        toggleBtn.classList.remove('bg-slate-300');
+        toggleBtn.classList.add('bg-blue-600');
+        toggleKnob.classList.remove('translate-x-0');
+        toggleKnob.classList.add('translate-x-5');
+      } else {
+        toggleBtn.classList.remove('bg-blue-600');
+        toggleBtn.classList.add('bg-slate-300');
+        toggleKnob.classList.remove('translate-x-5');
+        toggleKnob.classList.add('translate-x-0');
+      }
+    }
+
+    // Load saved state (default: on)
+    const savedLocation = JSON.parse(localStorage.getItem(locationKey) ?? 'true');
+    setLocationToggle(savedLocation);
+
+    toggleBtn.addEventListener('click', () => {
+      const current = toggleBtn.getAttribute('aria-checked') === 'true';
+      setLocationToggle(!current);
+      const t = document.createElement('div');
+      t.className = 'toast toast-success';
+      t.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>Location sharing ' + (!current ? 'enabled' : 'disabled');
       document.body.appendChild(t);
       setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, 2500);
     });

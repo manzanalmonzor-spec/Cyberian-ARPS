@@ -351,23 +351,23 @@
         const base = [];
         if (isAtLeastHigh) {
           base.push(
-            tip('🫀', "If the person is unresponsive and not breathing normally, start CPR: push hard and fast in the center of the chest — 100 compressions per minute. Don't stop until responders arrive."),
-            tip('🩸', "For heavy bleeding: press a clean cloth firmly on the wound. Don't remove it to check — add more cloth on top if it soaks through. Hold constant pressure."),
-            tip('🚫', "Do not give them anything to eat or drink, even if they ask. It can complicate emergency treatment."),
-            tip('🧍', "If spinal injury is possible (fall, vehicle crash, head trauma) — do not move them. Keep their head still until responders take over.")
+            tip('📞', "Stay on the line with emergency services. Describe what happened and follow any instructions they give you — they will guide you step by step."),
+            tip('🙏', "Stay with the person and keep them as calm and still as possible. Do not attempt to move them unless they are in immediate danger."),
+            tip('🚫', "Do not give them anything to eat, drink, or any medication — this can interfere with the treatment responders will provide."),
+            tip('📍', "Make sure your location is easy to find. Turn on lights, open gates, or ask someone to meet the ambulance and guide them to you.")
           );
         } else {
           base.push(
-            tip('🛋️', "Keep the person calm and in the most comfortable position they can manage. Minimize movement."),
-            tip('🩺', "Note their symptoms, when they started, any medications they take, and known allergies — responders will ask."),
-            tip('🚫', "Do not give medications unless you are 100% certain of what they need and why.")
+            tip('🙏', "Keep the person calm and comfortable. Reassure them that help is on the way and stay by their side."),
+            tip('📋', "While waiting, take note of their symptoms, when they started, any medications they take, and known allergies — responders will ask for this."),
+            tip('🚫', "Do not give any medication or attempt treatment on your own. Wait for trained responders to arrive.")
           );
         }
-        if (hasPregnant) base.push(tip('🤰', "Have her lie on her LEFT side — this reduces pressure on the main blood vessel and improves blood flow to the baby. Do not let her lie flat on her back."));
-        if (hasElderly)  base.push(tip('👴', "Check for: face drooping on one side, arm weakness, or slurred speech — these are stroke signs. Note the exact time symptoms started and tell responders immediately."));
-        if (hasInfant)   base.push(tip('👶', "Never shake an infant even if unresponsive. Keep their airway clear. For infant CPR: use only 2 fingers on the breastbone and breathe very gently — just enough to see the chest rise."));
-        if (hasPWD)      base.push(tip('♿', "Tell responders about any devices the person depends on (wheelchair, oxygen tank, hearing aid, pacemaker). Do not remove assistive devices without knowing if it's safe to do so."));
-        if (hasMedCond)  base.push(tip('💊', "If the person has a known condition (diabetes, heart disease, epilepsy), find their emergency medication if available and have it ready for responders."));
+        if (hasPregnant) base.push(tip('🤰', "Help her lie down on her left side in a comfortable position. Keep her calm and reassured until responders arrive."));
+        if (hasElderly)  base.push(tip('👴', "Stay with them and observe any changes — difficulty speaking, sudden weakness, or confusion. Tell responders exactly what you noticed and when it started."));
+        if (hasInfant)   base.push(tip('👶', "Keep the infant warm and supported. Do not shake or jostle them. Call emergency services immediately and follow their instructions carefully."));
+        if (hasPWD)      base.push(tip('♿', "Inform responders about any assistive devices the person uses (wheelchair, oxygen tank, hearing aid). Do not remove any devices unless instructed by emergency services."));
+        if (hasMedCond)  base.push(tip('💊', "If the person has a known condition (diabetes, heart disease, epilepsy), locate their emergency medication and have it ready to show responders when they arrive."));
         return base;
       },
 

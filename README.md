@@ -160,7 +160,7 @@ The User Dashboard is the main home screen where users can access and interact w
   <p>
     <img src="Images/read_user_walkthrough/4.jpg" alt="Evacuation Centers" height="550">
     &nbsp;&nbsp;&nbsp;
-    <img src="images/read_user_walkthrough/5.jpg" alt="Route Navigation" height="550">
+    <img src="Images/read_user_walkthrough/5.jpg" alt="Route Navigation" height="550">
   </p>
 
   **Settings/Profile:** By tapping "Settings" in the bottom navigation menu, users will be directed to the settings page where the user can see and edit their profile.

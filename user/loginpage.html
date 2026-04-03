@@ -93,6 +93,8 @@
             }
         }
 
+        @keyframes spin-g { to { transform: rotate(360deg); } }
+
         .overlay-container {
             position: absolute;
             top: 0;
@@ -272,33 +274,55 @@
             color: var(--warning);
         }
 
-        .social-container {
-            margin: 0 0 20px;
-            width: 100%;
+        .google-btn {
             display: flex;
-            justify-content: center;
-        }
-
-        .social-container a {
-            border: 1px solid #e5e7eb;
-            border-radius: 50%;
-            display: inline-flex;
-            justify-content: center;
             align-items: center;
-            margin: 0 5px;
-            height: 45px;
-            width: 45px;
-            color: var(--text-dark);
-            text-decoration: none;
-            font-size: 1.4rem;
-            transition: all 0.3s;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 13px 20px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 12px;
+            background: #fff;
+            color: #1f2937;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 0;
+            margin-bottom: 0;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            letter-spacing: 0;
+            text-transform: none;
         }
-
-        .social-container a:hover {
+        .google-btn:hover {
             border-color: #d1d5db;
-            background-color: #f9fafb;
-            color: #DB4437; /* Google red */
-            transform: translateY(-2px);
+            background: #f9fafb;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.09);
+            transform: translateY(-1px);
+        }
+        .google-btn:active { transform: scale(0.98); }
+        .google-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            margin: 16px 0;
+            color: #9ca3af;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
         }
 
         button {
@@ -450,16 +474,14 @@
                 letter-spacing: -0.04em;
                 text-align: center;
             }
-            .social-container { 
-                margin: 0 0 16px; 
-                justify-content: center;
+            .google-btn {
+                padding: 14px 20px;
+                font-size: 1rem;
+                border-radius: 16px;
+                min-height: 54px;
+                margin-top: 0;
             }
-            .social-container a {
-                width: 54px;
-                height: 54px;
-                font-size: 1.55rem;
-                margin: 0;
-            }
+            .auth-divider { margin: 14px 0; }
             span { 
                 display: block;
                 margin-bottom: 18px; 
@@ -527,8 +549,7 @@
             form { padding: 30px 18px 24px; }
             h1 { font-size: clamp(1.85rem, 8vw, 2.35rem); margin-bottom: 16px; }
             .form-logo { height: 64px; margin-bottom: 12px; }
-            .social-container { margin-bottom: 14px; }
-            .social-container a { width: 50px; height: 50px; font-size: 1.45rem; }
+            .google-btn { min-height: 50px; font-size: 0.95rem; }
             span { margin-bottom: 16px; font-size: 12px; }
             input { min-height: 54px; padding: 14px 46px; border-radius: 16px; }
             button { min-height: 54px; margin-top: 16px; }
@@ -546,10 +567,16 @@
         <form id="signUpForm" class="auth-form auth-form--signup">
             <img src="../Images/ARPLOGO.png" alt="ARPS Logo" class="form-logo">
             <h1>Join ARPS</h1>
-            <div class="social-container">
-                <a href="#" class="social" title="Continue with Google" id="googleSignUpBtn"><i class="ph-bold ph-google-logo"></i></a>
-            </div>
-            <span>or use your email for registration</span>
+            <button type="button" id="googleSignUpBtn" class="google-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                Continue with Google
+            </button>
+            <div class="auth-divider"><span>or use email</span></div>
             <div class="input-group">
                 <input type="text" id="signUpName" placeholder="e.g., Juan Dela Cruz" required />
                 <i class="ph ph-user"></i>
@@ -574,10 +601,16 @@
         <form id="signInForm" class="auth-form auth-form--signin">
             <img src="../Images/ARPLOGO.png" alt="ARPS Logo" class="form-logo">
             <h1>Welcome to ARPS</h1>
-            <div class="social-container">
-                <a href="#" class="social" title="Continue with Google" id="googleSignInBtn"><i class="ph-bold ph-google-logo"></i></a>
-            </div>
-            <span>or use your account</span>
+            <button type="button" id="googleSignInBtn" class="google-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+                Continue with Google
+            </button>
+            <div class="auth-divider"><span>or use email</span></div>
             <div class="input-group">
                 <input type="email" id="signInEmail" placeholder="yourname@email.com" required />
                 <i class="ph ph-envelope-simple"></i>
@@ -877,7 +910,7 @@
             case 'auth/operation-not-supported-in-this-environment': return 'This browser environment cannot use Firebase auth. Use email sign up below.';
             case 'auth/too-many-requests': return 'Too many failed attempts. Please try again later.';
             case 'auth/popup-closed-by-user': return 'Sign-in popup was closed. Please try again.';
-            case 'auth/unauthorized-domain': return 'This site is not authorized for Firebase popup sign-in yet.';
+            case 'auth/unauthorized-domain': return 'Google sign-in is not enabled for this domain yet. Please use email sign-in, or contact the admin to whitelist this domain in Firebase Console.';
             default: return 'Something went wrong. Please try again.';
         }
     }
@@ -990,35 +1023,93 @@
     });
 
     // --- GOOGLE SIGN IN ---
+    var GOOGLE_PENDING_KEY = 'arps_google_auth_pending';
+    var GOOGLE_BTN_SVG = '<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>';
+
+    function setGoogleBtnsLoading(loading) {
+        var btns = [document.getElementById('googleSignInBtn'), document.getElementById('googleSignUpBtn')];
+        btns.forEach(function(btn) {
+            if (!btn) return;
+            btn.disabled = loading;
+            btn.innerHTML = loading
+                ? '<svg width="18" height="18" viewBox="0 0 24 24" style="animation:spin-g .8s linear infinite;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-opacity=".25"/><path d="M12 3a9 9 0 019 9" stroke="#4285F4"/></svg> Signing in with Google...'
+                : GOOGLE_BTN_SVG + ' Continue with Google';
+        });
+    }
+
+    // Show loading overlay while returning from Google redirect (prevents white screen)
+    function showGoogleLoadingOverlay() {
+        var overlay = document.createElement('div');
+        overlay.id = 'google-auth-overlay';
+        overlay.style.cssText = 'position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:9999;';
+        overlay.innerHTML = '<svg width="48" height="48" viewBox="0 0 24 24" style="animation:spin-g .8s linear infinite" fill="none" stroke="#4285F4" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-opacity=".2"/><path d="M12 3a9 9 0 019 9"/></svg><p style="font-family:Inter,sans-serif;font-size:15px;font-weight:600;color:#374151;margin:0">Completing Google sign-in...</p>';
+        document.body.appendChild(overlay);
+    }
+
+    function hideGoogleLoadingOverlay() {
+        var overlay = document.getElementById('google-auth-overlay');
+        if (overlay) overlay.remove();
+    }
+
     function handleGoogleSignIn() {
         clearMessages();
 
         if (!firebaseContext) {
-            showError('signInError', 'Google sign-in is not available here. Use email sign up or sign in instead.');
+            showError('signInError', 'Google sign-in is not available. Please use email sign-in instead.');
             return;
         }
 
-        firebaseContext.auth.signInWithPopup(firebaseContext.googleProvider)
-            .then(function(result) {
-                saveSessionAndRedirect(result.user, result.user.displayName, 'firebase-google');
-            })
-            .catch(function(error) {
-                if (shouldFallbackToLocal(error)) {
-                    showError('signInError', 'Google sign-in is not available here. Use email sign up or sign in instead.');
-                    return;
-                }
+        setGoogleBtnsLoading(true);
 
+        // Mark that we're about to redirect so the page shows a loader on return
+        try { sessionStorage.setItem(GOOGLE_PENDING_KEY, '1'); } catch(_) {}
+
+        // Use redirect — works reliably on all devices and browsers (no popup issues)
+        firebaseContext.auth.signInWithRedirect(firebaseContext.googleProvider)
+            .catch(function(error) {
+                try { sessionStorage.removeItem(GOOGLE_PENDING_KEY); } catch(_) {}
+                setGoogleBtnsLoading(false);
                 showError('signInError', friendlyError(error.code));
             });
     }
 
-    document.getElementById('googleSignInBtn').addEventListener('click', function(e) {
-        e.preventDefault();
+    // On page load — if returning from Google redirect, show overlay immediately
+    // so the user never sees a white screen while Firebase processes the result
+    (function handleGoogleRedirectReturn() {
+        var isPending = false;
+        try { isPending = !!sessionStorage.getItem(GOOGLE_PENDING_KEY); } catch(_) {}
+
+        if (isPending) {
+            showGoogleLoadingOverlay();
+        }
+
+        if (!firebaseContext) {
+            hideGoogleLoadingOverlay();
+            return;
+        }
+
+        firebaseContext.auth.getRedirectResult()
+            .then(function(result) {
+                try { sessionStorage.removeItem(GOOGLE_PENDING_KEY); } catch(_) {}
+                hideGoogleLoadingOverlay();
+                if (result && result.user) {
+                    saveSessionAndRedirect(result.user, result.user.displayName, 'firebase-google');
+                }
+            })
+            .catch(function(error) {
+                try { sessionStorage.removeItem(GOOGLE_PENDING_KEY); } catch(_) {}
+                hideGoogleLoadingOverlay();
+                if (error && error.code && error.code !== 'auth/no-current-user') {
+                    showError('signInError', friendlyError(error.code));
+                }
+            });
+    }());
+
+    document.getElementById('googleSignInBtn').addEventListener('click', function() {
         handleGoogleSignIn();
     });
 
-    document.getElementById('googleSignUpBtn').addEventListener('click', function(e) {
-        e.preventDefault();
+    document.getElementById('googleSignUpBtn').addEventListener('click', function() {
         handleGoogleSignIn();
     });
 

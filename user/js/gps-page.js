@@ -137,18 +137,29 @@
       return '--';
     }
 
+    const norm = (s) => (s || '').trim().toLowerCase();
+    const adminNames = new Set(
+      [place.neighbourhood, place.barangay, place.city].map(norm).filter(Boolean),
+    );
+
     const parts = [];
-    if (place.street) {
+
+    // Only add street if it's a real road, not an admin area already being shown
+    if (place.street && !adminNames.has(norm(place.street))) {
       parts.push(place.street);
     }
-    if (place.barangay && !parts.includes(place.barangay)) {
-      parts.push(place.barangay);
+
+    // Prefer neighbourhood (more specific in Nominatim hierarchy) over barangay.
+    // e.g. Nominatim returns neighbourhood="Poblacion 3", barangay="Caridad" — show Poblacion 3.
+    const specificPlace = place.neighbourhood || place.barangay;
+    if (specificPlace && !parts.some((p) => norm(p) === norm(specificPlace))) {
+      parts.push(specificPlace);
     }
+
     if (parts.length === 0 && place.short) {
       return place.short;
     }
-
-    if (parts.length < 2 && place.city && !parts.includes(place.city)) {
+    if (parts.length < 2 && place.city && !parts.some((p) => norm(p) === norm(place.city))) {
       parts.push(place.city);
     }
 

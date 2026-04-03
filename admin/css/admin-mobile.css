@@ -1,0 +1,290 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   Admin Mobile Responsive — shared across all admin pages
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Hamburger button (visible on mobile only) ─────────────────────────────── */
+.admin-hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1000;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #0F172A;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.3);
+  transition: all 0.2s;
+}
+
+.admin-hamburger:active {
+  transform: scale(0.93);
+}
+
+.admin-hamburger svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* ── Sidebar overlay (mobile) ──────────────────────────────────────────────── */
+.admin-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.admin-sidebar-overlay.active {
+  display: block;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MOBILE: < 1024px
+   ═══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1023px) {
+
+  /* Show hamburger */
+  .admin-hamburger {
+    display: flex;
+  }
+
+  /* Sidebar: slide-in drawer */
+  .flex.h-screen>aside,
+  aside.w-\[280px\] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    z-index: 100 !important;
+    width: 280px !important;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  aside.sidebar-open {
+    transform: translateX(0) !important;
+  }
+
+  /* Main content: full width */
+  .flex.h-screen {
+    display: block !important;
+  }
+
+  .flex.h-screen>main,
+  main.flex-1 {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 72px 16px 24px !important;
+    overflow-x: hidden !important;
+  }
+
+  /* ── Header adjustments ──────────────────────── */
+  .flex.h-screen>main>div:first-child {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .flex.h-screen>main h1,
+  main h1 {
+    font-size: 1.5rem !important;
+  }
+
+  /* ── Stats grid: 2 columns on mobile ─────────── */
+  #statsGrid,
+  #alertsStatsGrid,
+  #centersStatsGrid,
+  #mapStatsGrid,
+  #weatherStatsGrid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* ── Main content grids: stack vertically ─────── */
+  .grid.grid-cols-\[1fr_380px\],
+  .grid.grid-cols-\[1fr_360px\],
+  .grid.grid-cols-\[1fr_400px\] {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* XL grid used in weather */
+  .xl\:grid-cols-\[1fr_400px\] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Settings two-column layout */
+  .grid.grid-cols-2.gap-6 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ── Tables: allow horizontal scroll ──────────── */
+  .overflow-x-auto {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .overflow-x-auto table {
+    min-width: 600px;
+  }
+
+  /* ── Incident rows: tighter ──────────────────── */
+  .incident-row {
+    padding: 12px 16px !important;
+  }
+
+  /* ── Map containers ──────────────────────────── */
+  #dashboardMap,
+  #adminLiveMap {
+    height: 300px !important;
+  }
+
+  /* ── Right panel map area ────────────────────── */
+  .live-map-area,
+  .live-map-area #adminLiveMap {
+    height: 350px !important;
+  }
+
+  /* ── Filter buttons: wrap ────────────────────── */
+  .map-filter-btn,
+  .alert-filter-btn,
+  .center-filter-btn,
+  .weather-filter-btn {
+    font-size: 11px !important;
+    padding: 5px 10px !important;
+  }
+
+  /* ── Badges ──────────────────────────────────── */
+  .badge {
+    font-size: 10px !important;
+    padding: 3px 8px !important;
+  }
+
+  /* ── Cards: smaller rounded corners ──────────── */
+  .rounded-3xl {
+    border-radius: 20px !important;
+  }
+
+  .rounded-\[2rem\] {
+    border-radius: 20px !important;
+  }
+
+  /* ── AI summary card spacing ─────────────────── */
+  .ai-summary-card,
+  .map-ai-card,
+  .alerts-ai-card,
+  .centers-ai-card {
+    padding: 14px !important;
+  }
+
+  /* ── Approvals stats: 1 column on very small ─── */
+  .grid.grid-cols-3 {
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* ── Approvals main card: full width ─────────── */
+  .max-w-5xl {
+    max-width: 100% !important;
+  }
+
+  /* ── Weather big text: scale down ────────────── */
+  .text-5xl {
+    font-size: 2.5rem !important;
+  }
+
+  .lg\:text-6xl {
+    font-size: 2.5rem !important;
+  }
+
+  .text-4xl {
+    font-size: 1.75rem !important;
+  }
+
+  /* ── Weather forecast grid ───────────────────── */
+  #forecastGrid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  /* ── Contact modal ───────────────────────────── */
+  .contact-modal .fixed {
+    padding: 16px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SMALL MOBILE: < 640px
+   ═══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 639px) {
+
+  .flex.h-screen>main,
+  main.flex-1 {
+    padding: 68px 12px 20px !important;
+  }
+
+  /* Stats: single column on very small */
+  #statsGrid,
+  #alertsStatsGrid,
+  #centersStatsGrid,
+  #mapStatsGrid,
+  #weatherStatsGrid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Approvals stats */
+  .grid.grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Weather forecast: 2 columns */
+  #forecastGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Weather telemetry cards */
+  .grid.grid-cols-2.md\:grid-cols-4 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Search input in approvals */
+  .search-input {
+    width: 100% !important;
+  }
+
+  /* Tab bar: wrap */
+  .flex.items-center.justify-between {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   EXTRA SMALL: < 400px
+   ═══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 399px) {
+  .admin-hamburger {
+    width: 40px;
+    height: 40px;
+    top: 12px;
+    left: 12px;
+    border-radius: 10px;
+  }
+
+  .flex.h-screen>main,
+  main.flex-1 {
+    padding: 60px 10px 16px !important;
+  }
+
+  .flex.h-screen>main h1,
+  main h1 {
+    font-size: 1.25rem !important;
+  }
+}

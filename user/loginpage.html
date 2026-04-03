@@ -288,6 +288,10 @@
             margin-top: 20px;
             box-shadow: 0 4px 15px rgba(230, 57, 70, 0.4);
             width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
         }
 
         button:active {
@@ -296,6 +300,20 @@
 
         button:focus {
             outline: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         
         button:hover {
@@ -848,7 +866,7 @@
         }
 
         var btn = document.getElementById('signUpBtn');
-        btn.textContent = 'Creating account...';
+        btn.innerHTML = '<div class="spinner"></div>';
         btn.disabled = true;
 
         try {
@@ -885,7 +903,7 @@
         if (!password) { showError('signInError', 'Please enter your password.'); return; }
 
         var btn = document.getElementById('signInBtn');
-        btn.textContent = 'Signing in...';
+        btn.innerHTML = '<div class="spinner"></div>';
         btn.disabled = true;
 
         // 1) Try local account first (instant, always reliable)

@@ -665,8 +665,10 @@
             }));
         }
 
+        // If not yet onboarded, redirect to onboarding instead of home
         if (localStorage.getItem('arps_onboarded_' + user.uid) !== 'true') {
-            localStorage.setItem('arps_onboarded_' + user.uid, 'true');
+            window.location.href = 'onboarding.html';
+            return;
         }
 
         window.location.href = 'home.html';

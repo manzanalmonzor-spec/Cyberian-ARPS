@@ -50,22 +50,7 @@
     });
   });
 
-  // Auto logout on 15 minutes of inactivity
-  let inactivityTimer;
-  const INACTIVITY_LIMIT = 15 * 60 * 1000; // 15 mins
-
-  function resetTimer() {
-    clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(() => {
-      localStorage.removeItem('arps_session');
-      alert("Your session has expired due to 15 minutes of inactivity. Please log in again.");
-      window.location.href = 'loginpage.html';
-    }, INACTIVITY_LIMIT);
-  }
-
-  const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
-  events.forEach(name => document.addEventListener(name, resetTimer, true));
-  resetTimer();
+  // Session is permanent (PWA) — user stays logged in until they manually sign out
 })();
 
 // Logout helper with confirmation UI

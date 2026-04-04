@@ -350,8 +350,8 @@
       // Fallback: if no separate emergency contact saved, use profile data from onboarding
       if (!ec.name && !ec.number) {
         const profile = JSON.parse(localStorage.getItem(profileKey) || '{}');
-        if (profile.emergencyContact || profile.contact) {
-          ec = { name: profile.emergencyContact || '', number: profile.contact || '' };
+        if (profile.emergencyContact || profile.emergencyNumber) {
+          ec = { name: profile.emergencyContact || '', number: profile.emergencyNumber || '' };
         }
       }
       dispEcName.textContent = ec.name || 'Not set';

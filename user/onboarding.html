@@ -336,11 +336,6 @@
         <input type="text" id="regFullName" placeholder="e.g. Juan Dela Cruz" required />
       </div>
 
-      <div class="form-field">
-        <label>Emergency Contact Name <span class="required">*</span></label>
-        <input type="text" id="regEmergencyContact" placeholder="e.g. Maria Dela Cruz" required />
-      </div>
-
       <div class="flex gap-3">
         <div class="form-field" style="flex: 1;">
           <label>Age <span class="required">*</span></label>
@@ -350,6 +345,16 @@
           <label>Contact Number <span class="required">*</span></label>
           <input type="tel" id="regContact" placeholder="e.g. 09171234567" required />
         </div>
+      </div>
+
+      <div class="form-field">
+        <label>Emergency Contact Name <span class="required">*</span></label>
+        <input type="text" id="regEmergencyContact" placeholder="e.g. Maria Dela Cruz" required />
+      </div>
+
+      <div class="form-field">
+        <label>Emergency Contact Number <span class="required">*</span></label>
+        <input type="tel" id="regEmergencyNumber" placeholder="e.g. 09181234567" required />
       </div>
 
       <div class="form-field">
@@ -707,16 +712,16 @@
           <span class="text-sm font-bold text-slate-800" id="reviewName">—</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-xs font-bold text-slate-400 uppercase">Emergency Contact</span>
-          <span class="text-sm font-bold text-slate-800" id="reviewEmergencyContact">—</span>
-        </div>
-        <div class="flex justify-between">
           <span class="text-xs font-bold text-slate-400 uppercase">Age / Gender</span>
           <span class="text-sm font-bold text-slate-800" id="reviewAgeGender">—</span>
         </div>
         <div class="flex justify-between">
           <span class="text-xs font-bold text-slate-400 uppercase">Contact</span>
           <span class="text-sm font-bold text-slate-800" id="reviewContact">—</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-xs font-bold text-slate-400 uppercase">Emergency Contact</span>
+          <span class="text-sm font-bold text-slate-800 text-right max-w-[60%]" id="reviewEmergencyContact">—</span>
         </div>
         <div class="flex justify-between">
           <span class="text-xs font-bold text-slate-400 uppercase">Barangay</span>
@@ -896,13 +901,14 @@
     if (step === 1) {
       // Validate personal info
       const name = document.getElementById('regFullName').value.trim();
-      const emergencyContact = document.getElementById('regEmergencyContact').value.trim();
       const age = document.getElementById('regAge').value.trim();
       const contact = document.getElementById('regContact').value.trim();
+      const emergencyContact = document.getElementById('regEmergencyContact').value.trim();
+      const emergencyNumber = document.getElementById('regEmergencyNumber').value.trim();
       const gender = document.querySelector('input[name="gender"]:checked');
       const barangay = document.getElementById('regBarangay').value.trim();
 
-      if (!name || !emergencyContact || !age || !contact || !gender || !barangay) {
+      if (!name || !age || !contact || !emergencyContact || !emergencyNumber || !gender || !barangay) {
         document.getElementById('step1Error').classList.remove('hidden');
         document.getElementById('step1Error').textContent = 'Please fill in all required fields.';
         return;
@@ -915,6 +921,11 @@
       if (contact.length < 10) {
         document.getElementById('step1Error').classList.remove('hidden');
         document.getElementById('step1Error').textContent = 'Please enter a valid contact number.';
+        return;
+      }
+      if (emergencyNumber.length < 10) {
+        document.getElementById('step1Error').classList.remove('hidden');
+        document.getElementById('step1Error').textContent = 'Please enter a valid emergency contact number.';
         return;
       }
 
@@ -942,16 +953,17 @@
       }
       // Fill review summary
       const name = document.getElementById('regFullName').value.trim();
-      const emergencyContact = document.getElementById('regEmergencyContact').value.trim();
       const age = document.getElementById('regAge').value.trim();
       const gender = document.querySelector('input[name="gender"]:checked').value;
       const contact = document.getElementById('regContact').value.trim();
+      const emergencyContact = document.getElementById('regEmergencyContact').value.trim();
+      const emergencyNumber = document.getElementById('regEmergencyNumber').value.trim();
       const barangay = document.getElementById('regBarangay').value.trim();
 
       document.getElementById('reviewName').textContent = name;
-      document.getElementById('reviewEmergencyContact').textContent = emergencyContact;
       document.getElementById('reviewAgeGender').textContent = `${age} yrs old · ${gender}`;
       document.getElementById('reviewContact').textContent = contact;
+      document.getElementById('reviewEmergencyContact').textContent = `${emergencyContact} · ${emergencyNumber}`;
       document.getElementById('reviewBarangay').textContent = barangay;
       document.getElementById('welcomeName').textContent = name;
 
@@ -1019,9 +1031,10 @@
       ]);
 
       const name = document.getElementById('regFullName').value.trim();
-      const emergencyContact = document.getElementById('regEmergencyContact').value.trim();
       const age = document.getElementById('regAge').value.trim();
       const contact = document.getElementById('regContact').value.trim();
+      const emergencyContact = document.getElementById('regEmergencyContact').value.trim();
+      const emergencyNumber = document.getElementById('regEmergencyNumber').value.trim();
       const gender = document.querySelector('input[name="gender"]:checked').value;
       const barangay = document.getElementById('regBarangay').value.trim();
       const atRisk = document.getElementById('regAtRisk').value;
@@ -1029,8 +1042,9 @@
       // Update local profile
       let profile = JSON.parse(localStorage.getItem('arps_profile_' + session.uid) || '{}');
       profile.name = name;
-      profile.emergencyContact = emergencyContact;
       profile.contact = contact;
+      profile.emergencyContact = emergencyContact;
+      profile.emergencyNumber = emergencyNumber;
       profile.atRisk = atRisk;
       profile.status = 'pending';
       localStorage.setItem('arps_profile_' + session.uid, JSON.stringify(profile));
@@ -1039,7 +1053,7 @@
       // Save emergency contact to the key used by settings page
       localStorage.setItem('arps_emergency_contact_' + session.uid, JSON.stringify({
         name: emergencyContact,
-        number: contact
+        number: emergencyNumber
       }));
 
       // Update session name
@@ -1051,6 +1065,7 @@
         uid: session.uid,
         name: name,
         emergencyContact: emergencyContact,
+        emergencyNumber: emergencyNumber,
         email: session.email,
         age: parseInt(age),
         contact: contact,

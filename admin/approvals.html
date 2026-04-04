@@ -507,6 +507,30 @@
         if (currentTab === 'approved') renderApproved();
       });
 
+      // One-time fix: restore old rejected users (not in bannedEmails) back to approved
+      (async function migrateOldRejected() {
+        try {
+          const rejectedSnap = await getDocs(query(collection(db, "users"), where("status", "==", "rejected")));
+          const bannedSnap = await getDocs(collection(db, "bannedEmails"));
+          const bannedEmails = new Set();
+          bannedSnap.forEach(d => bannedEmails.add((d.data().email || '').toLowerCase()));
+
+          for (const userDoc of rejectedSnap.docs) {
+            const email = (userDoc.data().email || '').toLowerCase();
+            if (!bannedEmails.has(email)) {
+              await updateDoc(doc(db, "users", userDoc.id), {
+                status: 'approved',
+                rejectionReason: '',
+                rejectedAt: ''
+              });
+              console.log('Restored rejected user to approved:', email);
+            }
+          }
+        } catch (e) {
+          console.error('Migration error:', e);
+        }
+      })();
+
       // Banned emails
       onSnapshot(collection(db, "bannedEmails"), (snapshot) => {
         bannedUsers = [];

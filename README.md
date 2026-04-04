@@ -50,7 +50,7 @@ You can Install the Web Application in your device for a better experience enabl
 1. Open the [Antique ARPS Web App](https://antique-arps.com) in your Browser.
 2. On the landing page on the top right you can **click on the install button**
 
-   <img src="Images/read_img/install.png" alt="install image" width="250">
+   <img src="Images/read_img/install.jpg" alt="install image" width="250">
 3. After doing so, some of the ARPS features will now be accessible offline.
 
 

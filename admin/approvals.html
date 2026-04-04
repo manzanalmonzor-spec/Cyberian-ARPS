@@ -1042,19 +1042,21 @@
         if (!banned) return;
         if (!confirm(`Are you sure you want to unban ${banned.email}? This account will be restored to approved and can log in again.`)) return;
         try {
-          // Remove from bannedEmails collection
+          // 1. Remove from bannedEmails collection
           await deleteDoc(doc(db, "bannedEmails", banned.docId));
 
-          // Find the user document by email and restore status to approved
+          // 2. Find ALL user documents with this email and restore to approved
           const userQuery = query(collection(db, "users"), where("email", "==", banned.email));
           const userSnap = await getDocs(userQuery);
-          userSnap.forEach(async (userDoc) => {
-            await updateDoc(doc(db, "users", userDoc.id), {
+          const updates = [];
+          for (const userDoc of userSnap.docs) {
+            updates.push(updateDoc(doc(db, "users", userDoc.id), {
               status: 'approved',
               rejectionReason: '',
               rejectedAt: ''
-            });
-          });
+            }));
+          }
+          await Promise.all(updates);
 
           toast('Unbanned & restored ' + banned.email, 'success');
         } catch (e) {

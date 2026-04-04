@@ -1,4 +1,4 @@
-/* Weather Admin - Trendy UI/UX */
+
 
 .weather-filter-btn {
   border: 1px solid transparent;
@@ -27,7 +27,7 @@
 }
 
 
-/* Hazard Matrix Premium Mod */
+
 .hazard-card {
   position: relative;
   overflow: hidden;
@@ -71,7 +71,7 @@
   opacity: 0.8;
 }
 
-/* Critical Hazard Theme */
+
 .hazard-critical {
   background: linear-gradient(135deg, rgba(254, 226, 226, 0.9) 0%, rgba(254, 202, 202, 0.6) 100%);
   border-color: rgba(248, 113, 113, 0.4);
@@ -80,7 +80,7 @@
 }
 .hazard-critical .hazard-value { color: #b91c1c; }
 
-/* High Hazard Theme */
+
 .hazard-high {
   background: linear-gradient(135deg, rgba(255, 237, 213, 0.9) 0%, rgba(253, 186, 116, 0.6) 100%);
   border-color: rgba(251, 146, 60, 0.4);
@@ -89,7 +89,7 @@
 }
 .hazard-high .hazard-value { color: #c2410c; }
 
-/* Medium Hazard Theme */
+
 .hazard-medium {
   background: linear-gradient(135deg, rgba(254, 243, 199, 0.9) 0%, rgba(253, 224, 71, 0.5) 100%);
   border-color: rgba(250, 204, 21, 0.4);
@@ -98,7 +98,7 @@
 }
 .hazard-medium .hazard-value { color: #a16207; }
 
-/* Low Hazard Theme */
+
 .hazard-low {
   background: linear-gradient(135deg, rgba(220, 252, 231, 0.9) 0%, rgba(167, 243, 208, 0.5) 100%);
   border-color: rgba(52, 211, 153, 0.4);
@@ -107,7 +107,7 @@
 }
 .hazard-low .hazard-value { color: #15803d; }
 
-/* Custom Badge implementation to override `badge` in `shared.css` if necessary for consistency */
+
 .risk-badge {
   display: inline-flex;
   align-items: center;
@@ -139,7 +139,7 @@
 .risk-low { background: #d1fae5; color: #065f46; border: 1px solid rgba(16, 185, 129, 0.2); }
 .risk-low::before { background: #10b981; }
 
-/* Hide scrollbars for clean UI, but allow scroll */
+
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -148,7 +148,7 @@
   display: none;
 }
 
-/* Original Sidebar Sizing and Active Styles */
+
 .sidebar-item {
   display: flex;
   align-items: center;

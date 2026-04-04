@@ -30,7 +30,7 @@
 
 <body class="bg-[#F8FAFC] font-sans">
   <div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
+    
     <aside class="w-[280px] bg-[#0F172A] text-white flex flex-col shrink-0 shadow-2xl z-50">
       <div class="px-6 py-8 border-b border-white/10">
         <div class="sidebar-brand">
@@ -71,15 +71,6 @@
           Alerts
         </a>
 
-        <a href="./centers.html" class="sidebar-item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path
-              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-          </svg>
-          Centers
-        </a>
-
         <a href="./weather.html" class="sidebar-item">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
@@ -106,9 +97,9 @@
       </nav>
     </aside>
 
-    <!-- Main -->
+    
     <main class="flex-1 overflow-auto p-8">
-      <!-- Header -->
+      
       <div class="flex justify-between items-center mb-8">
         <div>
           <h1 class="text-3xl font-black text-slate-900 tracking-tight">
@@ -121,13 +112,13 @@
         <div class="text-[13px] text-slate-400" id="currentDate"></div>
       </div>
 
-      <!-- Settings Grid -->
+      
       <div class="grid grid-cols-[1fr_380px] gap-5">
 
-        <!-- Left Column -->
+        
         <div class="flex flex-col gap-5">
 
-          <!-- Admin Info Card -->
+          
           <section class="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden">
             <div class="px-6 py-5 border-b border-slate-100">
               <h3 class="text-base font-bold text-slate-900">Admin Information</h3>
@@ -156,7 +147,7 @@
             </div>
           </section>
 
-          <!-- Admin Contact Number Card -->
+          
           <section class="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden">
             <div class="px-6 py-5 border-b border-slate-100">
               <div class="flex items-center gap-2">
@@ -205,7 +196,7 @@
             </div>
           </section>
 
-          <!-- Change Admin Credentials Card -->
+          
           <section class="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden">
             <div class="px-6 py-5 border-b border-slate-100">
               <div class="flex items-center gap-2">
@@ -286,7 +277,7 @@
             </div>
           </section>
 
-          <!-- Agency Emergency Numbers Card -->
+          
           <section class="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden">
             <div class="px-6 py-5 border-b border-slate-100">
               <div class="flex items-center gap-2">
@@ -308,7 +299,7 @@
             <div class="p-6">
               <div class="flex flex-col gap-4">
 
-                <!-- Medical -->
+                
                 <div class="flex flex-col gap-1.5">
                   <label for="agencyMedical" class="text-xs font-bold text-slate-600 uppercase tracking-wide flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-red-500 shrink-0"></span>
@@ -318,7 +309,7 @@
                     class="w-full px-4 py-3 text-sm font-medium border-[1.5px] border-slate-200 rounded-xl outline-none focus:border-red-400 focus:ring-4 focus:ring-red-400/10 transition-all bg-slate-50 focus:bg-white" />
                 </div>
 
-                <!-- Fire -->
+                
                 <div class="flex flex-col gap-1.5">
                   <label for="agencyFire" class="text-xs font-bold text-slate-600 uppercase tracking-wide flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-orange-500 shrink-0"></span>
@@ -328,7 +319,7 @@
                     class="w-full px-4 py-3 text-sm font-medium border-[1.5px] border-slate-200 rounded-xl outline-none focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10 transition-all bg-slate-50 focus:bg-white" />
                 </div>
 
-                <!-- Police -->
+                
                 <div class="flex flex-col gap-1.5">
                   <label for="agencyPolice" class="text-xs font-bold text-slate-600 uppercase tracking-wide flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
@@ -338,7 +329,7 @@
                     class="w-full px-4 py-3 text-sm font-medium border-[1.5px] border-slate-200 rounded-xl outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-400/10 transition-all bg-slate-50 focus:bg-white" />
                 </div>
 
-                <!-- Flood -->
+                
                 <div class="flex flex-col gap-1.5">
                   <label for="agencyFlood" class="text-xs font-bold text-slate-600 uppercase tracking-wide flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-cyan-500 shrink-0"></span>
@@ -348,7 +339,7 @@
                     class="w-full px-4 py-3 text-sm font-medium border-[1.5px] border-slate-200 rounded-xl outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 transition-all bg-slate-50 focus:bg-white" />
                 </div>
 
-                <!-- Earthquake -->
+                
                 <div class="flex flex-col gap-1.5">
                   <label for="agencyEarthquake" class="text-xs font-bold text-slate-600 uppercase tracking-wide flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-amber-600 shrink-0"></span>
@@ -358,7 +349,7 @@
                     class="w-full px-4 py-3 text-sm font-medium border-[1.5px] border-slate-200 rounded-xl outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all bg-slate-50 focus:bg-white" />
                 </div>
 
-                <!-- Typhoon -->
+                
                 <div class="flex flex-col gap-1.5">
                   <label for="agencyTyphoon" class="text-xs font-bold text-slate-600 uppercase tracking-wide flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-violet-500 shrink-0"></span>
@@ -384,10 +375,10 @@
           </section>
         </div>
 
-        <!-- Right Column -->
+        
         <div class="flex flex-col gap-5">
 
-          <!-- Info Card -->
+          
           <section class="rounded-2xl p-5 border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100/50">
             <div class="flex items-center gap-2 mb-3">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2"
@@ -413,7 +404,7 @@
             </div>
           </section>
 
-          <!-- Current Saved Value -->
+          
           <section class="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-100">
               <h3 class="text-sm font-bold">Saved Contact in Database</h3>
@@ -434,7 +425,7 @@
             </div>
           </section>
 
-          <!-- SOS Alert Sound -->
+          
           <section class="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-100">
               <div class="flex items-center gap-2">
@@ -476,7 +467,7 @@
             </div>
           </section>
 
-          <!-- System Info -->
+          
           <section class="bg-white rounded-3xl border border-slate-200/60 shadow-sm p-5">
             <h3 class="text-sm font-bold mb-3">System Information</h3>
             <div class="space-y-2.5">

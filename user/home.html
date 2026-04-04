@@ -13,6 +13,7 @@
   <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Plus Jakarta Sans', 'DM Sans', 'system-ui', 'sans-serif'] } } } }</script>
   <script src="js/auth-guard.js"></script>
   <script type="module" src="js/ban-guard.js"></script>
+  <script type="module" src="js/heartbeat.js"></script>
   <style>
     @keyframes advBreathe {
       0%, 100% { transform: scaleY(1) translateY(0); }
@@ -82,7 +83,7 @@
   <div class="app-wrapper home-page w-full min-h-screen relative">
     <div class="app-container home-page-content max-w-[480px] md:max-w-none mx-auto w-full">
 
-      <!-- Top Menu Bar -->
+      
       <div
         class="relative z-[2301] flex items-center justify-between px-5 md:px-10 pt-4 md:pt-8 pb-0 md:pb-1 animate-fade">
         <div class="flex items-center gap-2">
@@ -157,7 +158,7 @@
         </div>
       </div>
 
-      <!-- Header with Weather side-by-side -->
+      
       <div class="flex justify-between items-end px-5 md:px-10 pt-0 md:pt-2 pb-3 md:pb-4">
         <div class="animate-fade flex-1">
           <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-none">Hello, <span
@@ -184,7 +185,7 @@
         </a>
       </div>
 
-      <!-- Weather Advisor (PAGASA) -->
+      
       <div class="px-5 md:px-10 mt-1 md:mt-2 mb-8 animate-slideUp" style="animation-delay: 0.1s;">
         <div
           class="relative min-h-[118px] sm:min-h-[80px] bg-white/90 backdrop-blur-xl rounded-[24px] p-3 pl-24 sm:p-4 sm:pl-28 md:pl-32 border border-sky-100/80 shadow-[0_8px_30px_-12px_rgba(14,165,233,0.15)] flex items-center gap-3 sm:gap-4 group hover:shadow-[0_12px_40px_-12px_rgba(14,165,233,0.25)] transition-all overflow-visible">
@@ -289,10 +290,10 @@
         </div>
       </div>
 
-      <!-- SOS Button -->
+      
       <div class="flex justify-center my-12 animate-scale" style="animation-delay: 0.2s;">
         <div class="relative flex items-center justify-center">
-          <!-- Ripple rings -->
+          
           <div class="absolute w-52 h-52 md:w-80 md:h-80 rounded-full border border-red-500/30 animate-ping-slow"
             style="animation-duration: 3s;"></div>
           <div class="absolute w-52 h-52 md:w-80 md:h-80 rounded-full border border-red-500/20 animate-ping-slow"
@@ -305,11 +306,11 @@
             <div
               class="absolute inset-0 bg-gradient-to-b from-red-400 via-red-500 to-red-700 group-hover:from-red-500 group-hover:via-red-600 group-hover:to-red-800 transition-colors duration-300">
             </div>
-            <!-- Texture overlay -->
+            
             <div
               class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')] opacity-50 mix-blend-overlay">
             </div>
-            <!-- Inner glow -->
+            
             <div class="absolute inset-0 rounded-full border-4 border-white/20"></div>
 
             <svg class="relative z-10 mb-2 transform group-hover:scale-110 transition-transform duration-300" width="44"
@@ -328,14 +329,14 @@
         </div>
       </div>
 
-      <!-- Quick Status Cards -->
+      
       <div class="px-5 md:px-10 mb-8 animate-slideUp" style="animation-delay: 0.3s;">
         <div class="flex items-center justify-between mb-4 px-1">
           <h3 class="text-sm font-extrabold text-slate-800 tracking-tight">At a Glance</h3>
         </div>
 
         <div class="grid grid-cols-2 gap-3 md:gap-4">
-          <!-- Shelter Card -->
+          
           <a href="evacuation.html"
             class="bg-white/90 backdrop-blur-xl rounded-[20px] p-4 border border-slate-100/80 shadow-[0_4px_24px_-8px_rgba(15,23,42,0.06)] card-hover block no-underline relative overflow-hidden group">
             <div
@@ -367,7 +368,7 @@
             </div>
           </a>
 
-          <!-- Location Card -->
+          
           <a href="gps.html"
             class="bg-white/90 backdrop-blur-xl rounded-[20px] p-4 border border-slate-100/80 shadow-[0_4px_24px_-8px_rgba(15,23,42,0.06)] card-hover block no-underline relative overflow-hidden group">
             <div
@@ -399,9 +400,9 @@
         </div>
       </div>
 
-      <!-- Safety Learning Hub -->
+      
       <div class="px-5 md:px-10 mb-8 animate-slideUp" style="animation-delay: 0.4s;">
-        <!-- Header -->
+        
         <div class="flex items-center justify-between mb-4 px-1">
           <div>
             <h3 class="text-sm font-extrabold text-slate-800 tracking-tight">Safety Learning Hub</h3>
@@ -410,7 +411,7 @@
           <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-md">Read & Learn</span>
         </div>
 
-        <!-- Category Tabs — horizontal scroll on mobile -->
+        
         <div class="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide" id="learnTabs" style="-webkit-overflow-scrolling:touch;scrollbar-width:none;">
           <button data-tab="flood"      class="learn-tab active-tab shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all">🌊 Flood</button>
           <button data-tab="typhoon"    class="learn-tab shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all">🌀 Typhoon</button>
@@ -420,7 +421,7 @@
           <button data-tab="gobag"      class="learn-tab shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all">🎒 Go Bag</button>
         </div>
 
-        <!-- Tips Content -->
+        
         <div id="learnContent" class="flex flex-col gap-3"></div>
       </div>
 
@@ -567,7 +568,7 @@
         })();
       </script>
 
-      <!-- AI Chat Bot Widget -->
+      
       <div id="aiChatWidget" class="chat-widget fixed z-[170] flex flex-col items-end gap-3 pointer-events-none">
         <div id="aiChatWindow"
           class="pointer-events-none invisible mb-1 flex flex-col overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/95 opacity-0 shadow-[0_30px_70px_-18px_rgba(15,23,42,0.35)] backdrop-blur-xl transition-all duration-300 ease-out origin-bottom-right translate-y-4 scale-[0.98]">
@@ -616,7 +617,7 @@
             class="flex flex-1 flex-col gap-4 overflow-y-auto bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.08),_transparent_35%),linear-gradient(180deg,#F8FAFC_0%,#EEF2FF_100%)] px-4 py-4"
             aria-live="polite"></div>
 
-          <!-- Image preview bar -->
+          
           <div id="imagePreviewBar" class="hidden border-t border-slate-100 bg-slate-50/80 px-3 py-2">
             <div class="flex items-center gap-2">
               <div class="relative">
@@ -1993,7 +1994,7 @@ Be concise, practical, warm, and use Taglish if helpful. Use numbered steps.`;
     })();
   </script>
 
-  <!-- Cache admin contact number for offline SOS -->
+  
   <script type="module">
     import { doc, getDoc, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
     import { db } from "../firebase-config.js";

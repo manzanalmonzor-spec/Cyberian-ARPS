@@ -30,20 +30,20 @@ async function callPhilSMS(recipient, message) {
   return data;
 }
 
-// Province of Antique default coordinates for weather alerts
+
 const ANTIQUE_LAT = 11.3683;
 const ANTIQUE_LNG = 122.0643;
 
-// ── State ────────────────────────────────────────────────────────────────────
+
 let alerts            = [];
 let weatherAlerts     = [];
 let firestoreAlerts   = [];
 let currentFilter     = 'all';
 let selectedAlertId   = null;
 let selectedAlertIndex = null;
-let adminLocation     = null; // { lat, lng } — populated by geolocation
+let adminLocation     = null;
 
-// ── DOM refs ─────────────────────────────────────────────────────────────────
+
 const alertsStatsGrid    = document.getElementById('alertsStatsGrid');
 const alertsList         = document.getElementById('alertsList');
 const alertsAiSummary    = document.getElementById('alertsAiSummary');
@@ -63,7 +63,7 @@ const selectedAlertUrgency  = document.getElementById('selectedAlertUrgency');
 const selectedAlertSummary  = document.getElementById('selectedAlertSummary');
 const selectedAlertAction   = document.getElementById('selectedAlertAction');
 
-// ── Severity config ───────────────────────────────────────────────────────────
+
 const severityConfig = {
   Critical: { bg: 'bg-red-50',    border: 'border-red-200',    iconWrap: 'bg-red-100',    iconStroke: '#DC2626', title: 'text-red-800',    text: 'text-red-600',    badge: 'badge-critical' },
   High:     { bg: 'bg-orange-50', border: 'border-orange-200', iconWrap: 'bg-orange-100', iconStroke: '#EA580C', title: 'text-orange-800', text: 'text-orange-600', badge: 'badge-high'     },
@@ -71,7 +71,7 @@ const severityConfig = {
   Low:      { bg: 'bg-blue-50',   border: 'border-blue-200',   iconWrap: 'bg-blue-100',   iconStroke: '#2563EB', title: 'text-blue-800',   text: 'text-blue-600',   badge: 'badge-low'      }
 };
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+
 function setCurrentDate() {
   currentDate.textContent = new Date().toLocaleDateString('en-US', {
     weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
@@ -102,7 +102,7 @@ function getAlertIcon(type, strokeColor) {
   return icons[type] || icons.rain;
 }
 
-// ── Convert Firestore SOS doc → alert object ──────────────────────────────────
+
 function sosToAlert(docSnap) {
   const d   = docSnap.data();
   const msTs = d.createdAtMs || (d.createdAt?.toMillis ? d.createdAt.toMillis() : Date.now());
@@ -137,7 +137,7 @@ function sosToAlert(docSnap) {
   };
 }
 
-// ── Generate weather-based alerts from Open-Meteo data ───────────────────────
+
 async function fetchWeatherAlerts() {
   try {
     const params = [
@@ -196,18 +196,17 @@ async function fetchWeatherAlerts() {
   refreshAlerts();
 }
 
-// ── Barangay Priority Algorithm ───────────────────────────────────────────────
-// Extracts barangay/area name from locationLabel (first segment before comma)
+
 function extractBarangay(locationLabel) {
   if (!locationLabel || locationLabel === 'Unknown Location') return 'Unknown';
   return locationLabel.split(',')[0].trim();
 }
 
-// Build a map of barangay → { count, alerts, severity }
+
 function buildBarangayHotspots(alertList) {
   const map = {};
   for (const a of alertList) {
-    if (!a.firestoreId) continue; // skip weather alerts
+    if (!a.firestoreId) continue;
     const active = a.status === 'Pending' || a.status === 'Responding';
     if (!active) continue;
     const brgy = extractBarangay(a.area);
@@ -219,7 +218,7 @@ function buildBarangayHotspots(alertList) {
   return map;
 }
 
-// Haversine distance in kilometers between two lat/lng points
+
 function haversineKm(lat1, lng1, lat2, lng2) {
   const toRad = v => (v * Math.PI) / 180;
   const R = 6371;
@@ -229,21 +228,20 @@ function haversineKm(lat1, lng1, lat2, lng2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-// Get distance from admin to alert (null if either has no coords)
+
 function distanceToAdmin(alert) {
   if (!adminLocation || !alert.lat || !alert.lng) return null;
   return haversineKm(adminLocation.lat, adminLocation.lng, alert.lat, alert.lng);
 }
 
-// Compute priority score for sorting. Higher = more urgent.
-// Factors: severity, cluster count, status, proximity to admin
+
 function computePriority(alert, hotspotMap) {
   const severityScore = { Critical: 400, High: 300, Medium: 200, Low: 100 };
   const statusScore   = { Pending: 50, Responding: 30, Active: 20, Resolved: 0 };
 
   let score = (severityScore[alert.severity] || 100) + (statusScore[alert.status] || 0);
 
-  // Cluster bonus: each additional SOS from the same barangay adds priority
+
   if (alert.firestoreId) {
     const brgy = extractBarangay(alert.area);
     const cluster = hotspotMap[brgy];
@@ -252,8 +250,8 @@ function computePriority(alert, hotspotMap) {
     }
   }
 
-  // Proximity bonus: closer to admin = higher priority
-  // Max +200 for <1km, scaling down to +0 at 50km+
+
+
   const dist = distanceToAdmin(alert);
   if (dist !== null) {
     const proximityBonus = Math.max(0, Math.round(200 * (1 - dist / 50)));
@@ -263,14 +261,14 @@ function computePriority(alert, hotspotMap) {
   return score;
 }
 
-// ── Merge and re-render ───────────────────────────────────────────────────────
+
 function refreshAlerts() {
   const prevId = selectedAlertId;
 
-  // Build hotspot map from firestore alerts
+
   const hotspotMap = buildBarangayHotspots(firestoreAlerts);
 
-  // Merge weather + firestore, then sort by priority score (descending)
+
   alerts = [...weatherAlerts, ...firestoreAlerts];
   alerts.sort((a, b) => computePriority(b, hotspotMap) - computePriority(a, hotspotMap));
 
@@ -291,7 +289,7 @@ function refreshAlerts() {
   updateReadinessMetrics();
 }
 
-// ── Render functions ──────────────────────────────────────────────────────────
+
 function renderStats() {
   const critical = alerts.filter(a => a.severity === 'Critical').length;
   const high     = alerts.filter(a => a.severity === 'High').length;
@@ -349,7 +347,7 @@ function renderAlertsList(hotspotMap) {
     const cfg       = severityConfig[alert.severity] || severityConfig.Low;
     const isActive  = realIndex === selectedAlertIndex;
 
-    // Cluster badge: show if 2+ SOS from same barangay
+
     const brgy = extractBarangay(alert.area);
     const cluster = hotspotMap[brgy];
     const clusterBadge = (alert.firestoreId && cluster && cluster.count > 1)
@@ -417,7 +415,7 @@ function renderSelectedAlert(hotspotMap) {
   selectedAlertStatus.textContent   = alert.status;
   selectedAlertUrgency.textContent  = alert.urgency;
 
-  // Show cluster info + distance in area field
+
   const brgy = extractBarangay(alert.area);
   const cluster = hotspotMap[brgy];
   const dist = distanceToAdmin(alert);
@@ -432,7 +430,7 @@ function renderSelectedAlert(hotspotMap) {
   selectedAlertSummary.textContent  = alert.summary;
   selectedAlertAction.textContent   = alert.action;
 
-  // Action buttons — only for Firestore SOS alerts
+
   const actionBtns = document.getElementById('alertActionBtns');
   if (actionBtns) {
     if (alert.firestoreId && alert.status === 'Pending') {
@@ -477,7 +475,7 @@ function renderAiSummary(hotspotMap) {
   if (pending > 0)   text += `${pending} unacknowledged alert${pending !== 1 ? 's' : ''} awaiting dispatch. `;
   if (responding > 0) text += `${responding} incident${responding !== 1 ? 's' : ''} currently being responded to. `;
 
-  // Add hotspot clusters to summary
+
   const hotspots = Object.entries(hotspotMap).filter(([, v]) => v.count > 1).sort((a, b) => b[1].count - a[1].count);
   if (hotspots.length > 0) {
     const names = hotspots.map(([brgy, v]) => `${brgy} (${v.count} SOS)`).join(', ');
@@ -488,7 +486,7 @@ function renderAiSummary(hotspotMap) {
   alertsAiSummary.textContent = text;
 }
 
-// ── Render Barangay Hotspots panel ───────────────────────────────────────────
+
 function renderHotspots(hotspotMap) {
   const panel = document.getElementById('hotspotPanel');
   if (!panel) return;
@@ -533,11 +531,11 @@ function updateReadinessMetrics() {
   const medical    = firestoreAlerts.filter(a => a.category === 'Medical').length;
   const critical   = alerts.filter(a => a.severity === 'Critical').length;
 
-  // Rescue engagement: % of incidents being actively handled
+
   const rescueTeams = total > 0 ? Math.min(95, Math.round(((responding + resolved) / total) * 100)) : 90;
-  // Medical readiness: inversely proportional to unhandled medical incidents
+
   const medUnits    = total > 0 ? Math.max(40, Math.min(95, Math.round(100 - (medical / Math.max(1, total)) * 60))) : 88;
-  // Evacuation: drops with critical alerts
+
   const evacReady   = Math.max(30, Math.round(100 - critical * 8));
 
   const rescueBar = document.getElementById('rescueTeamsBar');
@@ -556,7 +554,7 @@ function updateReadinessMetrics() {
   if (evacVal)   evacVal.textContent   = `${evacReady}%`;
 }
 
-// ── Selection + filter ────────────────────────────────────────────────────────
+
 function selectAlert(index) {
   selectedAlertIndex = index;
   selectedAlertId    = alerts[index]?.firestoreId || alerts[index]?.id || null;
@@ -593,7 +591,7 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// ── Respond / Resolve actions ─────────────────────────────────────────────────
+
 function normalizePhone(num) {
   const text = String(num || '').trim();
   if (!text) return '';
@@ -621,13 +619,13 @@ async function respondToAlert(btn) {
   const newStatus = action === 'respond' ? 'Responding' : 'Resolved';
 
   try {
-    // 1 — Update Firestore status
+
     await updateDoc(doc(db, 'sosAlerts', fid), {
       status:    newStatus,
       updatedAt: serverTimestamp()
     });
 
-    // 2 — Send SMS only on "respond" and only if contact exists
+
     if (action === 'respond' && contact) {
       const phone = normalizePhone(contact);
       if (phone) {
@@ -662,31 +660,31 @@ function showToast(msg, type) {
   setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, 3000);
 }
 
-// ── Bootstrap ─────────────────────────────────────────────────────────────────
+
 setCurrentDate();
 
-// 0. Get admin location for proximity-based priority
+
 (function initAdminLocation() {
   if (!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       adminLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-      refreshAlerts(); // re-sort with proximity data
+      refreshAlerts();
     },
-    () => {} // silently ignore if denied
+    () => {}
   );
-  // Keep updating as admin moves
+
   navigator.geolocation.watchPosition(
     (pos) => {
       adminLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-      // Don't re-render on every GPS tick — only on next alert update
+
     },
     () => {},
     { enableHighAccuracy: false, maximumAge: 60000 }
   );
 })();
 
-// 1. Subscribe to Firebase SOS alerts (real-time)
+
 let _prevAlertPendingCount = -1;
 const sosQuery = query(collection(db, 'sosAlerts'), orderBy('createdAt', 'desc'), limit(50));
 onSnapshot(sosQuery, (snapshot) => {
@@ -696,7 +694,7 @@ onSnapshot(sosQuery, (snapshot) => {
   firestoreAlerts = snapshot.docs.map(sosToAlert);
   refreshAlerts();
 
-  // Play alarm if there are new pending SOS alerts
+
   if (prevCount >= 0 && pendingNow > prevCount && window.playSosAlarm) {
     window.playSosAlarm(5000);
   }
@@ -705,6 +703,6 @@ onSnapshot(sosQuery, (snapshot) => {
   console.error('Alerts snapshot error:', err);
 });
 
-// 2. Fetch live weather-based alerts once, then every 10 minutes
+
 fetchWeatherAlerts();
 setInterval(fetchWeatherAlerts, 10 * 60 * 1000);

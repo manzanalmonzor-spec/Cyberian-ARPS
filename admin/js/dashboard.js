@@ -30,7 +30,7 @@ const severityColor = {
   Low: "#10B981"
 };
 
-// ── DOM refs ──────────────────────────────────────────────────────────────────
+
 const currentDateEl = document.getElementById("currentDate");
 const statsGrid = document.getElementById("statsGrid");
 const filterStatus = document.getElementById("filterStatus");
@@ -46,12 +46,12 @@ const callBtn = document.getElementById("callBtn");
 const smsBtn = document.getElementById("smsBtn");
 const cancelContactBtn = document.getElementById("cancelContactBtn");
 
-// ── State ─────────────────────────────────────────────────────────────────────
+
 let incidents = [];
 let liveIncidents = [];
 let openDetailIncidentId = null;
 
-// ── Admin GPS tracking state ───────────────────────────────────────────────────
+
 let adminLocation = null;
 let adminMarkerOnMiniMap = null;
 let adminMarkerOnDetailMap = null;
@@ -99,7 +99,7 @@ function startAdminLocationTracking() {
   );
 }
 
-// ── Mini-map (right panel) ────────────────────────────────────────────────────
+
 let dashMap = null;
 let dashMapMarkers = [];
 
@@ -123,7 +123,7 @@ function initDashboardMap() {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(dashMap);
 
-    // Staggered invalidateSize calls to guarantee tiles render in all environments
+
     setTimeout(() => dashMap && dashMap.invalidateSize(), 0);
     setTimeout(() => dashMap && dashMap.invalidateSize(), 200);
     setTimeout(() => dashMap && dashMap.invalidateSize(), 500);
@@ -175,7 +175,7 @@ function renderDashboardMapMarkers() {
     bounds.push([lat, lng]);
   });
 
-  // ── Admin / Responder marker on mini-map ──
+
   if (adminLocation && adminLocation.lat && adminLocation.lng) {
     adminMarkerOnMiniMap = window.L.marker(
       [adminLocation.lat, adminLocation.lng],
@@ -194,16 +194,16 @@ function renderDashboardMapMarkers() {
   } else {
     try {
       dashMap.fitBounds(bounds, { padding: [24, 24], maxZoom: 15 });
-    } catch (e) { /* ignore */ }
+    } catch (e) {  }
   }
 }
 
-// ── Detail map (incident detail view) ─────────────────────────────────────────
+
 let detailMap = null;
 
 function destroyDetailMap() {
   if (detailMap) {
-    try { detailMap.remove(); } catch (e) { /* ignore */ }
+    try { detailMap.remove(); } catch (e) {  }
     detailMap = null;
   }
   adminMarkerOnDetailMap = null;
@@ -235,7 +235,7 @@ function initDetailMap(lat, lng, locationLabel) {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(detailMap);
 
-    // ── User SOS marker (red) ──
+
     const userIcon = window.L.divIcon({
       className: "",
       html: `<div style="
@@ -258,7 +258,7 @@ function initDetailMap(lat, lng, locationLabel) {
       .addTo(detailMap)
       .openPopup();
 
-    // ── Admin / Responder marker (blue) ──
+
     if (hasAdmin) {
       adminMarkerOnDetailMap = window.L.marker(
         [adminLocation.lat, adminLocation.lng],
@@ -271,7 +271,7 @@ function initDetailMap(lat, lng, locationLabel) {
           </div>`)
         .addTo(detailMap);
 
-      // Fit map to show both markers with padding
+
       const bounds = window.L.latLngBounds(
         [lat, lng],
         [adminLocation.lat, adminLocation.lng]
@@ -279,7 +279,7 @@ function initDetailMap(lat, lng, locationLabel) {
       detailMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
     }
 
-    // ── Legend overlay ──
+
     const legend = window.L.control({ position: "bottomleft" });
     legend.onAdd = () => {
       const div = window.L.DomUtil.create("div");
@@ -304,7 +304,7 @@ function initDetailMap(lat, lng, locationLabel) {
   }
 }
 
-// ── Utilities ─────────────────────────────────────────────────────────────────
+
 function toast(msg, type = "success") {
   const toastEl = document.createElement("div");
   const prefix = type === "success" ? "OK " : type === "info" ? "INFO " : "WARN ";
@@ -547,7 +547,7 @@ function showDetail(index) {
     </div>
   `;
 
-  // Initialize real Leaflet map in the detail view
+
   if (hasCoords) {
     setTimeout(() => initDetailMap(lat, lng, incident.locationLabel), 50);
   }
@@ -599,8 +599,8 @@ async function setStatus(index, status) {
     return;
   }
 
-  // Immediately mirror the new status in local state so the UI
-  // stays consistent even before the next onSnapshot arrives.
+
+
   const docId = incident.alertDocId;
   const li = liveIncidents.findIndex((i) => i.alertDocId === docId);
   if (li !== -1) liveIncidents[li].status = status;
@@ -609,8 +609,8 @@ async function setStatus(index, status) {
   toast(`${incident.id} marked as ${status}`);
   updateStats();
   renderRows();
-  // Use syncOpenDetail (ID-based) instead of index-based showDetail
-  // so it stays correct after any re-sort triggered by the onSnapshot.
+
+
   syncOpenDetail();
 }
 
@@ -636,7 +636,7 @@ function syncOpenDetail() {
   showDetail(nextIndex);
 }
 
-// ── Event listeners ────────────────────────────────────────────────────────────
+
 filterStatus.addEventListener("change", renderRows);
 
 rowsContainer.addEventListener("click", (event) => {
@@ -655,13 +655,13 @@ callBtn.addEventListener("click", () => doContact("Call"));
 smsBtn.addEventListener("click", () => doContact("SMS"));
 cancelContactBtn.addEventListener("click", closeContact);
 
-// ── Bootstrap ─────────────────────────────────────────────────────────────────
+
 setCurrentDate();
 mergeIncidents();
 updateStats();
 renderRows();
 
-// Initialize maps after full page load to guarantee container dimensions are computed
+
 window.addEventListener("load", () => {
   initDashboardMap();
   renderDashboardMapMarkers();
@@ -669,7 +669,7 @@ window.addEventListener("load", () => {
   fetchLiveSignal();
 });
 
-// ── Live PAGASA Wind Signal for Antique ──────────────────────────────────────
+
 async function fetchLiveSignal() {
   const LAT = 11.3683;
   const LNG = 122.0643;
@@ -686,7 +686,7 @@ async function fetchLiveSignal() {
     const gustKmh = wind.windspeed || 0;
     const wmoCode = wind.weathercode || 0;
 
-    // PAGASA wind signal thresholds
+
     let signal, bgClass, dotClass, textClass, dotPing;
     if (gustKmh >= 185) {
       signal = { num: 5, label: 'SIGNAL #5 ACTIVE' };
@@ -712,7 +712,7 @@ async function fetchLiveSignal() {
       bgClass = 'bg-amber-100'; dotClass = 'bg-amber-500'; textClass = 'text-amber-900';
       dotPing = '<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>';
     } else {
-      // No signal — show weather description
+
       var desc = 'Fair Weather';
       if (wmoCode === 0) desc = 'Clear Sky';
       else if (wmoCode <= 3) desc = 'Partly Cloudy';
@@ -739,11 +739,11 @@ async function fetchLiveSignal() {
     text.textContent = 'Weather unavailable';
   }
 
-  // Refresh every 10 minutes
+
   setTimeout(fetchLiveSignal, 10 * 60 * 1000);
 }
 
-// ── Firebase real-time listener ────────────────────────────────────────────────
+
 let _prevSosCount = -1;
 onSnapshot(collection(db, "sosAlerts"), (snapshot) => {
   const prevCount = _prevSosCount;
@@ -759,7 +759,7 @@ onSnapshot(collection(db, "sosAlerts"), (snapshot) => {
   renderDashboardMapMarkers();
   syncOpenDetail();
 
-  // Play alarm if there are new pending SOS alerts
+
   if (prevCount >= 0 && pendingNow > prevCount && window.playSosAlarm) {
     window.playSosAlarm(5000);
   }

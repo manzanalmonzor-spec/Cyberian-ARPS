@@ -1,6 +1,6 @@
-// Quick SMS test — run with: node test-sms.js
+
 async function test() {
-  const recipient = '09XXXXXXXXX'; // <-- replace with your phone number
+  const recipient = '09XXXXXXXXX';
   const token = process.env.PHILSMS_TOKEN;
 
   if (!token) {

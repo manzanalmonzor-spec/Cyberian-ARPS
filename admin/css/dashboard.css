@@ -1,4 +1,4 @@
-/* ── Dashboard Leaflet Maps ─────────────────────────────────────────────────── */
+
 #dashboardMap {
   height: 280px;
   width: 100%;
@@ -12,7 +12,7 @@
   width: 100%;
 }
 
-/* Detail map inside incident panel */
+
 #incidentDetailMap {
   height: 240px;
   width: 100%;

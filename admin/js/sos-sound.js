@@ -1,6 +1,4 @@
-// SOS Alert Sound System
-// Generates an emergency alarm using Web Audio API (no audio file needed)
-// Toggle saved in localStorage: arps_sos_sound_enabled
+
 
 (function() {
   var STORAGE_KEY = 'arps_sos_sound_enabled';
@@ -26,7 +24,7 @@
     return audioCtx;
   }
 
-  // Play emergency siren sound (alternating tones)
+
   window.playSosAlarm = function(duration) {
     if (!isSosSoundEnabled() || isPlaying) return;
     isPlaying = true;
@@ -48,7 +46,7 @@
         osc.stop(ctx.currentTime + (i * 0.5) + 0.45);
       }
 
-      // Fade out at end
+
       gain.gain.setValueAtTime(0.3, ctx.currentTime + duration / 1000 - 0.3);
       gain.gain.linearRampToValueAtTime(0, ctx.currentTime + duration / 1000);
 

@@ -1,4 +1,4 @@
-/* Settings page styles */
+
 #adminPhone:focus {
   border-color: #3B82F6;
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
@@ -13,7 +13,7 @@
   transform: scale(0.98) translateY(0);
 }
 
-/* Save status animation */
+
 #saveStatus {
   transition: all 0.3s ease;
 }
@@ -30,7 +30,7 @@
   border: 1px solid #FECACA;
 }
 
-/* Current date */
+
 #currentDate {
   white-space: nowrap;
 }

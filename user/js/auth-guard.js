@@ -1,10 +1,10 @@
-// Auth Guard - checks session on protected pages
-// Include this script on every page that requires authentication
+
+
 
 (function() {
   const session = JSON.parse(localStorage.getItem('arps_session') || 'null');
 
-  // If no session, redirect to login
+
   if (!session || !session.uid || !session.email) {
     if (window.location.pathname.indexOf('loginpage.html') === -1) {
       window.location.href = 'loginpage.html';
@@ -12,23 +12,23 @@
     return;
   }
 
-  // Check onboarding status
+
   const isOnboarded = localStorage.getItem('arps_onboarded_' + session.uid) === 'true';
   const currentPath = window.location.pathname;
   
-  // Try to get profile status
+
   let profile = {};
   try { profile = JSON.parse(localStorage.getItem('arps_profile_' + session.uid) || '{}'); } catch(e){}
   
-  // If not onboarded, redirect to onboarding (ignore loginpage)
+
   if (!isOnboarded && currentPath.indexOf('onboarding.html') === -1 && currentPath.indexOf('loginpage.html') === -1) {
     window.location.href = 'onboarding.html';
     return;
   }
 
-  // If onboarded but pending admin approval, verify against Firestore before redirecting
+
   if (isOnboarded && profile.status === 'pending' && currentPath.indexOf('pending.html') === -1 && currentPath.indexOf('loginpage.html') === -1) {
-    // Double-check Firestore — localStorage may be stale
+
     (async function() {
       try {
         var firestore = firebase.firestore();
@@ -36,40 +36,39 @@
         var freshDoc = await firestore.collection('users').doc(uid).get();
         var freshData = freshDoc.exists ? freshDoc.data() : null;
 
-        // Also try email lookup if UID doc not found
+
         if (!freshData && session.email) {
           var eq = await firestore.collection('users').where('email', '==', session.email.trim().toLowerCase()).get();
           if (!eq.empty) freshData = eq.docs[0].data();
         }
 
         if (freshData && freshData.status === 'approved') {
-          // Admin already approved — update local profile and let user through
+
           profile.status = 'approved';
           localStorage.setItem('arps_profile_' + uid, JSON.stringify(profile));
-          return; // stay on current page
+          return;
         }
 
-        // Still pending or no data — redirect to pending
+
         window.location.href = 'pending.html';
       } catch(e) {
-        // Firestore failed — fall back to local status
+
         window.location.href = 'pending.html';
       }
     })();
     return;
   }
 
-  // If rejected, block access and redirect to login
+
   if (profile.status === 'rejected' && currentPath.indexOf('loginpage.html') === -1) {
     localStorage.removeItem('arps_session');
     window.location.href = 'loginpage.html';
     return;
   }
 
-  // Expose session data globally
+
   window.arpsUser = session;
 
-  // Helper to update user name displays across the app
   document.addEventListener('DOMContentLoaded', function() {
     var nameEls = document.querySelectorAll('.user-display-name');
     nameEls.forEach(function(el) {
@@ -77,10 +76,9 @@
     });
   });
 
-  // Session is permanent (PWA) — user stays logged in until they manually sign out
 })();
 
-// Logout helper with confirmation UI
+
 function arpsLogout() {
   if (document.getElementById('logout-modal')) return;
 
@@ -105,7 +103,7 @@ function arpsLogout() {
   const modal = document.getElementById('logout-modal');
   const modalContent = modal.firstElementChild;
   
-  // Trigger animation
+
   requestAnimationFrame(() => {
     modal.style.opacity = '1';
     modalContent.style.transform = 'scale(1)';

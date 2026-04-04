@@ -8,13 +8,13 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 import { db } from '../../firebase-config.js';
 
-// ── State ─────────────────────────────────────────────────────────────────────
+
 let centers             = [];
 let currentFilter       = 'all';
 let selectedCenterIndex = null;
 let searchTerm          = '';
 
-// ── DOM refs ──────────────────────────────────────────────────────────────────
+
 const centersStatsGrid   = document.getElementById('centersStatsGrid');
 const centersTableBody   = document.getElementById('centersTableBody');
 const centersAiSummary   = document.getElementById('centersAiSummary');
@@ -36,7 +36,7 @@ const selectedCenterStatus   = document.getElementById('selectedCenterStatus');
 const selectedCenterFacilities = document.getElementById('selectedCenterFacilities');
 const selectedCenterAction   = document.getElementById('selectedCenterAction');
 
-// ── Status helpers ─────────────────────────────────────────────────────────────
+
 function getOccupancyPercent(center) {
   if (!center.capacity) return 0;
   return Math.min(100, Math.round((center.occupants / center.capacity) * 100));
@@ -65,24 +65,24 @@ function setCurrentDate() {
   });
 }
 
-// ── Readiness snapshot bars (derived from live data) ──────────────────────────
+
 function updateReadinessSnapshot() {
   const total         = centers.length;
   const totalCapacity = centers.reduce((s, c) => s + (c.capacity  || 0), 0);
   const totalOccupants = centers.reduce((s, c) => s + (c.occupants || 0), 0);
 
-  // Available beds as % of total capacity
+
   const bedsPercent = total > 0 && totalCapacity > 0
     ? Math.round(((totalCapacity - totalOccupants) / totalCapacity) * 100)
     : 0;
 
-  // Centers that have food supplies
+
   const foodCount = centers.filter(c =>
     Array.isArray(c.facilities) && c.facilities.some(f => /food/i.test(f))
   ).length;
   const foodPercent = total > 0 ? Math.round((foodCount / total) * 100) : 0;
 
-  // Centers that have medical support
+
   const medCount = centers.filter(c =>
     Array.isArray(c.facilities) && c.facilities.some(f => /medical/i.test(f))
   ).length;
@@ -105,7 +105,7 @@ function updateReadinessSnapshot() {
   if (medVal)  medVal.textContent = `${medPercent}%`;
 }
 
-// ── Render functions ───────────────────────────────────────────────────────────
+
 function renderStats() {
   const nearFull  = centers.filter(c => getCenterStatus(c) === 'Near Full').length;
   const moderate  = centers.filter(c => getCenterStatus(c) === 'Moderate').length;
@@ -215,7 +215,7 @@ function renderSelectedCenter() {
   const status = getCenterStatus(center);
   const colors = getStatusColors(status);
   const slots  = (center.capacity || 0) - (center.occupants || 0);
-// still wara na japon ja khing na taw-an ka proper evac please change the logic boss
+
   emptyCenterState.classList.add('hidden');
   selectedCenterState.classList.remove('hidden');
   selectedCenterName.textContent      = center.name || '—';
@@ -235,7 +235,7 @@ function renderSelectedCenter() {
     ? facilities.map(f => `<span class="facility-chip">${f}</span>`).join('')
     : '<span class="text-xs text-slate-400">No facilities listed</span>';
 }
-// still wara na japon ja khing na taw-an ka proper evac please change the logic boss
+
 function renderAiSummary() {
   if (centers.length === 0) {
     centersAiSummary.textContent = 'No evacuation centers are currently registered. Add center data to the Firestore "centers" collection to enable capacity tracking.';
@@ -269,7 +269,7 @@ function renderAll() {
   updateReadinessSnapshot();
 }
 
-// ── Selection + filter ─────────────────────────────────────────────────────────
+
 function selectCenter(index) {
   selectedCenterIndex = index;
   renderTable();
@@ -303,14 +303,14 @@ document.addEventListener('click', (e) => {
 
 setCurrentDate();
 
-// ── Search ────────────────────────────────────────────────────────────────────
+
 document.getElementById('centerSearch').addEventListener('input', e => {
   searchTerm = e.target.value;
   renderTable();
   renderSelectedCenter();
 });
 
-// ── Add Center modal ──────────────────────────────────────────────────────────
+
 const modal      = document.getElementById('addCenterModal');
 const modalError = document.getElementById('modalError');
 const submitBtn  = document.getElementById('btnSubmitCenter');

@@ -184,7 +184,7 @@ if (!ARPS_API_BASE_URL && window.location.hostname.indexOf("github.io") !== -1) 
   console.warn('ARPS API base URL is not configured. Set it in runtime-config.js or localStorage key "arps_api_base_url".');
 }
 
-// ── Report notification badge (user pages only) ─────────────────────────────
+
 if (!ARPS_IS_ADMIN_PAGE) {
   (function checkReportBadge() {
     function addBadge() {
@@ -229,17 +229,17 @@ if (!ARPS_IS_ADMIN_PAGE) {
   })();
 }
 
-// ── PWA (user pages only — skip /admin/) ─────────────────────────────────────
+
 if (!ARPS_IS_ADMIN_PAGE) {
 
-  // Register Service Worker
+
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
       navigator.serviceWorker.register(getArpsAppPath('service-worker.js')).catch(function () {});
     });
   }
 
-  // Inject <link rel="manifest"> + iOS meta tags
+
   (function () {
     if (!document.querySelector('link[rel="manifest"]')) {
       var link = document.createElement('link');
@@ -277,7 +277,7 @@ if (!ARPS_IS_ADMIN_PAGE) {
     }
   })();
 
-  // Android Install Prompt
+
   (function () {
     var deferredPrompt = null;
     var PROMPT_ID      = 'arps-install-prompt';
@@ -349,7 +349,7 @@ if (!ARPS_IS_ADMIN_PAGE) {
     }
   })();
 
-  // ── Offline Banner (user pages only) ───────────────────────────────────────
+
   (function () {
     var BANNER_ID = 'arps-offline-banner';
 

@@ -7,7 +7,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 import { db } from "../../firebase-config.js";
 
-// ── Agency key map: SOS type → localStorage key / display name ───────────────
+
 const AGENCY_STORAGE_KEY = {
   Medical:    'arps_agency_medical',
   Fire:       'arps_agency_fire',
@@ -34,7 +34,7 @@ function readCachedSmsTargets(type) {
   };
 }
 
-// ── Cache admin contact + agency numbers from Firestore into localStorage ─────
+
 async function cacheAdminContact(forceRefresh = false) {
   if (adminContactCachePromise && !forceRefresh) {
     return adminContactCachePromise;
@@ -78,9 +78,9 @@ async function getSmsTargets(type) {
   return readCachedSmsTargets(type);
 }
 
-// ── Pre-geocode on page load: save location name to localStorage ──────────────
+
 (async function preGeocode() {
-  // Only try if online — when offline we'll use what's already saved
+
   if (!navigator.onLine) return;
   try {
     const pos = await new Promise((resolve, reject) => {
@@ -89,7 +89,7 @@ async function getSmsTargets(type) {
       });
     });
     const place = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
-    // reverseGeocode already saves to localStorage if successful
+
   } catch {}
 })();
 
@@ -113,7 +113,7 @@ async function callPhilSMS(recipient, message) {
   return data;
 }
 
-// ── Step management ───────────────────────────────────────────────────────────
+
 const ALL_STEPS = ["step-main", "step-type", "step-sending", "step-success"];
 
 function showStep(id) {
@@ -127,10 +127,10 @@ function showStep(id) {
   active.classList.add("flex");
 }
 
-// ── Open directly on type selection ───────────────────────────────────────────
+
 showStep("step-type");
 
-// ── Step 2 → 3: Tap emergency type → send immediately ────────────────────────
+
 document.getElementById("typeGrid").addEventListener("click", e => {
   const btn = e.target.closest("[data-type]");
   if (!btn) return;
@@ -141,7 +141,7 @@ document.getElementById("btnBackToSOS").addEventListener("click", () => {
   window.location.href = "home.html";
 });
 
-// ── Step progress helpers ─────────────────────────────────────────────────────
+
 const CHECK_SVG = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>';
 const SPINNER   = '<div class="w-2 h-2 rounded-full border-2 border-slate-300 animate-spin" style="border-top-color:#1D4ED8"></div>';
 
@@ -185,7 +185,7 @@ function resetSteps() {
   document.getElementById("s3t").textContent = "Notifying responders...";
 }
 
-// ── Utilities ─────────────────────────────────────────────────────────────────
+
 function getDeviceId() {
   let id = localStorage.getItem("resq-device-id");
   if (!id) {
@@ -202,11 +202,11 @@ function getCurrentPosition() {
       return;
     }
 
-    // Try getting last-known cached position first (stored from home.html)
+
     const cachedLoc = localStorage.getItem('arps_last_location');
 
     navigator.geolocation.getCurrentPosition(resolve, (err) => {
-      // If permission denied or unavailable, try cached location
+
       if (cachedLoc) {
         try {
           const loc = JSON.parse(cachedLoc);
@@ -234,7 +234,7 @@ async function reverseGeocode(lat, lng) {
   let streetName = null;
   let nearbyDesc = null;
 
-  // 1) Try Photon geocoder (OSM-powered, has barangay data, no strict rate limit)
+
   try {
     const res = await timedFetch(
       `https://photon.komoot.io/reverse?lat=${lat}&lon=${lng}&lang=en`,
@@ -250,13 +250,13 @@ async function reverseGeocode(lat, lng) {
       const parts = [];
       if (barangay) parts.push(barangay);
       if (municipality && municipality !== barangay) parts.push(municipality);
-      // Skip province if it contains 'Region' (that's the region, not actual province)
+
       if (province && province !== municipality && !province.includes('Region')) parts.push(province);
       if (parts.length > 0) result = parts.join(', ');
     }
   } catch {}
 
-  // 2) Try Nominatim (has barangay in 'village' field — also grab road & nearby features)
+
   if (!result || !streetName) {
     try {
       const res = await timedFetch(
@@ -282,7 +282,7 @@ async function reverseGeocode(lat, lng) {
     } catch {}
   }
 
-  // 3) Fallback: BigDataCloud (no barangay data but has municipality + province)
+
   if (!result) {
     try {
       const res = await timedFetch(
@@ -292,13 +292,13 @@ async function reverseGeocode(lat, lng) {
       if (res.ok) {
         const data = await res.json();
         const adminList = data.localityInfo?.administrative || [];
-        // Municipality = adminLevel 6 for PH
+
         const muniEntry = adminList.find(l =>
           (l.description || '').toLowerCase().includes('municipality') ||
           (l.description || '').toLowerCase().includes('city') ||
           l.adminLevel === 6
         );
-        // Province = adminLevel 4 ONLY (adminLevel 3 is region, skip it)
+
         const provEntry = adminList.find(l => l.adminLevel === 4);
 
         const municipality = muniEntry?.name || data.city || null;
@@ -312,10 +312,10 @@ async function reverseGeocode(lat, lng) {
     } catch {}
   }
 
-  // 4) Get nearby terrain/landmark description using Overpass API
+
   nearbyDesc = await getNearbyDescription(lat, lng, streetName);
 
-  // Save to localStorage so offline SOS can use it
+
   if (result) {
     localStorage.setItem('arps_location_name', result);
   }
@@ -326,13 +326,13 @@ async function reverseGeocode(lat, lng) {
   return result;
 }
 
-// ── Get descriptive terrain/landmark info ("malapit sa baybay", "sa kalsada", etc.) ──
+
 async function getNearbyDescription(lat, lng, streetName) {
   const hints = [];
 
-  // Check nearby features via Overpass API (water, mountains, roads, schools, churches, etc.)
+
   try {
-    const radius = 300; // 300m radius
+    const radius = 300;
     const query = `
       [out:json][timeout:5];
       (
@@ -375,7 +375,7 @@ async function getNearbyDescription(lat, lng, streetName) {
       const data = await res.json();
       const elements = data.elements || [];
 
-      // Categorize nearby features
+
       const found = { coast: false, river: false, mountain: false, forest: false, farm: false,
         road: false, school: null, church: null, hospital: null, market: null, gasStation: null,
         police: null, fireStation: null, residential: false };
@@ -398,7 +398,7 @@ async function getNearbyDescription(lat, lng, streetName) {
         if (t.amenity === 'fire_station') found.fireStation = t.name || 'fire station';
       }
 
-      // Build descriptive hints in Filipino/English mix
+
       if (found.coast) hints.push('malapit sa dagat/baybay');
       if (found.river) hints.push('malapit sa ilog');
       if (found.mountain) hints.push('malapit sa bukid/bundok');
@@ -414,32 +414,32 @@ async function getNearbyDescription(lat, lng, streetName) {
       if (found.residential && hints.length === 0) hints.push('sa residential area');
     }
   } catch {
-    // Overpass failed — continue with what we have
+
   }
 
-  // Add street name if we have one
+
   if (streetName) {
     hints.unshift(`sa ${streetName}`);
   } else if (hints.length === 0) {
-    // No overpass data and no street — skip
+
     return null;
   }
 
-  // Limit to 3 most useful hints
+
   const finalHints = hints.slice(0, 3);
   return finalHints.length > 0 ? finalHints.join(', ') : null;
 }
 
-// ── Send SOS ──────────────────────────────────────────────────────────────────
+
 async function sendSosAlert(type) {
   resetSteps();
   showStep("step-sending");
   setVisible(1);
 
-  // Step 1 — GPS
+
   let lat, lng, accuracy, locationLabel, locationDesc, createdAtMs;
   const DEFAULT_LAT = 14.6507, DEFAULT_LNG = 121.0497;
-  // Read saved place name & description from localStorage (saved by home.html / last geocode)
+
   const savedLocationName = localStorage.getItem('arps_location_name');
   const savedLocationDesc = localStorage.getItem('arps_location_desc');
 
@@ -455,7 +455,7 @@ async function sendSosAlert(type) {
       locationLabel = place || savedLocationName || `${lat.toFixed(5)}°N, ${lng.toFixed(5)}°E`;
       locationDesc = localStorage.getItem('arps_location_desc') || savedLocationDesc || null;
     } else {
-      // Offline — use saved name & description from localStorage
+
       locationLabel = savedLocationName || `${lat.toFixed(5)}°N, ${lng.toFixed(5)}°E`;
       locationDesc = savedLocationDesc || null;
     }
@@ -471,7 +471,7 @@ async function sendSosAlert(type) {
     markDone(1, hint);
   }
 
-  // Step 2 — Write to Firestore
+
   setVisible(2);
   const { userName, userContact, userAtRisk } = getSosProfile();
   const session = window.arpsUser;
@@ -498,11 +498,11 @@ async function sendSosAlert(type) {
 
   try {
     if (!navigator.onLine) {
-      // Fire-and-forget when offline
+
       addDoc(collection(db, "sosAlerts"), payload).catch(console.error);
       markError(2, "Offline — proceeding to SMS fallback");
     } else {
-      // 4-second timeout when online to prevent hanging on weak connections
+
       const dbPromise = addDoc(collection(db, "sosAlerts"), payload);
       const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 4000));
       await Promise.race([dbPromise, timeout]);
@@ -516,7 +516,7 @@ async function sendSosAlert(type) {
     }
   }
 
-  // Step 3 — Send SMS to emergency contact + admin + agency
+
   setVisible(3);
 
   const { ecName, ecNumber } = getSosProfile();
@@ -550,7 +550,7 @@ async function sendSosAlert(type) {
   }
 
   if (!phoneAgency) {
-    // Warn in console so admin knows to configure it — not fatal
+
     console.warn(
       hasAgencySetting
         ? `Agency number for ${type} is invalid. Only admin will be notified.`
@@ -559,7 +559,7 @@ async function sendSosAlert(type) {
   }
 
   if (!navigator.onLine) {
-    // ─── OFFLINE: Open phone's native SMS app — admin only (agency requires internet for PhilSMS) ───
+
     document.getElementById("s3t").textContent = "Opening SMS app...";
     const allPhones = [phoneAdmin, phoneUser].filter(Boolean);
     if (allPhones.length > 0) {
@@ -572,7 +572,7 @@ async function sendSosAlert(type) {
       markDone(3, "No contacts set — SMS skipped");
     }
   } else {
-    // ─── ONLINE: Use PhilSMS API (automatic, no user action needed) ───
+
     document.getElementById("s3t").textContent = "Sending SMS via PhilSMS...";
     let sentTo = [];
 
@@ -600,7 +600,7 @@ async function sendSosAlert(type) {
         console.error(`PhilSMS failed for agency (${agencyName}):`, err);
       }
     } else {
-      // Agency number not configured — show non-blocking warning after step completes
+
       console.warn(
         hasAgencySetting
           ? `${agencyName} number saved by admin is invalid for PhilSMS.`
@@ -609,7 +609,7 @@ async function sendSosAlert(type) {
     }
 
     if (sentTo.length === 0 && (phoneUser || phoneAdmin || phoneAgency)) {
-      // PhilSMS failed for all — fallback to native SMS (admin + user only, no agency without internet)
+
       const allPhones = [phoneAdmin, phoneUser].filter(Boolean);
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       const sep = isIOS ? ',' : ';';
@@ -621,7 +621,7 @@ async function sendSosAlert(type) {
       markDone(3, `SMS auto-sent to ${sentTo.join(', ')}`);
     }
 
-    // Show non-blocking agency-not-configured warning below the step row
+
     if (!phoneAgency) {
       const warnEl = document.createElement('p');
       warnEl.className = 'text-[11px] text-amber-600 font-medium mt-1 text-center';
@@ -638,7 +638,7 @@ async function sendSosAlert(type) {
   showStep("step-success");
 }
 
-// ── PhilSMS helpers ───────────────────────────────────────────────────────────
+
 function getSosProfile() {
   const session = window.arpsUser;
   const uid = session ? session.uid : 'guest';
@@ -709,7 +709,7 @@ function buildSosSmsMessage(details) {
   return lines.join('\n');
 }
 
-// ── Send Another ──────────────────────────────────────────────────────────────
+
 document.getElementById("btnSendAnother").addEventListener("click", () => {
   showStep("step-type");
 });

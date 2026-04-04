@@ -59,7 +59,7 @@
   };
 
   function init() {
-    // Show saved location instantly for speed
+
     const saved = loadSavedLocation();
     const initialCenter = saved && saved.position ? saved.position : DEFAULT_LOCATION;
     const initialZoom = saved && saved.position ? 16 : 2;
@@ -75,7 +75,7 @@
 
     if (saved && saved.position) {
       paintLocation(saved);
-      // Reverse geocode the saved location immediately
+
       void updateLocationName(saved.position.lat, saved.position.lng);
     } else {
       paintLocation({ source: 'default', position: null, reason: null });
@@ -84,7 +84,7 @@
     ensureWatcher();
     invalidateMap(state.map);
 
-    // Fire fast low-accuracy fix first, then upgrade to high-accuracy
+
     void fastThenAccurate();
   }
 
@@ -94,7 +94,7 @@
       paintLocation(fast);
       void updateLocationName(fast.position.lat, fast.position.lng);
     }
-    // Then get high-accuracy fix
+
     const accurate = await resolveUserLocation({ allowSaved: false });
     if (accurate.source === 'live') {
       paintLocation(accurate);
@@ -118,7 +118,7 @@
       elements.locationNameShort.textContent = headline;
       elements.locationNameFull.textContent = place.full;
       elements.placeName.textContent = place.neighbourhood || place.barangay || headline;
-      // Update marker popup with real place name
+
       if (state.marker) {
         state.marker.setPopupContent(
           popupContent(place.short, place.full),
@@ -144,13 +144,13 @@
 
     const parts = [];
 
-    // Only add street if it's a real road, not an admin area already being shown
+
     if (place.street && !adminNames.has(norm(place.street))) {
       parts.push(place.street);
     }
 
-    // Prefer neighbourhood (more specific in Nominatim hierarchy) over barangay.
-    // e.g. Nominatim returns neighbourhood="Poblacion 3", barangay="Caridad" — show Poblacion 3.
+
+
     const specificPlace = place.neighbourhood || place.barangay;
     if (specificPlace && !parts.some((p) => norm(p) === norm(specificPlace))) {
       parts.push(specificPlace);
@@ -318,7 +318,7 @@
       popupContent(getPopupTitle(result.source), `Accuracy ${formatAccuracy(state.accuracyMeters)}`),
     );
 
-    // Reverse geocode on live watcher updates (throttled by cache)
+
     if (fromWatcher && state.position) {
       void updateLocationName(state.position.lat, state.position.lng);
     }

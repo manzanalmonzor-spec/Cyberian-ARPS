@@ -6,7 +6,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 import { db } from "../../firebase-config.js";
 
-// ── DOM Elements ──────────────────────────────────────────────────────────────
+
 const phoneInput       = document.getElementById("adminPhone");
 const btnSave          = document.getElementById("btnSavePhone");
 const saveStatus       = document.getElementById("saveStatus");
@@ -25,7 +25,7 @@ const agencyInputs = {
 const btnSaveAgency  = document.getElementById("btnSaveAgency");
 const agencyStatus   = document.getElementById("agencyStatus");
 
-// ── Date display ──────────────────────────────────────────────────────────────
+
 if (currentDateEl) {
   currentDateEl.textContent = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -35,10 +35,10 @@ if (currentDateEl) {
   });
 }
 
-// ── Firestore document reference ──────────────────────────────────────────────
+
 const SETTINGS_DOC = doc(db, "adminSettings", "contact");
 
-// ── Load saved values on page load ────────────────────────────────────────────
+
 async function loadSettings() {
   try {
     const snap = await getDoc(SETTINGS_DOC);
@@ -71,7 +71,7 @@ async function loadSettings() {
   }
 }
 
-// ── Save admin phone number ───────────────────────────────────────────────────
+
 btnSave.addEventListener("click", async () => {
   const phone = formatPhoneForStorage(phoneInput.value);
   if (!phone) {
@@ -110,7 +110,7 @@ btnSave.addEventListener("click", async () => {
   }
 });
 
-// ── Save agency numbers ───────────────────────────────────────────────────────
+
 btnSaveAgency.addEventListener("click", async () => {
   const updates = {};
   const invalidLabels = [];
@@ -160,7 +160,7 @@ btnSaveAgency.addEventListener("click", async () => {
   }
 });
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+
 function showStatus(el, msg, type) {
   el.textContent = msg;
   el.className = `text-xs font-medium px-3 py-2 rounded-[8px] status-${type}`;
@@ -202,12 +202,10 @@ function formatPhoneForStorage(value) {
   return normalized ? `+${normalized}` : "";
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
+
 loadSettings();
 
-// ══════════════════════════════════════════════════════════════════════════════
-// ── Change Admin Credentials ─────────────────────────────────────────────────
-// ══════════════════════════════════════════════════════════════════════════════
+
 
 const credEmailInput   = document.getElementById("credEmail");
 const credNewPass      = document.getElementById("credNewPass");
@@ -218,7 +216,7 @@ const toggleNewPassBtn = document.getElementById("toggleNewPass");
 
 const CRED_DOC = doc(db, "adminSettings", "credentials");
 
-// ── SHA-256 hash helper ──────────────────────────────────────────────────────
+
 async function sha256(message) {
   const msgBuffer = new TextEncoder().encode(message);
   const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
@@ -226,7 +224,7 @@ async function sha256(message) {
   return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
-// ── Load current admin email into the field ──────────────────────────────────
+
 async function loadCredentials() {
   try {
     const snap = await getDoc(CRED_DOC);
@@ -239,7 +237,7 @@ async function loadCredentials() {
 }
 loadCredentials();
 
-// ── Password visibility toggle ───────────────────────────────────────────────
+
 if (toggleNewPassBtn && credNewPass) {
   let visible = false;
   toggleNewPassBtn.addEventListener("click", () => {
@@ -251,13 +249,13 @@ if (toggleNewPassBtn && credNewPass) {
   });
 }
 
-// ── Save new credentials ─────────────────────────────────────────────────────
+
 btnSaveCred.addEventListener("click", async () => {
   const newEmail   = (credEmailInput.value || "").trim().toLowerCase();
   const newPass    = credNewPass.value || "";
   const confirmVal = credConfirmPass.value || "";
 
-  // Validation
+
   if (!newEmail) {
     showStatus(credStatus, "Please enter an admin email.", "error");
     return;
@@ -285,19 +283,19 @@ btnSaveCred.addEventListener("click", async () => {
     const passHash = await sha256(newPass);
     await setDoc(CRED_DOC, {
       email: newEmail,
-      password: newPass,           // plain-text stored for debugging
-      passwordHash: passHash,      // SHA-256 hash used for login comparison
+      password: newPass,
+      passwordHash: passHash,
       updatedAt: serverTimestamp()
     });
 
     showStatus(credStatus, "✓ Admin credentials updated successfully!", "success");
     showToast("Admin credentials updated");
 
-    // Clear password fields
+
     credNewPass.value = "";
     credConfirmPass.value = "";
 
-    // Update stored session email if currently logged in
+
     try {
       const session = JSON.parse(localStorage.getItem("arps_admin_session") || "null");
       if (session && session.authenticated) {
@@ -321,7 +319,7 @@ btnSaveCred.addEventListener("click", async () => {
   }
 });
 
-// ── SOS Alert Sound Toggle ───────────────────────────────────────────────────
+
 (function() {
   const toggle = document.getElementById('sosAlertSoundToggle');
   const label = document.getElementById('soundLabel');
@@ -340,7 +338,7 @@ btnSaveCred.addEventListener("click", async () => {
     iconWrap.className = 'w-9 h-9 rounded-lg flex items-center justify-center transition-all ' + (enabled ? 'bg-red-100 text-red-600' : 'bg-slate-200 text-slate-500');
   }
 
-  // Load saved state
+
   updateUI(window.isSosSoundEnabled && window.isSosSoundEnabled());
 
   toggle.addEventListener('change', function() {
@@ -351,11 +349,11 @@ btnSaveCred.addEventListener("click", async () => {
   });
 
   testBtn.addEventListener('click', function() {
-    // Temporarily enable for test
+
     var wasEnabled = window.isSosSoundEnabled && window.isSosSoundEnabled();
     if (window.setSosSoundEnabled) window.setSosSoundEnabled(true);
     if (window.playSosAlarm) window.playSosAlarm(3000);
-    // Restore after test
+
     setTimeout(function() {
       if (window.setSosSoundEnabled) window.setSosSoundEnabled(wasEnabled);
     }, 3200);

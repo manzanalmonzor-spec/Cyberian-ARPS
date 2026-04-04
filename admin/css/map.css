@@ -54,7 +54,7 @@
 }
 
 #adminLiveMap {
-  height: 560px;
+  height: 100%;
   width: 100%;
   position: relative;
   z-index: 0;
@@ -166,7 +166,7 @@
   border: 0;
 }
 
-/* Zoom controls styling */
+
 .leaflet-control-zoom {
   border: none !important;
   box-shadow: 0 2px 12px rgba(0,0,0,0.15) !important;

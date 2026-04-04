@@ -34,7 +34,7 @@
 </head>
 <body class="bg-[#F8FAFC] font-sans">
   <div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
+    
     <aside
       class="w-[280px] bg-[#0F172A] text-white flex flex-col shrink-0 shadow-2xl z-50"
     >
@@ -96,23 +96,7 @@
           Alerts
         </a>
 
-        <a href="./centers.html" class="sidebar-item">
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path
-              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-            />
-          </svg>
-          Centers
-        </a>
+
 
         <a href="./weather.html" class="sidebar-item active">
           <svg
@@ -158,14 +142,14 @@
       </nav>
     </aside>
 
-    <!-- Main -->
+    
     <main class="flex-1 overflow-auto p-4 md:p-8 relative z-0 bg-[#F4F7FC]">
-      <!-- Decorator elements for background -->
+      
       <div class="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-blue-100/40 via-blue-50/20 to-transparent pointer-events-none -z-10"></div>
       <div class="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-blue-300/10 blur-[120px] pointer-events-none -z-10"></div>
       <div class="absolute top-80 -left-40 w-[500px] h-[500px] rounded-full bg-emerald-300/10 blur-[120px] pointer-events-none -z-10"></div>
 
-      <!-- Header -->
+      
       <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
         <div>
           <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-blue-900 to-slate-800 tracking-tight drop-shadow-sm">
@@ -185,15 +169,15 @@
         </div>
       </div>
 
-      <!-- Stats Grid -->
+      
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="weatherStatsGrid"></div>
 
-      <!-- Content Grid -->
+      
       <div class="grid grid-cols-1 xl:grid-cols-[1fr_400px] gap-6 lg:gap-8 border-b border-transparent">
         
-        <!-- Left Column -->
+        
         <div class="flex flex-col gap-6">
-          <!-- Live Telemetry Area -->
+          
           <section class="bg-white/70 backdrop-blur-2xl rounded-[2rem] border border-white shadow-[0_8px_40px_rgb(0,0,0,0.04)] overflow-hidden flex flex-col relative">
             <div class="absolute top-0 right-0 w-64 h-64 bg-blue-400/5 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -218,7 +202,7 @@
                   <p class="text-5xl lg:text-6xl font-black text-amber-900 tracking-tighter drop-shadow-sm z-10" id="temperatureValue">--</p>
                   <p class="mt-3 inline-block z-10 text-[13px] font-bold text-amber-700/90 bg-amber-200/40 backdrop-blur-sm px-4 py-1.5 rounded-xl border border-amber-200/50 shadow-sm" id="temperatureSub">--</p>
                 </div>
-                <!-- same for wind -->
+                
                 <div class="relative overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50/30 rounded-[1.5rem] p-6 border border-blue-100/80 shadow-sm flex flex-col justify-center items-center text-center group transition-all duration-300 hover:shadow-md hover:-translate-y-1">
                   <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-400/10 rounded-full blur-2xl"></div>
@@ -258,7 +242,7 @@
             </div>
           </section>
 
-          <!-- Hazard Assessment Matrix -->
+          
           <section class="bg-white/70 backdrop-blur-2xl rounded-[2rem] border border-white shadow-[0_8px_40px_rgb(0,0,0,0.04)] overflow-hidden">
             <div class="px-6 py-5 border-b border-slate-100/80">
               <h3 class="text-lg font-extrabold text-slate-800">Hazard Assessment Matrix</h3>
@@ -270,9 +254,9 @@
           </section>
         </div>
 
-        <!-- Right Column -->
+        
         <aside class="flex flex-col gap-6 shrink-0">
-          <!-- AI Summary -->
+          
           <section class="relative overflow-hidden rounded-[2rem] p-6 border border-blue-200/60 bg-gradient-to-br from-blue-50/90 to-indigo-50/50 backdrop-blur-xl shadow-[0_8px_30px_rgba(29,78,216,0.06)] group hover:shadow-[0_8px_30px_rgba(29,78,216,0.1)] transition-all duration-500">
             <div class="absolute top-0 right-0 w-32 h-32 bg-blue-400/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
             <div class="flex items-center gap-3 mb-4 relative z-10">
@@ -288,7 +272,7 @@
             </p>
           </section>
 
-          <!-- Official Advisory -->
+          
           <section class="bg-white/70 backdrop-blur-2xl rounded-[2rem] border border-white shadow-[0_8px_40px_rgb(0,0,0,0.04)] overflow-hidden flex flex-col relative">
             <div class="absolute -top-24 -right-24 w-48 h-48 bg-slate-200/40 rounded-full blur-3xl pointer-events-none"></div>
             
@@ -344,7 +328,7 @@
             </div>
           </section>
 
-          <!-- Operational Impact -->
+          
           <section class="bg-white/70 backdrop-blur-2xl rounded-[2rem] border border-white shadow-[0_8px_40px_rgb(0,0,0,0.04)] p-6 relative overflow-hidden">
             <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-slate-200/40 rounded-full blur-3xl pointer-events-none"></div>
             

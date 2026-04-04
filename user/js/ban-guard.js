@@ -10,7 +10,7 @@ import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/fire
   if (!email) return;
 
   onSnapshot(doc(db, "bannedEmails", email), function(snap) {
-    // Only act on server-confirmed data, not stale cache
+
     if (snap.metadata.fromCache) return;
 
     if (snap.exists()) {
@@ -22,7 +22,7 @@ import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/fire
   function showBanCard(reason) {
     if (document.getElementById('arps-ban-overlay')) return;
 
-    // Inject !important CSS to force-kill all scrolling on every element
+
     var style = document.createElement('style');
     style.textContent =
       'html.arps-banned, html.arps-banned body { overflow:hidden!important; position:fixed!important; width:100%!important; height:100%!important; top:0!important; left:0!important; touch-action:none!important; overscroll-behavior:none!important; -webkit-overflow-scrolling:auto!important; }' +

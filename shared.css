@@ -87,7 +87,7 @@ body {
 ::-webkit-scrollbar-thumb{background:rgba(203,213,225,0.7);border-radius:4px}
 ::-webkit-scrollbar-thumb:hover{background:rgba(148,163,184,0.8)}
 
-/* Mobile Bottom Pill Navigation */
+
 .bottom-nav {
   position: fixed;
   bottom: 24px;
@@ -305,7 +305,7 @@ body.dropdown-open{overflow:hidden}
   }
 }
 
-/* Responsive Desktop Rules */
+
 @media (min-width: 768px) {
   .bottom-nav {
     top: 0;

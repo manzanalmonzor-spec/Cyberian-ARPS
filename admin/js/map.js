@@ -191,7 +191,7 @@ function createIncidentIcon(incident, active) {
     });
   }
 
-  // Fallback: name initials
+
   const initials = (incident.name || "?").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
   return window.L.divIcon({
     className: "resq-admin-marker-wrap",
@@ -227,7 +227,7 @@ function ensureMap() {
       scrollWheelZoom: true
     }).setView([14.6507, 121.0497], 13);
 
-    // Add zoom controls at top-right so they don't overlap the legend
+
     window.L.control.zoom({ position: "topright" }).addTo(state.map);
 
     window.L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -238,10 +238,12 @@ function ensureMap() {
     state.centerLayer = window.L.layerGroup().addTo(state.map);
     state.routeLayer = window.L.layerGroup().addTo(state.map);
 
-    // Staggered invalidateSize calls guarantee tiles load across all environments
+
     setTimeout(() => state.map && state.map.invalidateSize(), 0);
     setTimeout(() => state.map && state.map.invalidateSize(), 200);
     setTimeout(() => state.map && state.map.invalidateSize(), 500);
+    setTimeout(() => state.map && state.map.invalidateSize(), 1000);
+    setTimeout(() => state.map && state.map.invalidateSize(), 2000);
   } catch (err) {
     console.error("RESQ: Map initialization failed —", err.message);
     state.map = null;
@@ -291,7 +293,7 @@ function initRescuerTracking() {
       const lat = pos.coords.latitude;
       const lng = pos.coords.longitude;
       updateRescuerMarker(lat, lng);
-      // Pan to rescuer only when no incident is focused
+
       if (state.map && !state.selectedIncidentId) {
         state.map.setView([lat, lng], 14);
       }
@@ -613,8 +615,12 @@ function renderRouteOverlay() {
 }
 
 function syncMapViewport() {
+
+  if (state._skipViewportSync) return;
+
   const incident = getSelectedIncident();
   const center = getActiveCenter();
+
 
   if (incident && center) {
     fitMapToPoints(state.map, [incident, center], {
@@ -624,11 +630,8 @@ function syncMapViewport() {
     return;
   }
 
-  if (incident && state.evacuationCenters.length > 0) {
-    fitMapToPoints(state.map, [incident, ...state.evacuationCenters.slice(0, 3)], {
-      maxZoom: 15,
-      padding: [40, 40]
-    });
+
+  if (incident) {
     return;
   }
 
@@ -806,6 +809,27 @@ function selectIncidentById(incidentId) {
   renderIncidentMarkers();
   renderFeed();
   renderSelectedIncident();
+
+
+  if (state.map) {
+
+    state.map.stop();
+    state.map.setView([incident.lat, incident.lng], 17, { animate: true, duration: 0.5 });
+
+
+    const marker = state.incidentMarkers.find((m) => {
+      const ll = m.getLatLng();
+      return Math.abs(ll.lat - incident.lat) < 0.0001 && Math.abs(ll.lng - incident.lng) < 0.0001;
+    });
+    if (marker) {
+      setTimeout(() => marker.openPopup(), 300);
+    }
+  }
+
+
+  state._skipViewportSync = true;
+  setTimeout(() => { state._skipViewportSync = false; }, 2000);
+
   void loadEvacuationOptionsForSelectedIncident();
 }
 
@@ -861,7 +885,7 @@ function renderAll() {
   syncMapViewport();
 }
 
-// Cache all users' selfies from Firestore
+
 const userSelfieByUid = new Map();
 const userSelfieByName = new Map();
 let usersLoadedOnce = false;
@@ -890,7 +914,7 @@ function applySelfies() {
   let changed = false;
   state.incidents.forEach(incident => {
     if (incident.selfieUrl) return;
-    // Try by uid first, then by name
+
     let selfie = incident.uid ? userSelfieByUid.get(incident.uid) : null;
     if (!selfie && incident.name) {
       selfie = userSelfieByName.get(incident.name.trim().toLowerCase());
@@ -907,7 +931,7 @@ async function loadSelfiesForIncidents() {
   await loadAllUserSelfies(false);
   const changed = applySelfies();
 
-  // If some incidents still have no selfie and we haven't retried, refresh user list
+
   const missing = state.incidents.some(i => !i.selfieUrl);
   if (missing && usersLoadedOnce) {
     await loadAllUserSelfies(true);
@@ -950,7 +974,7 @@ function init() {
   renderAll();
   startLiveSubscription();
 
-  // Ensure map initializes after the page is fully painted
+
   if (document.readyState === "complete") {
     ensureMap();
     renderIncidentMarkers();

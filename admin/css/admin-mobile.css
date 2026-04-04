@@ -1,8 +1,6 @@
-/* ══════════════════════════════════════════════════════════════════════════════
-   Admin Mobile Responsive — shared across all admin pages
-   ══════════════════════════════════════════════════════════════════════════════ */
 
-/* ── Hamburger button (visible on mobile only) ─────────────────────────────── */
+
+
 .admin-hamburger {
   display: none;
   position: fixed;
@@ -31,7 +29,7 @@
   height: 22px;
 }
 
-/* ── Sidebar overlay (mobile) ──────────────────────────────────────────────── */
+
 .admin-sidebar-overlay {
   display: none;
   position: fixed;
@@ -46,17 +44,15 @@
   display: block;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════════
-   MOBILE: < 1024px
-   ═══════════════════════════════════════════════════════════════════════════════ */
+
 @media (max-width: 1023px) {
 
-  /* Show hamburger */
+  
   .admin-hamburger {
     display: flex;
   }
 
-  /* Sidebar: slide-in drawer */
+  
   .flex.h-screen>aside,
   aside.w-\[280px\] {
     position: fixed !important;
@@ -73,7 +69,7 @@
     transform: translateX(0) !important;
   }
 
-  /* Main content: full width */
+  
   .flex.h-screen {
     display: block !important;
   }
@@ -86,7 +82,7 @@
     overflow-x: hidden !important;
   }
 
-  /* ── Header adjustments ──────────────────────── */
+  
   .flex.h-screen>main>div:first-child {
     flex-direction: column !important;
     align-items: flex-start !important;
@@ -98,7 +94,7 @@
     font-size: 1.5rem !important;
   }
 
-  /* ── Stats grid: 2 columns on mobile ─────────── */
+  
   #statsGrid,
   #alertsStatsGrid,
   #centersStatsGrid,
@@ -108,7 +104,7 @@
     gap: 12px !important;
   }
 
-  /* ── Main content grids: stack vertically ─────── */
+  
   .grid.grid-cols-\[1fr_380px\],
   .grid.grid-cols-\[1fr_360px\],
   .grid.grid-cols-\[1fr_400px\] {
@@ -116,17 +112,17 @@
     gap: 16px !important;
   }
 
-  /* XL grid used in weather */
+  
   .xl\:grid-cols-\[1fr_400px\] {
     grid-template-columns: 1fr !important;
   }
 
-  /* Settings two-column layout */
+  
   .grid.grid-cols-2.gap-6 {
     grid-template-columns: 1fr !important;
   }
 
-  /* ── Tables: allow horizontal scroll ──────────── */
+  
   .overflow-x-auto {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
@@ -136,24 +132,24 @@
     min-width: 600px;
   }
 
-  /* ── Incident rows: tighter ──────────────────── */
+  
   .incident-row {
     padding: 12px 16px !important;
   }
 
-  /* ── Map containers ──────────────────────────── */
+  
   #dashboardMap,
   #adminLiveMap {
     height: 300px !important;
   }
 
-  /* ── Right panel map area ────────────────────── */
+  
   .live-map-area,
   .live-map-area #adminLiveMap {
     height: 350px !important;
   }
 
-  /* ── Filter buttons: wrap ────────────────────── */
+  
   .map-filter-btn,
   .alert-filter-btn,
   .center-filter-btn,
@@ -162,13 +158,13 @@
     padding: 5px 10px !important;
   }
 
-  /* ── Badges ──────────────────────────────────── */
+  
   .badge {
     font-size: 10px !important;
     padding: 3px 8px !important;
   }
 
-  /* ── Cards: smaller rounded corners ──────────── */
+  
   .rounded-3xl {
     border-radius: 20px !important;
   }
@@ -177,7 +173,7 @@
     border-radius: 20px !important;
   }
 
-  /* ── AI summary card spacing ─────────────────── */
+  
   .ai-summary-card,
   .map-ai-card,
   .alerts-ai-card,
@@ -185,18 +181,18 @@
     padding: 14px !important;
   }
 
-  /* ── Approvals stats: 1 column on very small ─── */
+  
   .grid.grid-cols-3 {
     grid-template-columns: 1fr 1fr 1fr !important;
     gap: 10px !important;
   }
 
-  /* ── Approvals main card: full width ─────────── */
+  
   .max-w-5xl {
     max-width: 100% !important;
   }
 
-  /* ── Weather big text: scale down ────────────── */
+  
   .text-5xl {
     font-size: 2.5rem !important;
   }
@@ -209,20 +205,18 @@
     font-size: 1.75rem !important;
   }
 
-  /* ── Weather forecast grid ───────────────────── */
+  
   #forecastGrid {
     grid-template-columns: repeat(3, 1fr) !important;
   }
 
-  /* ── Contact modal ───────────────────────────── */
+  
   .contact-modal .fixed {
     padding: 16px !important;
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════════
-   SMALL MOBILE: < 640px
-   ═══════════════════════════════════════════════════════════════════════════════ */
+
 @media (max-width: 639px) {
 
   .flex.h-screen>main,
@@ -230,7 +224,7 @@
     padding: 68px 12px 20px !important;
   }
 
-  /* Stats: single column on very small */
+  
   #statsGrid,
   #alertsStatsGrid,
   #centersStatsGrid,
@@ -239,36 +233,34 @@
     grid-template-columns: 1fr 1fr !important;
   }
 
-  /* Approvals stats */
+  
   .grid.grid-cols-3 {
     grid-template-columns: 1fr !important;
   }
 
-  /* Weather forecast: 2 columns */
+  
   #forecastGrid {
     grid-template-columns: repeat(2, 1fr) !important;
   }
 
-  /* Weather telemetry cards */
+  
   .grid.grid-cols-2.md\:grid-cols-4 {
     grid-template-columns: 1fr 1fr !important;
   }
 
-  /* Search input in approvals */
+  
   .search-input {
     width: 100% !important;
   }
 
-  /* Tab bar: wrap */
+  
   .flex.items-center.justify-between {
     flex-wrap: wrap;
     gap: 10px;
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════════
-   EXTRA SMALL: < 400px
-   ═══════════════════════════════════════════════════════════════════════════════ */
+
 @media (max-width: 399px) {
   .admin-hamburger {
     width: 40px;

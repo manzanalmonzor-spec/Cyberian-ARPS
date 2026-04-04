@@ -105,7 +105,7 @@ export async function GET(request) {
     message: 'ARPS API test — please ignore.'
   };
 
-  // ?test=1 → test with env var token
+
   if (url.searchParams.get('test') === '1' && token) {
     try {
       const result = await sendViaPhilSms(PHILSMS_ENDPOINTS[0], token, testPayload);

@@ -20,6 +20,7 @@ const PRECACHE_URLS = [
   'user/weather.html',
   'user/js/auth-guard.js',
   'user/js/ban-guard.js',
+  'user/js/heartbeat.js',
   'user/js/map-common.js',
   'user/js/gps-page.js',
   'user/js/sos.js',
@@ -30,7 +31,7 @@ function toScopeUrl(relativePath) {
   return new URL(String(relativePath || '').replace(/^\/+/, ''), self.registration.scope).toString();
 }
 
-// External APIs — skip entirely, let them fail gracefully when offline
+
 const SKIP_DOMAINS = [
   'firestore.googleapis.com',
   'firebase.googleapis.com',
@@ -50,7 +51,7 @@ const SKIP_DOMAINS = [
   'valhalla1.openstreetmap.de',
 ];
 
-// installer ka pre cache
+
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -59,7 +60,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// stale cache strat kung may update sa website pero wala pa na cache ang mga new files, ipakita lang ang cached version pero pag may internet connection na, i-update ang cache para next time may update na siya  
+
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
@@ -73,15 +74,15 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const req = event.request;
 
-  // ga handle lang sang GET requests kag mga http(s) nga requests, indi niya i-handle ang mga non-GET or data URIs or chrome-extension:// etc. nga requests
+
   if (req.method !== 'GET' || !req.url.startsWith('http')) return;
 
   const { hostname } = new URL(req.url);
 
-  // Skip external APIs — allow them to fail naturally (Firebase handles its own offline)
+
   if (SKIP_DOMAINS.some(d => hostname.includes(d))) return;
 
-  // for design nga kung mag offline di ma damage ang designs
+
   const isCDN = [
     'cdn.tailwindcss.com',
     'fonts.googleapis.com',
@@ -111,8 +112,8 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Network-first for local app files: always try to get fresh code,
-  // fall back to cache only when offline.
+
+
   event.respondWith(
     fetch(req)
       .then(res => {

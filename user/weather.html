@@ -11,6 +11,7 @@
   <script>tailwind.config={theme:{extend:{fontFamily:{sans:['DM Sans','Segoe UI','system-ui','sans-serif']}}}}</script>
   <script src="js/auth-guard.js"></script>
   <script type="module" src="js/ban-guard.js"></script>
+  <script type="module" src="js/heartbeat.js"></script>
 <link rel="icon" type="image/png" href="../Images/ARPLOGO.png">
 </head>
 <body class="bg-slate-100 font-sans">
@@ -24,7 +25,7 @@
     <button id="btnRefresh" class="w-9 h-9 rounded-[10px] bg-white border border-slate-200 flex items-center justify-center btn-press"><svg id="rIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h5M20 20v-5h-5"/><path d="M20.49 9A9 9 0 005.64 5.64L4 4m16 16l-1.64-1.64A9 9 0 013.51 15"/></svg></button>
   </div>
 
-  <!-- Hero -->
+  
   <div class="mx-4 md:mx-8 mt-4 md:mt-6 rounded-2xl p-5" style="background:linear-gradient(145deg,#1E40AF 0%,#1D4ED8 50%,#2563EB 100%)">
     <div class="flex justify-between items-center">
       <div>
@@ -37,7 +38,7 @@
     </div>
   </div>
 
-  <!-- Stats -->
+  
   <div class="grid grid-cols-3 md:grid-cols-3 gap-4 md:gap-6 px-4 md:px-8 mt-6">
     <div class="bg-white rounded-2xl p-3.5 border border-slate-200 text-center card-hover cursor-pointer" onclick="showDetail('rainfall')">
       <div class="w-9 h-9 rounded-[10px] bg-blue-50 flex items-center justify-center mx-auto mb-2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2"><path d="M12 21c3.5 0 6-2.5 6-6.2C18 11 12 3 12 3S6 11 6 14.8C6 18.5 8.5 21 12 21z"/></svg></div>
@@ -56,7 +57,7 @@
     </div>
   </div>
 
-  <!-- Severe Warning -->
+  
   <div id="warningCard" class="mx-4 md:mx-8 mt-5 md:mt-8 rounded-2xl p-4 cursor-pointer card-hover hidden" onclick="window.location.href='alerts.html'">
     <div class="flex items-center gap-2.5 mb-2.5">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
@@ -66,12 +67,12 @@
     <p class="text-[13px] leading-relaxed" id="warningText"></p>
   </div>
 
-  <!-- 24-Hour Forecast -->
+  
   <h3 class="text-[15px] font-bold text-slate-900 mx-4 md:mx-8 mt-8 mb-4">24-Hour Forecast</h3>
   <div class="flex gap-2.5 px-4 overflow-x-auto pb-2" id="forecastScroll" style="-webkit-overflow-scrolling:touch">
   </div>
 
-  <!-- Detail Modal -->
+  
   <div id="detailModal" class="hidden">
     <div class="modal-overlay" onclick="closeDetail()">
       <div class="modal-content" onclick="event.stopPropagation()">
@@ -84,7 +85,7 @@
     </div>
   </div>
 
-  <!-- Bottom Nav -->
+  
   </div>
   <nav class="bottom-nav">
   <div class="bottom-nav-brand">

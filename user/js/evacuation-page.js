@@ -24,11 +24,11 @@
     startLocationWatch,
   } = global.ResqMaps;
 
-  // ── LocalStorage keys for offline/instant cache ──
+
   const CACHE_KEY = 'resq.evacPage';
-  const CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+  const CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000;
   const ROUTE_CACHE_KEY = 'resq.routeCache';
-  const ROUTE_CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+  const ROUTE_CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
   const MAX_STORED_ROUTES = 30;
   const REGISTERED_CENTER_EVENT = 'arps:registered-centers';
   const REGISTERED_GEOCODE_CACHE_KEY = 'resq.evacPage.registeredGeocodes';
@@ -81,7 +81,7 @@
       if (entries.length > MAX_STORED_ROUTES) entries.length = MAX_STORED_ROUTES;
       global.localStorage.setItem(ROUTE_CACHE_KEY, JSON.stringify(Object.fromEntries(entries)));
     } catch {
-      // Storage full — ignore
+
     }
   }
 
@@ -165,9 +165,9 @@
     searchInput: document.getElementById('searchInput'),
   };
 
-  // ══════════════════════════════════════════════════════════════════════
-  //  CACHE: Save & Restore from localStorage
-  // ══════════════════════════════════════════════════════════════════════
+
+
+
 
   function saveStateToCache() {
     if (
@@ -199,7 +199,7 @@
 
       global.localStorage.setItem(CACHE_KEY, JSON.stringify(snapshot));
     } catch {
-      // Storage full or unavailable — ignore
+
     }
   }
 
@@ -211,13 +211,13 @@
       const snapshot = JSON.parse(raw);
       if (!snapshot || ![3, 4].includes(snapshot.version)) return null;
 
-      // Check age
+
       if (Date.now() - snapshot.savedAt > CACHE_MAX_AGE_MS) {
         global.localStorage.removeItem(CACHE_KEY);
         return null;
       }
 
-      // Validate position
+
       if (
         !snapshot.residentPosition ||
         !Number.isFinite(snapshot.residentPosition.lat) ||
@@ -226,7 +226,7 @@
         return null;
       }
 
-      // Validate cached places aren't corrupted (e.g. from wrong Overpass mirror)
+
       const cachedCandidates = [
         ...(Array.isArray(snapshot.nearbyPlaces) ? snapshot.nearbyPlaces : []),
         ...(Array.isArray(snapshot.supplementalPlaces) ? snapshot.supplementalPlaces : []),
@@ -237,7 +237,7 @@
         if (firstPlace && typeof firstPlace.lat === 'number') {
           const distKm = haversineKm(snapshot.residentPosition, firstPlace);
           if (distKm > 10) {
-            // Places are way too far — cache is corrupted, discard
+
             global.localStorage.removeItem(CACHE_KEY);
             return null;
           }
@@ -250,9 +250,9 @@
     }
   }
 
-  // ══════════════════════════════════════════════════════════════════════
-  //  INIT
-  // ══════════════════════════════════════════════════════════════════════
+
+
+
 
   function init() {
     state.map = createBaseMap('centersMap', {
@@ -265,7 +265,7 @@
     bindEvents();
     bindRegisteredCenterBridge();
 
-    // ── Try to restore from cache first for instant display ──
+
     const cached = loadStateFromCache();
     if (cached) {
       restoreFromCache(cached);
@@ -277,12 +277,12 @@
     applyFilter();
     invalidateMap(state.map);
 
-    // ── Get GPS + load real places fast ──
+
     void fastStartup();
   }
 
   async function fastStartup() {
-    // Use saved GPS position to kick off a fast query immediately — no waiting for GPS
+
     const savedPos = loadSavedLocation({ maxAgeMs: 30 * 60 * 1000 });
     if (savedPos && !state.hasLoadedCenters) {
       void fetchFastEvacPlaces(savedPos).then((fastPlaces) => {
@@ -302,7 +302,7 @@
     if (fastResult.source === 'live' && fastResult.position) {
       paintOrigin(fastResult, { forcePlacesRefresh: false });
 
-      // Fire fast query and full refresh at the same time — don't block one on the other
+
       void fetchFastEvacPlaces(fastResult.position).then((fastPlaces) => {
         if (fastPlaces.length > 0 && state.nearbyPlaces.length === 0) {
           state.nearbyPlaces = fastPlaces;
@@ -346,7 +346,7 @@
       updatedAt: state.updatedAt,
     });
 
-    // Show cached place name immediately
+
     const originLabel = document.getElementById('originLabel');
     if (state.originPlaceName) {
       const labelName = readOriginPrimaryLabel(state.originPlaceName);
@@ -409,7 +409,7 @@
       }
     });
 
-    // ── Save state when user leaves the page / switches tab ──
+
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
         saveStateToCache();
@@ -522,7 +522,7 @@
     applyFilter();
     renderOriginStatus(result);
 
-    // Resolve the real place name (barangay, purok, city)
+
     if (state.residentPosition) {
       void resolveOriginPlaceName(state.residentPosition.lat, state.residentPosition.lng);
     }
@@ -632,7 +632,7 @@
       recomputeCenters();
       applyFilter();
 
-      // Save fresh data to cache immediately
+
       saveStateToCache();
 
       if (
@@ -669,7 +669,7 @@
       recomputeCenters();
       applyFilter();
 
-      // Auto-retry with backoff: 3s, 5s, 10s, 15s, then every 15s until it works
+
       const retryAttempt = typeof config.retryAttempt === 'number' ? config.retryAttempt : 0;
       const retryDelays = [3000, 5000, 10000, 15000];
       const delayMs = retryDelays[Math.min(retryAttempt, retryDelays.length - 1)];
@@ -699,7 +699,7 @@
       }).addTo(state.map);
 
       state.residentMarker.bindPopup('', { className: 'resq-popup' });
-      // Zoom into user's real location
+
       state.map.setView([state.residentPosition.lat, state.residentPosition.lng], 14);
     } else {
       state.residentMarker.setLatLng([state.residentPosition.lat, state.residentPosition.lng]);
@@ -1058,7 +1058,7 @@
 
   function updateNearestSummary() {
     const nearestCenter = state.filteredCenters[0] || state.bestCenter || state.centers[0];
-    // Show place name if resolved, otherwise show coordinates as fallback
+
     if (!state.originPlaceName && state.residentPosition) {
       elements.originCoords.textContent = formatShortCoordinates(state.residentPosition);
       elements.originAddress.textContent = '';
@@ -1088,13 +1088,13 @@
       if (originLabel) originLabel.textContent = labelName;
       elements.originCoords.textContent = formatOriginHeadline(place);
       elements.originAddress.textContent = formatOriginAddress(place);
-      // Update the resident marker popup with the real place name
+
       if (state.residentMarker) {
         state.residentMarker.setPopupContent(
           popupContent(place.short, place.full),
         );
       }
-      // Save updated place name to cache
+
       recomputeCenters();
       applyFilter();
       saveStateToCache();
@@ -1436,10 +1436,10 @@
   async function fetchOSRMRoute(from, to) {
     const cacheKey = `${from.lat.toFixed(4)}:${from.lng.toFixed(4)}-${to.lat.toFixed(4)}:${to.lng.toFixed(4)}`;
 
-    // 1. In-memory cache (same session, instant)
+
     if (roadRouteCache.has(cacheKey)) return roadRouteCache.get(cacheKey);
 
-    // 2. localStorage cache (survives offline / page reload, up to 7 days)
+
     const stored = loadStoredRoutes();
     if (stored[cacheKey]) {
       const coords = stored[cacheKey].coords;
@@ -1447,7 +1447,7 @@
       return coords;
     }
 
-    // 3. Fetch from network
+
     let coords;
     try {
       coords = await fetchValhallaRoute(from, to);
@@ -1555,7 +1555,7 @@ out tags;`)}`;
         landmarkRouteCache.set(cacheKey, landmarks);
         return landmarks;
       } catch (_err) {
-        // try next endpoint
+
       }
     }
     return [];
@@ -1762,7 +1762,7 @@ out tags;`)}`;
         persistRegisteredGeocodeCache();
         return buildRegisteredCenterCandidate(center, resolvedPosition);
       } catch {
-        // Try the next query variant.
+
       }
     }
 
@@ -2906,7 +2906,7 @@ out center tags;`;
         JSON.stringify(registeredGeocodeCache),
       );
     } catch {
-      // Ignore storage failures.
+
     }
   }
 

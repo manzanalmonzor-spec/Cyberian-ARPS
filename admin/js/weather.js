@@ -1,9 +1,9 @@
-// Province of Antique, Philippines — default fallback coordinates
+
 const DEFAULT_LAT  = 11.3683;
 const DEFAULT_LNG  = 122.0643;
 const DEFAULT_AREA = 'Province of Antique';
 
-// ── Live weather state ───────────────────────────────────────────────────────
+
 let wx = {
   tempC: null, feelsLikeC: null,
   windKmh: null, gustKmh: null,
@@ -17,7 +17,7 @@ let wx = {
   hourlyTimes: [], hourlyTempsC: [], hourlyWmoCodes: []
 };
 
-// ── DOM refs ─────────────────────────────────────────────────────────────────
+
 const weatherStatsGrid    = document.getElementById('weatherStatsGrid');
 const weatherStatusPill   = document.getElementById('weatherStatusPill');
 const currentDate         = document.getElementById('currentDate');
@@ -29,7 +29,7 @@ const filterButtons       = document.querySelectorAll('.weather-filter-btn');
 const weatherOverviewView = document.getElementById('weatherOverviewView');
 const weatherForecastView = document.getElementById('weatherForecastView');
 
-// ── WMO weather code helpers ─────────────────────────────────────────────────
+
 function wmoInfo(code) {
   if (code === 0)           return { desc: 'Clear sky',       icon: 'sun'     };
   if (code <= 3)            return { desc: 'Partly cloudy',   icon: 'cloud'   };
@@ -42,7 +42,7 @@ function wmoInfo(code) {
   return                           { desc: 'Thunderstorm',    icon: 'thunder' };
 }
 
-// ── PAGASA wind signal ───────────────────────────────────────────────────────
+
 function getPagasaSignal(gustKmh) {
   if (gustKmh >= 185) return { num: 4, label: 'SIGNAL #4 ACTIVE', severity: 'Critical' };
   if (gustKmh >= 100) return { num: 3, label: 'SIGNAL #3 ACTIVE', severity: 'Critical' };
@@ -51,7 +51,7 @@ function getPagasaSignal(gustKmh) {
   return                     { num: 0, label: 'NO WIND SIGNAL',   severity: 'Low'      };
 }
 
-// ── Hazard helpers ───────────────────────────────────────────────────────────
+
 function hazardLevel(value, t) {
   if (value >= t[2]) return 'Critical';
   if (value >= t[1]) return 'High';
@@ -64,12 +64,12 @@ function hazardClass(level) {
 }
 
 function badge(label) {
-  // Map "Medium" to "Medium/Warning" or "Moderate"
+
   const lbl = label === 'Medium' || label === 'Moderate' ? 'medium' : label.toLowerCase();
   return `<span class="risk-badge risk-${lbl}">${label}</span>`;
 }
 
-// ── Forecast icon SVGs ───────────────────────────────────────────────────────
+
 function forecastIcon(code) {
   const { icon } = wmoInfo(code);
   if (icon === 'sun') {
@@ -81,11 +81,11 @@ function forecastIcon(code) {
   if (icon === 'cloud') {
     return `<svg class="mx-auto drop-shadow-sm" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round"><path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15"/></svg>`;
   }
-  // rain
+
   return `<svg class="mx-auto drop-shadow-sm" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15"/><path d="M8 19l-1 2M12 19l-1 2M16 19l-1 2"/></svg>`;
 }
 
-// ── Render helpers ───────────────────────────────────────────────────────────
+
 function setCurrentDate() {
   currentDate.textContent = new Date().toLocaleDateString('en-US', {
     weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
@@ -139,7 +139,7 @@ function renderOverviewValues() {
   document.getElementById('visibilityValue').textContent  = wx.visibilityM != null ? (wx.visibilityM >= 1000 ? `${(wx.visibilityM / 1000).toFixed(1)} km` : `${Math.round(wx.visibilityM)} m`) : '--';
   document.getElementById('cloudValue').textContent       = wx.cloudPct != null ? `${wx.cloudPct}%` : '--';
 
-  // Apply conditional styles to warnings
+
   if(wx.precipMm >= 20) {
     document.getElementById('rainfallSub').className = 'text-[11px] font-bold text-red-600 mt-1.5 truncate flex items-center justify-center gap-1';
     document.getElementById('rainfallSub').innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4m0 4h.01"/></svg> ' + rainRisk;
@@ -295,7 +295,7 @@ function renderAdvisory() {
   document.getElementById('advisoryTrend').textContent     = trend;
   document.getElementById('advisorySummary').textContent   = summary;
   
-  // Clean up formatting
+
   document.getElementById('advisoryAction').textContent    = action;
 }
 
@@ -405,7 +405,7 @@ function renderAll() {
   }
 }
 
-// ── API helpers ──────────────────────────────────────────────────────────────
+
 async function getLocation() {
   return new Promise((resolve) => {
     if (!navigator.geolocation) {
@@ -414,7 +414,7 @@ async function getLocation() {
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        // Try to get municipality name via reverse geocoding (free Nominatim)
+
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
         fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`)
@@ -464,7 +464,7 @@ function applyWeatherData(data, area) {
   wx.hourlyWmoCodes = h.weather_code;
 }
 
-// ── View toggle ──────────────────────────────────────────────────────────────
+
 function setView(view) {
   filterButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
   weatherOverviewView.classList.toggle('hidden', view === 'forecast');
@@ -472,11 +472,11 @@ function setView(view) {
   
   if(view === 'forecast') {
     weatherForecastView.classList.remove('animate-[fadeInUp_0.4s_ease-out]');
-    void weatherForecastView.offsetWidth; // trigger reflow
+    void weatherForecastView.offsetWidth;
     weatherForecastView.classList.add('animate-[fadeInUp_0.4s_ease-out]');
   } else {
     weatherOverviewView.classList.remove('animate-[fadeInUp_0.4s_ease-out]');
-    void weatherOverviewView.offsetWidth; // trigger reflow
+    void weatherOverviewView.offsetWidth;
     weatherOverviewView.classList.add('animate-[fadeInUp_0.4s_ease-out]');
   }
 }
@@ -486,7 +486,7 @@ document.addEventListener('click', (e) => {
   if (btn) setView(btn.dataset.view);
 });
 
-// ── Bootstrap ────────────────────────────────────────────────────────────────
+
 async function init() {
   setCurrentDate();
   weatherAiSummary.innerHTML = '<span class="animate-pulse">Loading live telemetric weather data for your sector…</span>';
@@ -503,7 +503,7 @@ async function init() {
 
   renderAll();
 
-  // Refresh data every 10 mins
+
   setInterval(async () => {
     try {
       const { lat: l, lng: g, area: a } = await getLocation();

@@ -29,20 +29,20 @@
 
   const GEOLOCATION_OPTIONS = Object.freeze({
     enableHighAccuracy: true,
-    timeout: 15000,  // give GPS chip more time for a precise fix
-    maximumAge: 10000, // only accept positions up to 10s old (reduces stale-barangay bug)
+    timeout: 15000,
+    maximumAge: 10000,
   });
 
   const FAST_GEOLOCATION_OPTIONS = Object.freeze({
     enableHighAccuracy: false,
     timeout: 3000,
-    maximumAge: 30000, // coarse fix for quick display only
+    maximumAge: 30000,
   });
 
   const reverseGeocodeCache = new Map();
 
   async function reverseGeocode(lat, lng) {
-    const cacheKey = `${lat.toFixed(3)}:${lng.toFixed(3)}`; // ~111m grid — avoids caching wrong barangay for nearby coords
+    const cacheKey = `${lat.toFixed(3)}:${lng.toFixed(3)}`;
     if (reverseGeocodeCache.has(cacheKey)) {
       return reverseGeocodeCache.get(cacheKey);
     }
@@ -95,10 +95,10 @@
         data.address?.district,
       ),
       barangay: pickFirstText(
-        data.address?.village,       // most PH barangays in OSM
+        data.address?.village,
         data.address?.suburb,
-        data.address?.quarter,       // some PH mappers use this
-        data.address?.city_district, // barangay-level in some PH cities
+        data.address?.quarter,
+        data.address?.city_district,
         data.address?.hamlet,
         data.address?.borough,
       ),
@@ -107,9 +107,9 @@
         data.address?.pedestrian,
         data.address?.footway,
         data.address?.path,
-        // NOTE: intentionally exclude data.address?.residential — in Philippine OSM
-        // that field contains the area/sitio name (same as barangay), not a road name,
-        // which causes double-name display like "Caridad, Poblacion 3".
+
+
+
       ),
       houseNumber: data.address?.house_number,
       city: pickFirstText(
@@ -179,16 +179,16 @@
     const country = normalizePlaceText(fields.country);
 
     const shortParts = [];
-    // Use only the most specific admin unit (neighbourhood > barangay), not both.
-    // Showing both causes "Poblacion 3, Caridad" when they represent different OSM levels
-    // for the same real-world location.
+
+
+
     appendUniquePlacePart(shortParts, neighbourhood || barangay);
     appendUniquePlacePart(shortParts, street);
     appendUniquePlacePart(shortParts, city);
 
     const fullParts = [];
     appendUniquePlacePart(fullParts, street);
-    // Same rule as short: only the most specific admin unit, not both
+
     appendUniquePlacePart(fullParts, neighbourhood || barangay);
     appendUniquePlacePart(fullParts, city);
     appendUniquePlacePart(fullParts, province);
@@ -349,7 +349,7 @@
         }),
       );
     } catch {
-      // Ignore storage write failures so live location still works.
+
     }
   }
 
@@ -580,8 +580,8 @@
 
     const rawPlaces = await requestNearbyPlacesFromOverpass(origin, radiusMeters, config.signal);
 
-    // Safety filter: reject any place beyond the search radius (some Overpass mirrors return bad data)
-    const maxKm = (radiusMeters / 1000) * 1.5; // allow 50% tolerance
+
+    const maxKm = (radiusMeters / 1000) * 1.5;
     const places = rawPlaces.filter((place) => haversineKm(origin, place) <= maxKm);
 
     nearbyFacilityCache.set(cacheKey, places);
@@ -604,7 +604,7 @@
 
     const rawSignals = await requestHazardSignalsFromOverpass(origin, radiusMeters, config.signal);
 
-    // Safety filter: reject any signal beyond the search radius
+
     const maxKm = (radiusMeters / 1000) * 1.5;
     const signals = rawSignals.filter((sig) => haversineKm(origin, sig) <= maxKm);
 
@@ -1233,7 +1233,7 @@ out center tags;`;
     return `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=17/${latitude}/${longitude}`;
   }
 
-  // ── Fast query: only schools + government (most common evacuation centers in PH) ──
+
   function buildCombinedEvacHazardQuery(origin, placesRadius, hazardsRadius) {
     const lat = origin.lat.toFixed(6);
     const lng = origin.lng.toFixed(6);

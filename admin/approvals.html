@@ -202,7 +202,7 @@
         </div>
 
         <!-- Stats Row -->
-        <div class="grid grid-cols-3 gap-4 mb-6 max-w-5xl">
+        <div class="grid grid-cols-4 gap-4 mb-6 max-w-5xl">
           <div class="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-5 flex items-center gap-4">
             <div class="w-11 h-11 rounded-[12px] bg-amber-100 flex items-center justify-center shrink-0">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -230,6 +230,15 @@
               <p class="text-2xl font-black text-slate-900 mt-0.5" id="statTotal">0</p>
             </div>
           </div>
+          <div class="bg-white rounded-2xl border border-slate-200/60 shadow-sm p-5 flex items-center gap-4">
+            <div class="w-11 h-11 rounded-[12px] bg-red-100 flex items-center justify-center shrink-0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+            </div>
+            <div>
+              <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Banned</p>
+              <p class="text-2xl font-black text-slate-900 mt-0.5" id="statBanned">0</p>
+            </div>
+          </div>
         </div>
 
         <!-- Main Card -->
@@ -246,6 +255,11 @@
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="margin-right:4px;vertical-align:-2px"><path d="M5 13l4 4L19 7"/></svg>
                 Approved Users
                 <span class="tab-count" id="tabApprovedCount">0</span>
+              </button>
+              <button class="tab-btn" data-tab="banned" id="tabBanned">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:4px;vertical-align:-2px"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                Banned
+                <span class="tab-count" id="tabBannedCount">0</span>
               </button>
             </div>
 
@@ -305,6 +319,32 @@
                 </div>
                 <p class="text-slate-500 font-semibold mb-1">No approved users yet</p>
                 <p class="text-slate-400 text-sm">Approved citizens will appear here.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Panel: Banned -->
+          <div class="tab-panel" id="panelBanned">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-slate-200">
+                    <th class="text-left py-3 px-5 text-xs font-semibold text-slate-400 uppercase">Email</th>
+                    <th class="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Name</th>
+                    <th class="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Reason</th>
+                    <th class="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase">Banned On</th>
+                    <th class="text-right py-3 px-5 text-xs font-semibold text-slate-400 uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="bannedBody">
+                </tbody>
+              </table>
+              <div id="bannedEmpty" class="hidden text-center py-16">
+                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                </div>
+                <p class="text-slate-500 font-semibold mb-1">No banned accounts</p>
+                <p class="text-slate-400 text-sm">Permanently banned emails will appear here.</p>
               </div>
             </div>
           </div>
@@ -382,7 +422,7 @@
 
     <script type="module">
       import { db } from "../firebase-config.js";
-      import { collection, query, where, onSnapshot, doc, updateDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+      import { collection, query, where, onSnapshot, doc, updateDoc, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
       window.toast = function(msg, type='success') {
         const t = document.createElement('div');
@@ -400,6 +440,7 @@
       // ── State ──
       let pendingUsers = [];
       let approvedUsers = [];
+      let bannedUsers = [];
       let currentTab = 'pending';
       let searchQuery = '';
 
@@ -407,7 +448,8 @@
       const tabBtns = document.querySelectorAll('.tab-btn');
       const panels = {
         pending: document.getElementById('panelPending'),
-        approved: document.getElementById('panelApproved')
+        approved: document.getElementById('panelApproved'),
+        banned: document.getElementById('panelBanned')
       };
 
       tabBtns.forEach(btn => {
@@ -465,17 +507,37 @@
         if (currentTab === 'approved') renderApproved();
       });
 
+      // Banned emails
+      onSnapshot(collection(db, "bannedEmails"), (snapshot) => {
+        bannedUsers = [];
+        snapshot.forEach((d) => {
+          let banned = d.data();
+          banned.docId = d.id;
+          bannedUsers.push(banned);
+        });
+        bannedUsers.sort((a, b) => {
+          let ta = a.bannedAt ? (a.bannedAt.toMillis ? a.bannedAt.toMillis() : new Date(a.bannedAt).getTime()) : 0;
+          let tb = b.bannedAt ? (b.bannedAt.toMillis ? b.bannedAt.toMillis() : new Date(b.bannedAt).getTime()) : 0;
+          return tb - ta;
+        });
+        updateCounts();
+        if (currentTab === 'banned') renderBanned();
+      });
+
       function updateCounts() {
         document.getElementById('tabPendingCount').textContent = pendingUsers.length;
         document.getElementById('tabApprovedCount').textContent = approvedUsers.length;
+        document.getElementById('tabBannedCount').textContent = bannedUsers.length;
         document.getElementById('statPending').textContent = pendingUsers.length;
         document.getElementById('statApproved').textContent = approvedUsers.length;
+        document.getElementById('statBanned').textContent = bannedUsers.length;
         document.getElementById('statTotal').textContent = pendingUsers.length + approvedUsers.length;
       }
 
       function renderCurrentTab() {
         if (currentTab === 'pending') renderPending();
-        else renderApproved();
+        else if (currentTab === 'approved') renderApproved();
+        else if (currentTab === 'banned') renderBanned();
       }
 
       function filterUsers(list) {
@@ -903,6 +965,89 @@
         }
         btn.textContent = 'Reject & Notify';
         btn.disabled = false;
+      };
+
+      // ── Render Banned ──
+      function renderBanned() {
+        const tbody = document.getElementById('bannedBody');
+        const emptyMsg = document.getElementById('bannedEmpty');
+        const filtered = bannedUsers.filter(u => {
+          if (!searchQuery) return true;
+          const email = (u.email || '').toLowerCase();
+          const name = (u.name || '').toLowerCase();
+          const reason = (u.reason || '').toLowerCase();
+          return email.includes(searchQuery) || name.includes(searchQuery) || reason.includes(searchQuery);
+        });
+
+        tbody.innerHTML = '';
+
+        if (filtered.length === 0) {
+          emptyMsg.classList.remove('hidden');
+          if (searchQuery && bannedUsers.length > 0) {
+            emptyMsg.querySelector('p:first-of-type').textContent = 'No matching banned accounts';
+            emptyMsg.querySelector('p:last-of-type').textContent = `No results for "${searchQuery}"`;
+          } else {
+            emptyMsg.querySelector('p:first-of-type').textContent = 'No banned accounts';
+            emptyMsg.querySelector('p:last-of-type').textContent = 'Permanently banned emails will appear here.';
+          }
+        } else {
+          emptyMsg.classList.add('hidden');
+
+          filtered.forEach((banned, i) => {
+            const realIndex = bannedUsers.indexOf(banned);
+            let timeStr = '—';
+            if (banned.bannedAt) {
+              const d = banned.bannedAt.toDate ? banned.bannedAt.toDate() : new Date(banned.bannedAt);
+              timeStr = d.toLocaleString('en-PH', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+            }
+
+            const row = document.createElement('tr');
+            row.className = 'border-b border-slate-100 hover:bg-slate-50 transition-colors row-animate';
+            row.style.animationDelay = `${i * 0.04}s`;
+            row.innerHTML = `
+              <td class="py-4 px-5">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-slate-800">${highlightMatch(banned.email || '—')}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-4 px-4">
+                <p class="text-sm font-medium text-slate-700">${highlightMatch(banned.name || '—')}</p>
+              </td>
+              <td class="py-4 px-4">
+                <p class="text-sm text-red-600 font-medium max-w-[250px] truncate" title="${(banned.reason || '').replace(/"/g, '&quot;')}">${banned.reason || '—'}</p>
+              </td>
+              <td class="py-4 px-4">
+                <p class="text-[13px] text-slate-600 font-medium">${timeStr}</p>
+              </td>
+              <td class="py-4 px-5 text-right">
+                <button onclick="unbanUser(${realIndex})" title="Unban this email" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-600 hover:text-white transition-colors text-xs font-bold">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>
+                  Unban
+                </button>
+              </td>
+            `;
+            tbody.appendChild(row);
+          });
+        }
+      }
+
+      // ── Unban user ──
+      window.unbanUser = async function(index) {
+        const banned = bannedUsers[index];
+        if (!banned) return;
+        if (!confirm(`Are you sure you want to unban ${banned.email}? This email will be able to sign up and log in again.`)) return;
+        try {
+          await deleteDoc(doc(db, "bannedEmails", banned.docId));
+          toast('Unbanned ' + banned.email, 'success');
+        } catch (e) {
+          console.error(e);
+          toast('Failed to unban', 'error');
+        }
       };
     </script>
     <script src="./js/admin-mobile.js"></script>

@@ -10,6 +10,9 @@ import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/fire
   if (!email) return;
 
   onSnapshot(doc(db, "bannedEmails", email), function(snap) {
+    // Only act on server-confirmed data, not stale cache
+    if (snap.metadata.fromCache) return;
+
     if (snap.exists()) {
       var data = snap.data();
       showBanCard(data.reason || 'Your account has been permanently banned by the administrator.');

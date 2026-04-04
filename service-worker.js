@@ -1,4 +1,4 @@
-const CACHE_NAME = 'arps-cache-v6';
+const CACHE_NAME = 'arps-cache-v7';
 
 const PRECACHE_URLS = [
   'manifest.json',
@@ -19,6 +19,7 @@ const PRECACHE_URLS = [
   'user/report.html',
   'user/weather.html',
   'user/js/auth-guard.js',
+  'user/js/ban-guard.js',
   'user/js/map-common.js',
   'user/js/gps-page.js',
   'user/js/sos.js',

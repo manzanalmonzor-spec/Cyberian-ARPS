@@ -320,3 +320,44 @@ btnSaveCred.addEventListener("click", async () => {
     `;
   }
 });
+
+// ── SOS Alert Sound Toggle ───────────────────────────────────────────────────
+(function() {
+  const toggle = document.getElementById('sosAlertSoundToggle');
+  const label = document.getElementById('soundLabel');
+  const iconWrap = document.getElementById('soundIconWrap');
+  const soundIcon = document.getElementById('soundIcon');
+  const testBtn = document.getElementById('btnTestSound');
+  if (!toggle) return;
+
+  const onSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14"/><path d="M15.54 8.46a5 5 0 010 7.07"/></svg>';
+  const offSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 005.12 2.12M15 9.34V4a3 3 0 00-5.94-.6"/><path d="M17 16.95A7 7 0 015 12v-2m14 0v2c0 .76-.13 1.49-.35 2.17"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
+
+  function updateUI(enabled) {
+    toggle.checked = enabled;
+    label.textContent = enabled ? 'Sound On' : 'Sound Off';
+    soundIcon.outerHTML = enabled ? onSvg : offSvg;
+    iconWrap.className = 'w-9 h-9 rounded-lg flex items-center justify-center transition-all ' + (enabled ? 'bg-red-100 text-red-600' : 'bg-slate-200 text-slate-500');
+  }
+
+  // Load saved state
+  updateUI(window.isSosSoundEnabled && window.isSosSoundEnabled());
+
+  toggle.addEventListener('change', function() {
+    var enabled = toggle.checked;
+    if (window.setSosSoundEnabled) window.setSosSoundEnabled(enabled);
+    updateUI(enabled);
+    if (window.toast) toast(enabled ? 'SOS alert sound enabled' : 'SOS alert sound disabled', 'success');
+  });
+
+  testBtn.addEventListener('click', function() {
+    // Temporarily enable for test
+    var wasEnabled = window.isSosSoundEnabled && window.isSosSoundEnabled();
+    if (window.setSosSoundEnabled) window.setSosSoundEnabled(true);
+    if (window.playSosAlarm) window.playSosAlarm(3000);
+    // Restore after test
+    setTimeout(function() {
+      if (window.setSosSoundEnabled) window.setSosSoundEnabled(wasEnabled);
+    }, 3200);
+  });
+})();

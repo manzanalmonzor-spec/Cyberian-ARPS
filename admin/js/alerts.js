@@ -687,10 +687,20 @@ setCurrentDate();
 })();
 
 // 1. Subscribe to Firebase SOS alerts (real-time)
+let _prevAlertPendingCount = -1;
 const sosQuery = query(collection(db, 'sosAlerts'), orderBy('createdAt', 'desc'), limit(50));
 onSnapshot(sosQuery, (snapshot) => {
+  const prevCount = _prevAlertPendingCount;
+  const pendingNow = snapshot.docs.filter(d => (d.data().status || 'Pending') === 'Pending').length;
+
   firestoreAlerts = snapshot.docs.map(sosToAlert);
   refreshAlerts();
+
+  // Play alarm if there are new pending SOS alerts
+  if (prevCount >= 0 && pendingNow > prevCount && window.playSosAlarm) {
+    window.playSosAlarm(5000);
+  }
+  _prevAlertPendingCount = pendingNow;
 }, (err) => {
   console.error('Alerts snapshot error:', err);
 });

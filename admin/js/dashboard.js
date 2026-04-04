@@ -669,7 +669,11 @@ window.addEventListener("load", () => {
 });
 
 // ── Firebase real-time listener ────────────────────────────────────────────────
+let _prevSosCount = -1;
 onSnapshot(collection(db, "sosAlerts"), (snapshot) => {
+  const prevCount = _prevSosCount;
+  const pendingNow = snapshot.docs.filter(d => (d.data().status || 'Pending') === 'Pending').length;
+
   liveIncidents = snapshot.docs
     .map(mapLiveIncident)
     .sort((a, b) => (b.sortTime || 0) - (a.sortTime || 0));
@@ -679,6 +683,12 @@ onSnapshot(collection(db, "sosAlerts"), (snapshot) => {
   renderRows();
   renderDashboardMapMarkers();
   syncOpenDetail();
+
+  // Play alarm if there are new pending SOS alerts
+  if (prevCount >= 0 && pendingNow > prevCount && window.playSosAlarm) {
+    window.playSosAlarm(5000);
+  }
+  _prevSosCount = pendingNow;
 }, (err) => {
   console.error("Firestore listener error:", err);
   toast("Could not connect to Firebase. Check Firestore rules.", "error");

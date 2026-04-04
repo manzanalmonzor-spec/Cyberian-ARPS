@@ -329,6 +329,35 @@
       </div>
     </div>
 
+    <!-- Reject Reason Modal -->
+    <div id="rejectModal" class="hidden" style="z-index:350">
+      <div class="fixed inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm" onclick="closeRejectModal()">
+        <div class="bg-white rounded-2xl max-w-md w-full mx-4 overflow-hidden animate-slideUp" onclick="event.stopPropagation()">
+          <div class="px-5 py-4 border-b border-slate-200 flex justify-between items-center bg-red-50">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </div>
+              <h3 class="text-base font-bold text-slate-800">Reject Account</h3>
+            </div>
+            <button onclick="closeRejectModal()" class="w-8 h-8 rounded-lg bg-slate-200 text-slate-600 flex items-center justify-center hover:bg-slate-300 transition-colors">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="p-5">
+            <p class="text-sm text-slate-600 mb-1">Rejecting <strong id="rejectUserName" class="text-slate-900"></strong></p>
+            <p class="text-xs text-slate-400 mb-4">This note will be sent to the user in real-time.</p>
+            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Reason for rejection</label>
+            <textarea id="rejectReason" rows="4" placeholder="e.g. ID photo is blurry, please re-submit a clearer photo of your valid ID." class="w-full px-4 py-3 rounded-xl border-[1.5px] border-slate-200 text-sm font-medium outline-none focus:border-red-400 focus:ring-4 focus:ring-red-400/10 transition-all bg-slate-50 focus:bg-white resize-none"></textarea>
+            <div class="flex gap-3 mt-4">
+              <button onclick="closeRejectModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm py-3 rounded-xl transition-colors">Cancel</button>
+              <button onclick="confirmReject()" id="btnConfirmReject" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold text-sm py-3 rounded-xl transition-colors shadow-lg shadow-red-600/20">Reject & Notify</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- User Detail Modal -->
     <div id="userDetailModal" class="hidden" style="z-index:300">
       <div class="fixed inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm" onclick="closeUserDetail()">
@@ -805,30 +834,54 @@
         }
       };
 
-      window.rejectUser = async function(index) {
+      let rejectTarget = null;
+
+      window.rejectUser = function(index) {
         const user = pendingUsers[index];
-        if (confirm(`Are you sure you want to reject ${user.name}?`)) {
-          try {
-            await updateDoc(doc(db, "users", user.docId), { status: 'rejected' });
-            toast('Rejected ' + user.name, 'error');
-          } catch (e) {
-            console.error(e);
-            toast('Failed to reject', 'error');
-          }
-        }
+        rejectTarget = { user, source: 'pending' };
+        document.getElementById('rejectUserName').textContent = user.name;
+        document.getElementById('rejectReason').value = '';
+        document.getElementById('rejectModal').classList.remove('hidden');
       };
 
-      window.revokeUser = async function(index) {
+      window.revokeUser = function(index) {
         const user = approvedUsers[index];
-        if (confirm(`Are you sure you want to revoke access for ${user.name}? They will need to re-register.`)) {
-          try {
-            await updateDoc(doc(db, "users", user.docId), { status: 'rejected' });
-            toast('Revoked access for ' + user.name, 'info');
-          } catch (e) {
-            console.error(e);
-            toast('Failed to revoke', 'error');
-          }
+        rejectTarget = { user, source: 'approved' };
+        document.getElementById('rejectUserName').textContent = user.name;
+        document.getElementById('rejectReason').value = '';
+        document.getElementById('rejectModal').classList.remove('hidden');
+      };
+
+      window.closeRejectModal = function() {
+        document.getElementById('rejectModal').classList.add('hidden');
+        rejectTarget = null;
+      };
+
+      window.confirmReject = async function() {
+        if (!rejectTarget) return;
+        const reason = document.getElementById('rejectReason').value.trim();
+        if (!reason) {
+          document.getElementById('rejectReason').style.borderColor = '#EF4444';
+          document.getElementById('rejectReason').placeholder = 'Please provide a reason for rejection.';
+          return;
         }
+        const btn = document.getElementById('btnConfirmReject');
+        btn.textContent = 'Rejecting...';
+        btn.disabled = true;
+        try {
+          await updateDoc(doc(db, "users", rejectTarget.user.docId), {
+            status: 'rejected',
+            rejectionReason: reason,
+            rejectedAt: new Date().toISOString()
+          });
+          toast('Rejected ' + rejectTarget.user.name, 'error');
+          closeRejectModal();
+        } catch (e) {
+          console.error(e);
+          toast('Failed to reject', 'error');
+        }
+        btn.textContent = 'Reject & Notify';
+        btn.disabled = false;
       };
     </script>
     <script src="./js/admin-mobile.js"></script>

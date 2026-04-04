@@ -587,6 +587,7 @@
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 
 <script>
     // If already logged in, go straight to home
@@ -664,7 +665,7 @@
     setupPasswordToggle('toggleSignInPassword', 'signInPassword');
 
     // Helper: save session and redirect
-    function saveSessionAndRedirect(user, displayName, authMode) {
+    async function saveSessionAndRedirect(user, displayName, authMode) {
         const session = {
             uid: user.uid,
             email: user.email,
@@ -684,13 +685,46 @@
             }));
         }
 
-        // If not yet onboarded, redirect to onboarding instead of home
-        if (localStorage.getItem('arps_onboarded_' + user.uid) !== 'true') {
-            window.location.href = 'onboarding.html';
+        // If already marked as onboarded locally, go to home
+        if (localStorage.getItem('arps_onboarded_' + user.uid) === 'true') {
+            window.location.href = 'home.html';
             return;
         }
 
-        window.location.href = 'home.html';
+        // Check Firestore for existing user data (covers users who onboarded before this update)
+        try {
+            if (firebase.apps && firebase.apps.length) {
+                var userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                if (userDoc.exists) {
+                    var userData = userDoc.data();
+                    // User already has a Firestore profile — they already onboarded
+                    localStorage.setItem('arps_onboarded_' + user.uid, 'true');
+                    // Restore their profile locally
+                    var profile = JSON.parse(localStorage.getItem(profileKey) || '{}');
+                    profile.name = userData.name || session.name;
+                    profile.contact = userData.contact || '';
+                    profile.emergencyContact = userData.emergencyContact || '';
+                    profile.emergencyNumber = userData.emergencyNumber || '';
+                    profile.atRisk = userData.atRisk || 'None';
+                    profile.status = userData.status || 'approved';
+                    localStorage.setItem(profileKey, JSON.stringify(profile));
+                    // Restore emergency contact for settings page
+                    if (userData.emergencyContact || userData.emergencyNumber) {
+                        localStorage.setItem('arps_emergency_contact_' + user.uid, JSON.stringify({
+                            name: userData.emergencyContact || '',
+                            number: userData.emergencyNumber || ''
+                        }));
+                    }
+                    window.location.href = 'home.html';
+                    return;
+                }
+            }
+        } catch (e) {
+            console.error('Firestore check failed, falling back to onboarding:', e);
+        }
+
+        // No Firestore record found — new user, go to onboarding
+        window.location.href = 'onboarding.html';
     }
 
     function normalizeEmail(email) {

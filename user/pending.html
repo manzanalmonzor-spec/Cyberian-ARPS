@@ -49,15 +49,28 @@
     </div>
   </div>
   
+  <!-- Rejection notice (hidden by default, shown in real-time) -->
+  <div id="rejectionNotice" class="hidden w-full bg-red-50 rounded-2xl p-4 border border-red-200 mb-6 text-left">
+    <div class="flex items-center gap-2 mb-2">
+      <div class="w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center shrink-0">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </div>
+      <p class="text-sm font-bold text-red-700">Account Rejected</p>
+    </div>
+    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Reason from admin:</p>
+    <p id="rejectionReason" class="text-sm text-red-800 leading-relaxed bg-white rounded-xl p-3 border border-red-100 font-medium"></p>
+    <p class="text-[11px] text-slate-400 mt-2 font-medium">Please fix the issue and create a new account, or contact the admin for assistance.</p>
+  </div>
+
   <div class="w-full flex flex-col gap-3">
-    <button onclick="checkStatus()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 rounded-xl shadow-lg transition-transform hover:-translate-y-0.5 btn-press flex items-center justify-center gap-2">
+    <button onclick="checkStatus()" id="btnCheckStatus" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 rounded-xl shadow-lg transition-transform hover:-translate-y-0.5 btn-press flex items-center justify-center gap-2">
       <i class="ph-bold ph-arrows-clockwise text-lg"></i> Check Status Now
     </button>
     <button onclick="logout()" class="w-full bg-white border border-slate-200 text-slate-600 font-bold py-3.5 rounded-xl hover:bg-slate-50 transition-colors btn-press">
       Sign Out
     </button>
   </div>
-  
+
 </div>
 
 <script type="module">
@@ -86,8 +99,29 @@
         const profile = getProfile();
         profile.status = 'rejected';
         localStorage.setItem('arps_profile_' + session.uid, JSON.stringify(profile));
-        alert("Your registration has been rejected by the administrator. Please log in again or contact support.");
-        logout();
+
+        // Show rejection reason in real-time
+        const reason = data.rejectionReason || 'No specific reason provided. Please contact the administrator.';
+        document.getElementById('rejectionReason').textContent = reason;
+        document.getElementById('rejectionNotice').classList.remove('hidden');
+
+        // Update the UI to reflect rejection
+        document.querySelector('h2').textContent = 'Registration Rejected';
+        document.querySelector('h2').classList.remove('text-slate-800');
+        document.querySelector('h2').classList.add('text-red-700');
+        const icon = document.querySelector('.ph-hourglass-high');
+        if (icon) {
+          icon.classList.remove('ph-hourglass-high', 'text-amber-500');
+          icon.classList.add('ph-x-circle', 'text-red-500');
+          icon.closest('.w-24').classList.remove('bg-amber-50', 'shadow-amber-100/50');
+          icon.closest('.w-24').classList.add('bg-red-50', 'shadow-red-100/50');
+          icon.closest('.w-24').querySelector('.animate-ping').classList.remove('border-amber-300');
+          icon.closest('.w-24').querySelector('.animate-ping').classList.add('border-red-300');
+        }
+        document.querySelector('p.text-slate-500').innerHTML = `Hi <strong class="text-slate-700">${session.name || 'User'}</strong>, your registration was not approved. Please review the admin's note below.`;
+
+        // Hide check status button, it's no longer relevant
+        document.getElementById('btnCheckStatus').style.display = 'none';
       }
     }
   });

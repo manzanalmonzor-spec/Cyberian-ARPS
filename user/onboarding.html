@@ -307,6 +307,11 @@
 <body>
 
 <div class="wizard-container">
+  <!-- Back to sign up -->
+  <button onclick="localStorage.removeItem('arps_session'); window.location.href='loginpage.html';" style="position:absolute;top:14px;left:14px;z-index:10;width:36px;height:36px;border-radius:12px;border:none;background:#f1f5f9;color:#475569;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+  </button>
+
   <div class="progress-bar">
     <div class="progress-fill" id="progressFill" style="width: 20%;"></div>
   </div>

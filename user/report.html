@@ -301,21 +301,96 @@
     setTimeout(() => { t.classList.add("out"); setTimeout(() => t.remove(), 300); }, 3200);
   }
 
-  window.requestNotifPermission = async function () {
-    if (!('Notification' in window)) { toast("Notifications not supported", "error"); return; }
-    if (Notification.permission === 'granted') { toast("Notifications already enabled", "info"); return; }
-    const p = await Notification.requestPermission();
-    updateNotifDot();
-    toast(p === 'granted' ? "Notifications enabled" : "Notifications blocked — enable in browser settings", p === 'granted' ? "success" : "error");
+  // Auto-request notification permission on first load
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+
+  // Track notification updates
+  let notifUpdates = [];
+
+  window.requestNotifPermission = function () {
+    // Show notification history panel
+    showNotifPanel();
   };
 
   function sendNotif(title, body) {
-    if (Notification.permission !== 'granted') return;
-    try { new Notification(title, { body, tag: 'resq-status' }); } catch (_) {}
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try { new Notification(title, { body, tag: 'resq-status' }); } catch (_) {}
+    }
   }
 
-  function updateNotifDot() {
-    document.getElementById('notifDot').classList.toggle('hidden', Notification.permission !== 'granted');
+  function addNotifUpdate(status, message) {
+    notifUpdates.unshift({ status, message, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+    document.getElementById('notifDot').classList.remove('hidden');
+  }
+
+  function showNotifPanel() {
+    // Mark as read
+    document.getElementById('notifDot').classList.add('hidden');
+
+    const existing = document.getElementById('notifPanel');
+    if (existing) { existing.remove(); return; }
+
+    const panel = document.createElement('div');
+    panel.id = 'notifPanel';
+    panel.style.cssText = 'position:fixed;inset:0;z-index:9999;';
+
+    const hasUpdates = notifUpdates.length > 0;
+    const statusText = currentStatus || 'Pending';
+    const statusConfig = {
+      Pending: { color: '#F59E0B', bg: '#FFFBEB', label: 'Waiting for admin response' },
+      Responding: { color: '#3B82F6', bg: '#EFF6FF', label: 'Responders are on the way' },
+      Resolved: { color: '#10B981', bg: '#ECFDF5', label: 'Incident has been resolved' }
+    };
+    const cfg = statusConfig[statusText] || statusConfig.Pending;
+
+    let updatesHtml = '';
+    if (hasUpdates) {
+      updatesHtml = notifUpdates.map(u => `
+        <div style="display:flex;align-items:start;gap:10px;padding:12px 0;border-bottom:1px solid #f1f5f9;">
+          <div style="width:8px;height:8px;border-radius:50%;background:${u.status === 'Responding' ? '#3B82F6' : '#10B981'};margin-top:5px;flex-shrink:0;"></div>
+          <div style="flex:1;">
+            <p style="font-size:13px;font-weight:700;color:#0F172A;margin:0;">${u.status === 'Responding' ? 'Responders Dispatched' : 'Incident Resolved'}</p>
+            <p style="font-size:12px;color:#64748B;margin:3px 0 0;">${u.message}</p>
+          </div>
+          <span style="font-size:11px;color:#94A3B8;font-weight:600;flex-shrink:0;">${u.time}</span>
+        </div>
+      `).join('');
+    } else {
+      updatesHtml = `
+        <div style="text-align:center;padding:24px 0;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5" style="margin:0 auto 8px;display:block;"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <p style="font-size:13px;color:#94A3B8;font-weight:600;margin:0;">No updates yet</p>
+          <p style="font-size:12px;color:#CBD5E1;margin:4px 0 0;">You'll be notified when admin responds</p>
+        </div>
+      `;
+    }
+
+    panel.innerHTML = `
+      <div style="position:absolute;inset:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(2px);" id="notifPanelBg"></div>
+      <div style="position:absolute;top:60px;right:16px;width:calc(100% - 32px);max-width:340px;background:#fff;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,0.2);overflow:hidden;animation:slideDown .3s cubic-bezier(0.16,1,0.3,1);" id="notifCard">
+        <div style="padding:16px 18px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;">
+          <p style="font-size:15px;font-weight:800;color:#0F172A;margin:0;">Notifications</p>
+          <button id="notifPanelClose" style="background:none;border:none;color:#94A3B8;font-size:18px;cursor:pointer;padding:4px;">&times;</button>
+        </div>
+        <div style="padding:4px 18px 8px;">
+          <div style="background:${cfg.bg};border-radius:12px;padding:12px 14px;margin:10px 0;display:flex;align-items:center;gap:10px;">
+            <div style="width:10px;height:10px;border-radius:50%;background:${cfg.color};flex-shrink:0;"></div>
+            <div>
+              <p style="font-size:12px;font-weight:700;color:#0F172A;margin:0;">Current: ${statusText}</p>
+              <p style="font-size:11px;color:#64748B;margin:2px 0 0;">${cfg.label}</p>
+            </div>
+          </div>
+          ${updatesHtml}
+        </div>
+      </div>
+    `;
+    document.body.appendChild(panel);
+
+    const close = () => panel.remove();
+    document.getElementById('notifPanelBg').addEventListener('click', close);
+    document.getElementById('notifPanelClose').addEventListener('click', close);
   }
 
   const TYPE_ICONS = {
@@ -613,24 +688,38 @@
     applyStatusUI(data.status || 'Pending');
   }
 
-  updateNotifDot();
+  // Hide notif dot on load (will show when new updates arrive)
+  document.getElementById('notifDot').classList.add('hidden');
 
   const deviceId = getDeviceId();
+  const session = JSON.parse(localStorage.getItem('arps_session') || 'null');
+  const userUid = session ? session.uid : null;
+
+  // Query by device ID
   const q = query(
     collection(db, 'sosAlerts'),
     where('reporterId', '==', deviceId)
   );
 
-  let firstLoad = true;
+  // Also query by UID as fallback
+  let uidUnsub = null;
+  if (userUid) {
+    const qUid = query(
+      collection(db, 'sosAlerts'),
+      where('uid', '==', userUid)
+    );
+    uidUnsub = onSnapshot(qUid, (snap) => {
+      if (snap.empty) return;
+      // Merge any UID-matched docs that device query might miss
+      handleSnapshot(snap);
+    });
+  }
 
-  onSnapshot(q, (snapshot) => {
-    if (snapshot.empty) {
-      document.getElementById('loadingState').classList.add('hidden');
-      const noRpt = document.getElementById('noReportState');
-      noRpt.classList.remove('hidden');
-      noRpt.classList.add('flex');
-      return;
-    }
+  let firstLoad = true;
+  let knownDocIds = new Set();
+
+  function handleSnapshot(snapshot) {
+    if (snapshot.empty) return;
 
     const sorted = snapshot.docs.slice().sort((a, b) => {
       const aMs = a.data().createdAtMs || a.data().createdAt?.toMillis?.() || 0;
@@ -645,9 +734,6 @@
     if (firstLoad) {
       firstLoad = false;
       showTracking(data, docSnap.id);
-      if ('Notification' in window && Notification.permission === 'default') {
-        setTimeout(() => Notification.requestPermission().then(updateNotifDot), 1200);
-      }
       return;
     }
 
@@ -656,15 +742,44 @@
 
     if (status === 'Responding' && prev !== 'Responding') {
       const type = data.type || 'Emergency';
-      sendNotif('🚨 ARPS — Responders Dispatched', `A response team has been sent for your ${type} report. Stay safe and stay in contact.`);
-      toast('Responders have been dispatched to your location!', 'info');
+      sendNotif('ARPS — Responders Dispatched', `A response team has been sent for your ${type} report. Stay safe and stay in contact.`);
+      showStatusPopup('responding', type);
+      addNotifUpdate('Responding', `A rescue team has been dispatched for your ${type} report`);
+      localStorage.setItem('arps_report_update', JSON.stringify({ status: 'Responding', ts: Date.now() }));
     }
 
     if (status === 'Resolved' && prev !== 'Resolved') {
       const name = data.name || 'Reporter';
-      sendNotif('✅ ARPS — Incident Resolved', `Your report has been resolved. Thank you, ${name} — you helped keep your community safe.`);
-      toast('Incident resolved. Thank you for reporting!', 'success');
+      sendNotif('ARPS — Incident Resolved', `Your report has been resolved. Thank you, ${name} — you helped keep your community safe.`);
+      showStatusPopup('resolved', data.type || 'Emergency');
+      addNotifUpdate('Resolved', `Your ${data.type || 'Emergency'} report has been resolved`);
+      localStorage.setItem('arps_report_update', JSON.stringify({ status: 'Resolved', ts: Date.now() }));
     }
+  }
+
+  onSnapshot(q, (snapshot) => {
+    if (snapshot.empty) {
+      // Only show "no report" if UID query also has nothing (wait a moment)
+      if (!userUid) {
+        document.getElementById('loadingState').classList.add('hidden');
+        const noRpt = document.getElementById('noReportState');
+        noRpt.classList.remove('hidden');
+        noRpt.classList.add('flex');
+      } else {
+        // Give UID query a chance to find it
+        setTimeout(() => {
+          if (firstLoad) {
+            document.getElementById('loadingState').classList.add('hidden');
+            const noRpt = document.getElementById('noReportState');
+            noRpt.classList.remove('hidden');
+            noRpt.classList.add('flex');
+          }
+        }, 2000);
+      }
+      return;
+    }
+
+    handleSnapshot(snapshot);
 
   }, (err) => {
     console.error('Snapshot error:', err);
@@ -678,6 +793,97 @@
     if (heading) heading.textContent = 'Connection Error';
     toast("Could not load report status. Check your connection.", "error");
   });
+
+  // ── Big status popup notification ──
+  function showStatusPopup(type, emergencyType) {
+    // Remove any existing popup
+    const old = document.getElementById('statusPopup');
+    if (old) old.remove();
+
+    const isResponding = type === 'responding';
+    const config = isResponding ? {
+      icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`,
+      bg: '#EFF6FF', border: '#BFDBFE', iconBg: '#DBEAFE',
+      title: 'Responders Dispatched!',
+      message: `A rescue team is now on the way for your <strong>${emergencyType}</strong> report. Stay calm and stay where you are.`,
+      accent: '#2563EB'
+    } : {
+      icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>`,
+      bg: '#ECFDF5', border: '#A7F3D0', iconBg: '#D1FAE5',
+      title: 'Incident Resolved',
+      message: `Your <strong>${emergencyType}</strong> report has been resolved. Thank you for helping keep your community safe.`,
+      accent: '#059669'
+    };
+
+    const popup = document.createElement('div');
+    popup.id = 'statusPopup';
+    popup.innerHTML = `
+      <div style="position:fixed;inset:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s ease;" id="popupOverlay">
+        <div style="background:#fff;border-radius:24px;width:90%;max-width:340px;padding:28px 24px;text-align:center;transform:scale(0.9);transition:transform 0.35s cubic-bezier(0.16,1,0.3,1);box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);" id="popupCard">
+          <div style="width:64px;height:64px;border-radius:50%;background:${config.iconBg};display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:3px solid ${config.border};">
+            ${config.icon}
+          </div>
+          <h3 style="font-size:20px;font-weight:800;color:#0F172A;margin:0 0 8px;font-family:inherit;">${config.title}</h3>
+          <p style="font-size:14px;color:#475569;margin:0 0 20px;line-height:1.6;font-family:inherit;">${config.message}</p>
+          <div style="background:${config.bg};border:1px solid ${config.border};border-radius:14px;padding:12px 16px;margin-bottom:20px;">
+            <p style="font-size:12px;color:${config.accent};font-weight:700;margin:0;">
+              ${isResponding ? 'Stay in a safe location. Responders will reach you shortly.' : 'Stay alert for any secondary hazards in your area.'}
+            </p>
+          </div>
+          <button id="popupDismiss" style="width:100%;padding:14px;border-radius:14px;border:none;background:${config.accent};color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px ${config.accent}44;">Got it</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(popup);
+
+    // Trigger animation
+    requestAnimationFrame(() => {
+      document.getElementById('popupOverlay').style.opacity = '1';
+      document.getElementById('popupCard').style.transform = 'scale(1)';
+    });
+
+    // Play a notification sound using Web Audio
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = isResponding ? 880 : 1047;
+      gain.gain.value = 0.15;
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+      osc.stop(ctx.currentTime + 0.6);
+      // Second tone
+      setTimeout(() => {
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.frequency.value = isResponding ? 1047 : 1319;
+        gain2.gain.value = 0.15;
+        osc2.start();
+        gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+        osc2.stop(ctx.currentTime + 0.5);
+      }, 200);
+    } catch(e) {}
+
+    // Vibrate on mobile
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+
+    // Dismiss
+    const dismiss = () => {
+      const overlay = document.getElementById('popupOverlay');
+      const card = document.getElementById('popupCard');
+      if (overlay) overlay.style.opacity = '0';
+      if (card) card.style.transform = 'scale(0.9)';
+      setTimeout(() => popup.remove(), 300);
+    };
+    document.getElementById('popupDismiss').addEventListener('click', dismiss);
+  }
+
+  // Clear the update flag since user is on report page
+  localStorage.removeItem('arps_report_update');
 </script>
 </body>
 </html>

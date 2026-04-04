@@ -1995,7 +1995,7 @@ Be concise, practical, warm, and use Taglish if helpful. Use numbered steps.`;
 
   <!-- Cache admin contact number for offline SOS -->
   <script type="module">
-    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    import { doc, getDoc, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
     import { db } from "../firebase-config.js";
     try {
       const snap = await getDoc(doc(db, "adminSettings", "contact"));
@@ -2003,6 +2003,86 @@ Be concise, practical, warm, and use Taglish if helpful. Use numbered steps.`;
         localStorage.setItem('arps_admin_contact', snap.data().phone);
       }
     } catch (e) {  }
+
+    // ── Background SOS status listener — notify user when admin responds ──
+    (function() {
+      const session = JSON.parse(localStorage.getItem('arps_session') || 'null');
+      if (!session) return;
+
+      let deviceId = localStorage.getItem('resq-device-id');
+      const uid = session.uid;
+      if (!deviceId && !uid) return;
+
+      let prevStatus = localStorage.getItem('arps_last_sos_status') || null;
+
+      function watchQuery(field, value) {
+        if (!value) return;
+        const q = query(collection(db, 'sosAlerts'), where(field, '==', value));
+        onSnapshot(q, (snap) => {
+          if (snap.empty) return;
+          const sorted = snap.docs.slice().sort((a, b) => {
+            const aMs = a.data().createdAtMs || 0;
+            const bMs = b.data().createdAtMs || 0;
+            return bMs - aMs;
+          });
+          const data = sorted[0].data();
+          const status = data.status || 'Pending';
+
+          if (prevStatus && status !== prevStatus) {
+            if (status === 'Responding' || status === 'Resolved') {
+              localStorage.setItem('arps_report_update', JSON.stringify({ status, ts: Date.now() }));
+              showHomeNotification(status, data.type || 'Emergency');
+            }
+          }
+          prevStatus = status;
+          localStorage.setItem('arps_last_sos_status', status);
+        });
+      }
+
+      if (deviceId) watchQuery('reporterId', deviceId);
+      if (uid) watchQuery('uid', uid);
+
+      function showHomeNotification(status, type) {
+        const isResponding = status === 'Responding';
+        const bar = document.createElement('div');
+        bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;padding:0 16px;animation:slideDown .4s cubic-bezier(0.16,1,0.3,1);';
+        bar.innerHTML = `
+          <div style="max-width:480px;margin:12px auto 0;background:${isResponding ? '#1D4ED8' : '#059669'};color:#fff;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px ${isResponding ? 'rgba(29,78,216,0.4)' : 'rgba(5,150,105,0.4)'};">
+            <div style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              ${isResponding
+                ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>'
+                : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>'
+              }
+            </div>
+            <div style="flex:1;min-width:0;">
+              <p style="font-size:13px;font-weight:800;margin:0;">${isResponding ? 'Responders Dispatched!' : 'Incident Resolved'}</p>
+              <p style="font-size:11px;opacity:0.85;margin:3px 0 0;">${isResponding ? `A team is on the way for your ${type} report` : `Your ${type} report has been resolved`}</p>
+            </div>
+            <a href="report.html" style="background:rgba(255,255,255,0.2);color:#fff;text-decoration:none;font-size:11px;font-weight:700;padding:8px 12px;border-radius:10px;white-space:nowrap;">View</a>
+          </div>
+        `;
+        document.body.appendChild(bar);
+
+        // Vibrate
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+
+        // Browser notification
+        if ('Notification' in window && Notification.permission === 'granted') {
+          try { new Notification(isResponding ? 'ARPS — Responders Dispatched' : 'ARPS — Incident Resolved', {
+            body: isResponding ? `A team is heading to your ${type} report location` : `Your ${type} report has been resolved`,
+            tag: 'arps-sos-update'
+          }); } catch(e) {}
+        }
+
+        // Auto-dismiss after 8 seconds
+        setTimeout(() => {
+          bar.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+          bar.style.opacity = '0';
+          bar.style.transform = 'translateY(-100%)';
+          setTimeout(() => bar.remove(), 300);
+        }, 8000);
+      }
+    })();
   </script>
 </body>
 

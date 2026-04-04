@@ -26,9 +26,36 @@
     return;
   }
 
-  // If onboarded but pending admin approval, redirect to pending (ignore loginpage)
+  // If onboarded but pending admin approval, verify against Firestore before redirecting
   if (isOnboarded && profile.status === 'pending' && currentPath.indexOf('pending.html') === -1 && currentPath.indexOf('loginpage.html') === -1) {
-    window.location.href = 'pending.html';
+    // Double-check Firestore — localStorage may be stale
+    (async function() {
+      try {
+        var firestore = firebase.firestore();
+        var uid = session.uid;
+        var freshDoc = await firestore.collection('users').doc(uid).get();
+        var freshData = freshDoc.exists ? freshDoc.data() : null;
+
+        // Also try email lookup if UID doc not found
+        if (!freshData && session.email) {
+          var eq = await firestore.collection('users').where('email', '==', session.email.trim().toLowerCase()).get();
+          if (!eq.empty) freshData = eq.docs[0].data();
+        }
+
+        if (freshData && freshData.status === 'approved') {
+          // Admin already approved — update local profile and let user through
+          profile.status = 'approved';
+          localStorage.setItem('arps_profile_' + uid, JSON.stringify(profile));
+          return; // stay on current page
+        }
+
+        // Still pending or no data — redirect to pending
+        window.location.href = 'pending.html';
+      } catch(e) {
+        // Firestore failed — fall back to local status
+        window.location.href = 'pending.html';
+      }
+    })();
     return;
   }
 

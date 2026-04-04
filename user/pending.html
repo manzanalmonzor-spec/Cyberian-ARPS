@@ -75,7 +75,7 @@
 
 <script type="module">
   import { db } from "../firebase-config.js";
-  import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+  import { doc, onSnapshot, collection, query, where, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
   const session = JSON.parse(localStorage.getItem('arps_session') || 'null');
   if (!session || !session.uid) window.location.href = 'loginpage.html';
@@ -86,8 +86,27 @@
     try { return JSON.parse(localStorage.getItem('arps_profile_' + session.uid) || '{}'); } catch(e) { return {}; }
   }
 
+  // Check if already approved locally — skip waiting screen
+  const cachedProfile = getProfile();
+  if (cachedProfile.status === 'approved') {
+    window.location.href = 'home.html';
+  }
+
+  // Find the correct Firestore doc ID (may differ from session.uid for unbanned/re-login users)
+  let firestoreDocId = session.uid;
+  try {
+    const uidDoc = await getDoc(doc(db, "users", session.uid));
+    if (!uidDoc.exists() && session.email) {
+      const q = query(collection(db, "users"), where("email", "==", session.email.trim().toLowerCase()));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        firestoreDocId = snap.docs[0].id;
+      }
+    }
+  } catch(e) {}
+
   // Real-time listener for approval status from Firestore
-  const unsub = onSnapshot(doc(db, "users", session.uid), (docSnapshot) => {
+  const unsub = onSnapshot(doc(db, "users", firestoreDocId), (docSnapshot) => {
     if (docSnapshot.exists()) {
       const data = docSnapshot.data();
       if (data.status === 'approved') {
@@ -127,7 +146,6 @@
   });
 
   window.checkStatus = function() {
-    // Manual check just triggers a UI spinner since Firestore is already real-time
     const btn = document.querySelector('button[onclick="checkStatus()"]');
     const orig = btn.innerHTML;
     btn.innerHTML = '<span class="animate-spin inline-block w-5 h-5 border-[3px] border-slate-400 border-t-white rounded-full"></span>';

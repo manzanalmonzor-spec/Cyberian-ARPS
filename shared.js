@@ -184,6 +184,51 @@ if (!ARPS_API_BASE_URL && window.location.hostname.indexOf("github.io") !== -1) 
   console.warn('ARPS API base URL is not configured. Set it in runtime-config.js or localStorage key "arps_api_base_url".');
 }
 
+// ── Report notification badge (user pages only) ─────────────────────────────
+if (!ARPS_IS_ADMIN_PAGE) {
+  (function checkReportBadge() {
+    function addBadge() {
+      var update = localStorage.getItem('arps_report_update');
+      if (!update) return;
+      if (window.location.pathname.indexOf('report.html') !== -1) return;
+
+      var tryAttach = function() {
+        var navLinks = document.querySelectorAll('.bottom-nav a, nav a');
+        for (var i = 0; i < navLinks.length; i++) {
+          var link = navLinks[i];
+          if (link.href && link.href.indexOf('report.html') !== -1) {
+            if (link.querySelector('.report-notif-badge')) return;
+            link.style.position = 'relative';
+            var dot = document.createElement('span');
+            dot.className = 'report-notif-badge';
+            dot.style.cssText = 'position:absolute;top:2px;right:50%;transform:translateX(12px);width:8px;height:8px;border-radius:50%;background:#EF4444;border:2px solid #fff;z-index:10;';
+            link.appendChild(dot);
+            break;
+          }
+        }
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', tryAttach);
+      } else {
+        tryAttach();
+      }
+    }
+    addBadge();
+
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'arps_report_update') {
+        if (!e.newValue) {
+          var dot = document.querySelector('.report-notif-badge');
+          if (dot) dot.remove();
+        } else {
+          addBadge();
+        }
+      }
+    });
+  })();
+}
+
 // ── PWA (user pages only — skip /admin/) ─────────────────────────────────────
 if (!ARPS_IS_ADMIN_PAGE) {
 

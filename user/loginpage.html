@@ -688,9 +688,28 @@
         // Check Firestore for existing user data and status
         try {
             if (firebase.apps && firebase.apps.length) {
-                var userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                var firestore = firebase.firestore();
+                var userData = null;
+                var foundDocId = null;
+
+                // 1. Try lookup by UID first
+                var userDoc = await firestore.collection('users').doc(user.uid).get();
                 if (userDoc.exists) {
-                    var userData = userDoc.data();
+                    userData = userDoc.data();
+                    foundDocId = userDoc.id;
+                }
+
+                // 2. If not found by UID, search by email (handles unbanned/re-login users)
+                if (!userData && user.email) {
+                    var emailQuery = await firestore.collection('users').where('email', '==', user.email.trim().toLowerCase()).get();
+                    if (!emailQuery.empty) {
+                        var matchedDoc = emailQuery.docs[0];
+                        userData = matchedDoc.data();
+                        foundDocId = matchedDoc.id;
+                    }
+                }
+
+                if (userData) {
                     var userStatus = userData.status || 'pending';
 
                     // Block rejected users from logging in

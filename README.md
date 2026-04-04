@@ -85,8 +85,7 @@ The Admin page will primarily be handled by the respected MDRRMO in their respec
   *Alerts:* After clicking "Alerts" on the left navigation menu, the operator will be directed to the Alerts Management page, where they can see the full details and history of SOS reports from users.
   <p><img src="Images/read_admin_walkthrough/3.png" alt="Alerts Management" width="800"></p>
 
-  *Centers:* By tapping "Centers" in the left navigation menu, the operator will be able to manage and view the capacity and status of local evacuation centers.
-  <p><img src="Images/read_admin_walkthrough/4.png" alt="Evacuation Centers" width="800"></p>
+  
 
   *Weather:* By tapping "Weather" in the left navigation menu, the operator is directed to the Weather Intelligence page. This displays localized info based on the Open-Meteo API for the municipality's coordinates.
   <p><img src="Images/read_admin_walkthrough/5.png" alt="Weather Intelligence" width="800"></p>

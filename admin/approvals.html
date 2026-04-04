@@ -537,6 +537,10 @@
         else if (currentTab === 'banned') renderBanned();
       }
 
+      setInterval(() => {
+        if (currentTab === 'approved') renderApproved();
+      }, 30000);
+
       function filterUsers(list) {
         if (!searchQuery) return list;
         return list.filter(u => {
@@ -677,7 +681,7 @@
             const genderIcon = user.gender === 'Male' ? '♂' : user.gender === 'Female' ? '♀' : '⚥';
             const genderColor = user.gender === 'Male' ? 'text-blue-600 bg-blue-50' : user.gender === 'Female' ? 'text-pink-600 bg-pink-50' : 'text-violet-600 bg-violet-50';
 
-            const isOnline = user.lastSeen && user.lastSeen.toDate && (Date.now() - user.lastSeen.toDate().getTime() < 5 * 60 * 1000);
+            const isOnline = user.lastSeen && user.lastSeen.toDate && (Date.now() - user.lastSeen.toDate().getTime() < 3 * 60 * 1000);
             const onlineDot = isOnline
               ? `<span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" title="Online"></span>`
               : `<span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-slate-300 border-2 border-white" title="Offline"></span>`;

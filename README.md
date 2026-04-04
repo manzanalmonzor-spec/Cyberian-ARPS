@@ -50,7 +50,7 @@ You can Install the Web Application in your device for a better experience enabl
 1. Open the [Antique ARPS Web App](https://antique-arps.com) in your Browser.
 2. On the landing page on the top right you can **click on the install button**
 
-   <img src="Images/read_img/install.jpg" alt="install image" width="250">
+   <img src="Images/read_img/install.png" alt="install image" width="250">
 3. After doing so, some of the ARPS features will now be accessible offline.
 
 
@@ -73,7 +73,7 @@ The Admin page will primarily be handled by the respected MDRRMO in their respec
   <summary><strong><font color="blue">Click to view: Admin Walkthrough</font></strong></summary>
 
 
-  **Admin Login:** To ensure secure access, administrators from the MDRRMO must first authenticate using their official credentials on this secure login page.
+  **Admin Login:** To ensure secure access, administrators from the MDRRMO must first authenticate using their official credentials on this secure login page. To login in the admin page you can use the account "admin@gmail.com" with the password "admin1234"
   <p><img src="Images/read_admin_walkthrough/10.png" alt="Admin Login" width="800"></p>
 
   **Admin Dashboard:** The Admin Dashboard provides the operator with a comprehensive overview of all incoming emergency requests from users. This includes critical real-time data, such as the exact location of the user and the specific type of emergency reported.
@@ -108,7 +108,10 @@ The User Dashboard is the main home screen where users can access and interact w
   ### 1. Login Process
 Here is the step-by-step process for users to authenticate and access the system securely.
 
-**Step 1:** Users begin at the ARPS landing page. By tapping the **"Open Citizen App"** button, they will be directed to the Login portal.
+**Step 1:** Users begin at the ARPS landing page. By tapping the **"Open Citizen App"** button, they will be directed to the Login portal.  
+<p>
+  <img src="Images/read_user_walkthrough/16.jpg" alt="Main Page 1" width="300"> 
+</p>
 
 
 **Step 2:** New users can register their accounts by inputting their Name, Email, and Password, while returning users can quickly access their accounts via the Sign In page.
@@ -139,13 +142,12 @@ Here is the step-by-step process for users to authenticate and access the system
 **Step 7:** This page confirms the submission and informs the user that their account is pending. They must wait for an administrator to manually verify their submitted ID picture before gaining full access.
 <p><img src="Images/read_user_walkthrough/12.jpg" alt="Pending Approval" width="300"></p>
 
-  <hr>
+  <br>
 
   ### 2. Main Dashboard
 Once logged in, users are greeted by the main page where they can navigate the system.
 
 **Overview:** The main dashboard gives the user tips and information that can be helpful in times of need. This includes an SOS button, AI-driven contextual tips, and the Nearest Home Shelter based on your current location.
-<p><img src="Images/read_user_walkthrough/1.jpg" alt="Main Page 1" width="300"></p>
 
 **SOS Button:** When the SOS button is clicked, this page will appear prompting the user to select what kind of emergency they are experiencing so that the appropriate help can be dispatched immediately.
 <p><img src="Images/read_user_walkthrough/1.jpg" alt="Main Page 1" width="300"></p>

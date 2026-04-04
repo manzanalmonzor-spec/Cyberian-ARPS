@@ -179,7 +179,7 @@ Once logged in, users are greeted by the main page where they can navigate the s
 <p><img src="Images/read_user_walkthrough/15.jpg" alt="ARPS AI Assistant" width="300"></p>
 
 </details>
-<br>
+
 
 
 # Application Programming Interface

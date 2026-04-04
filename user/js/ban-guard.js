@@ -1,4 +1,4 @@
-import { db } from "../firebase-config.js";
+import { db } from "../../firebase-config.js";
 import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 (function() {
@@ -19,18 +19,19 @@ import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/fire
   function showBanCard(reason) {
     if (document.getElementById('arps-ban-overlay')) return;
 
-    // Lock scroll immediately
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
-    document.body.style.height = '100%';
-    document.body.style.top = '0';
-    document.body.style.left = '0';
-    document.documentElement.style.overflow = 'hidden';
+    // Inject !important CSS to force-kill all scrolling on every element
+    var style = document.createElement('style');
+    style.textContent =
+      'html.arps-banned, html.arps-banned body { overflow:hidden!important; position:fixed!important; width:100%!important; height:100%!important; top:0!important; left:0!important; touch-action:none!important; overscroll-behavior:none!important; -webkit-overflow-scrolling:auto!important; }' +
+      'html.arps-banned *, html.arps-banned body * { overflow:hidden!important; overscroll-behavior:none!important; touch-action:none!important; }' +
+      '#arps-ban-overlay { touch-action:auto!important; }' +
+      '#arps-ban-overlay button { touch-action:auto!important; cursor:pointer!important; }';
+    document.head.appendChild(style);
+    document.documentElement.classList.add('arps-banned');
 
     var overlay = document.createElement('div');
     overlay.id = 'arps-ban-overlay';
-    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.85);backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s ease;overflow:hidden;touch-action:none;';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.85);backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s ease;overflow:hidden;';
 
     var safeReason = reason.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
@@ -50,14 +51,10 @@ import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/fire
 
     document.body.appendChild(overlay);
 
-    // Block all touch/scroll
-    overlay.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
-    document.addEventListener('touchmove', function(e) {
-      if (document.getElementById('arps-ban-overlay')) e.preventDefault();
-    }, { passive: false });
-    document.addEventListener('scroll', function() {
-      if (document.getElementById('arps-ban-overlay')) window.scrollTo(0, 0);
-    });
+    // Block touchmove globally
+    document.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
+    // Force scroll to top if anything tries to scroll
+    window.addEventListener('scroll', function() { window.scrollTo(0, 0); }, true);
 
     requestAnimationFrame(function() {
       overlay.style.opacity = '1';
@@ -69,7 +66,7 @@ import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/fire
       window.location.href = 'loginpage.html';
     });
 
-    // Auto force logout after 10 seconds even if they don't click
+    // Auto force logout after 10 seconds
     setTimeout(function() {
       localStorage.removeItem('arps_session');
       window.location.href = 'loginpage.html';

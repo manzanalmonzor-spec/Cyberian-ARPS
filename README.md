@@ -50,7 +50,7 @@ You can Install the Web Application in your device for a better experience enabl
 1. Open the [Antique ARPS Web App](https://antique-arps.com) in your Browser.
 2. On the landing page on the top right you can **click on the install button**
 
-   <img src="Images/read_img/install.jpg" alt="install image" width="250">
+   <img src="Images/read_img/install.png" alt="install image" width="250">
 3. After doing so, some of the ARPS features will now be accessible offline.
 
 
@@ -71,7 +71,7 @@ The Admin page will primarily be handled by the respected MDRRMO in their respec
 
 <details>
   <summary><strong><font color="blue">Click to view: Admin Walkthrough</font></strong></summary>
-  <br>
+
 
   **Admin Login:** To ensure secure access, administrators from the MDRRMO must first authenticate using their official credentials on this secure login page.
   <p><img src="Images/read_admin_walkthrough/10.png" alt="Admin Login" width="800"></p>
@@ -109,13 +109,11 @@ The User Dashboard is the main home screen where users can access and interact w
 Here is the step-by-step process for users to authenticate and access the system securely.
 
 **Step 1:** Users begin at the ARPS landing page. By tapping the **"Open Citizen App"** button, they will be directed to the Login portal.
-<p><img src="Images/read_user_walkthrough/16.jpg" alt="Landing Page" width="300"></p>
+
 
 **Step 2:** New users can register their accounts by inputting their Name, Email, and Password, while returning users can quickly access their accounts via the Sign In page.
 <p>
-  <img src="Images/read_user_walkthrough/7.jpg" alt="Sign Up" width="300">
-  &nbsp;&nbsp;&nbsp;
-  <img src="Images/read_user_walkthrough/13.jpg" alt="Sign In" width="300">
+  <img src="Images/read_user_walkthrough/1.jpg" alt="Main Page 1" width="300"> <img src="Images/read_user_walkthrough/2.jpg" alt="Main Page 2" width="300">
 </p>
 
 > **Note:** Users only need to perform a **one-time login**. Once authenticated, the system keeps you logged in so that the SOS button and critical emergency features are instantly accessible in high-pressure situations without needing to re-enter credentials.
@@ -155,6 +153,7 @@ Once logged in, users are greeted by the main page where they can navigate the s
 <p><img src="Images/read_user_walkthrough/2.jpg" alt="Main Page 2" width="300"></p>
 
 > **Legal Warning:** To protect the integrity of the system and ensure responders are available for real emergencies, **prank reporting is strictly prohibited.** False reports are a criminal offense under **Presidential Decree No. 1727** and **Article 155 of the Revised Penal Code (Alarms and Scandals)**. Violators will be tracked via their verified ID and face legal prosecution.
+<br>
 
 > **📡 Offline SOS Capability:** The SOS button is designed to save lives even during total internet blackouts. If no connection is detected:
 > 1. The system automatically retrieves your **last recorded location** from the secure local cache.
@@ -164,12 +163,6 @@ Once logged in, users are greeted by the main page where they can navigate the s
 **Reports:** After an SOS is sent, users can track the status of their emergency on the Reports page. This is easily accessible by tapping the Reports icon on the bottom navigation bar. It also provides situational guidance while you wait for help.
 <p><img src="Images/read_user_walkthrough/3.jpg" alt="Main Page 3" width="300"></p>
 
-**Centers & Routing:** By tapping "Centers" in the bottom navigation menu, users can easily locate the nearest evacuation center. The app automatically calculates and displays the safest route to guide you to your destination.
-<p>
-  <img src="Images/read_user_walkthrough/4.jpg" alt="Evacuation Centers" height="550">
-  &nbsp;&nbsp;&nbsp;
-  <img src="Images/read_user_walkthrough/5.jpg" alt="Route Navigation" height="550">
-</p>
 
 **Settings/Profile:** In the settings page, users can view and edit their profile information to ensure their emergency contact details and health info stay up to date.
 <p><img src="Images/read_user_walkthrough/6.jpg" alt="Profile Settings" width="300"></p>

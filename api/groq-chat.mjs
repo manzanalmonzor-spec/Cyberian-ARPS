@@ -53,7 +53,7 @@ export function OPTIONS(request) {
 export async function POST(request) {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
-    return json(request, { error: 'GROQ_API_KEY is not configured' }, 500);
+    return json(request, { error: 'AI service is not configured. Please contact the administrator.' }, 500);
   }
 
   const { model, messages, temperature, max_tokens } = await getBody(request);

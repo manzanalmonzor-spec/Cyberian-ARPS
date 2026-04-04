@@ -48,60 +48,54 @@ You can Install the Web Application in your device for a better experience enabl
 
 ## Steps to Install
 1. Open the [Antique ARPS Web App](https://antique-arps.com) in your Browser.
-2. On the landing page on the top right you can **click on the install button**
+2. On the landing page on the top right you can *click on the install button*
 
-   <img src="Images/read_img/install.png" alt="install image" width="250">
+   <img src="Images/read_img/install.jpg" alt="install image" width="250">
 3. After doing so, some of the ARPS features will now be accessible offline.
 
 
 # Features
-* **Offline Access:** Install the application directly to your device home screen. This allows you to access critical safety information and emergency guides even during total internet blackouts.
-* **One-Tap SOS System:** Send immediate emergency alerts to the MDRRMO. The system intelligently uses PhilSMS for internet-based alerts but automatically falls back to your phone’s native SMS app if you are offline.
-* **Smart Evacuation Routing:** Find the nearest "Safe Zones" and evacuation centers instantly. The system uses the Overpass API to locate facilities and provides real-time navigation to guide you safely to your destination.
-* **Real-Time Weather Intelligence:** Stay ahead of hazards with live weather updates and storm tracking powered by Open-Meteo localized specifically to your current GPS coordinates.
-* **Live Incident Mapping:** For administrators, a real-time "Live Map" visualizes all active SOS signals across the municipality, allowing for faster response times and better resource management.
+* *Offline Access:* Install the application directly to your device home screen. This allows you to access critical safety information and emergency guides even during total internet blackouts, and also has an offline SMS integration for when there is no internet connection available.
+* *One-Tap SOS System:* Send immediate emergency alerts to the MDRRMO. The system intelligently uses PhilSMS for internet-based alerts but automatically falls back to your phone’s native SMS app if you are offline.
+* *Smart Evacuation Routing:* Find the nearest "Safe Zones" and evacuation centers instantly. The system uses the Overpass API to locate facilities and provides real-time navigation to guide you safely to your destination.
+* *Real-Time Weather Intelligence:* Stay ahead of hazards with live weather updates and storm tracking powered by Open-Meteo localized specifically to your current GPS coordinates.
+* *Live Incident Mapping:* For administrators, a real-time "Live Map" visualizes all active SOS signals across the municipality, allowing for faster response times and better resource management.
 
-* **One-Tap SOS System:** Send immediate emergency alerts to the MDRRMO. The system intelligently uses PhilSMS for internet-based alerts but automatically falls back to your phone’s native SMS app if you are offline.
+
 
 
 # Walkthrough
 
 ## Admin
-  The Admin page will primarily be handled by the respected MDRRMO in their respected municipalities in Antique in order to receive emergency alerts and define areas with possible hazards and risks.
+The Admin page will primarily be handled by the respected MDRRMO in their respective municipalities in Antique in order to receive emergency alerts and define areas with possible hazards and risks.
+
 <details>
-  <summary><strong><font color ="blue">Click to view: Admin Walkthrough</font></strong></summary>
+  <summary><strong><font color="blue">Click to view: Admin Walkthrough</font></strong></summary>
   <br>
 
-   **Admin Dashboard:** The Admin Dashboard provides the operator with a comprehensive overview of all incoming emergency requests from users. This includes critical real-time data, such as the exact location of the user and the specific type of emergency reported.
-  <p><img src="Images/read_admin_walkthrough/1.jpg" alt="Main Page 1" width="800"></p>
+  *Admin Login:* To ensure secure access, administrators from the MDRRMO must first authenticate using their official credentials on this secure login page.
+  <p><img src="Images/read_admin_walkthrough/10.png" alt="Admin Login" width="800"></p>
 
-  **Live Map:** By clicking "Live Maps" on the left navigation menu, the operator is directed to an interactive map displaying real-time, active incident mapping across the municipality where the operator can visibly see where users SOS alerts are. 
-  <p><img src="Images/read_admin_walkthrough/2.jpg" alt="Main Page 2" width="800"></p>
+  *Admin Dashboard:* The Admin Dashboard provides the operator with a comprehensive overview of all incoming emergency requests from users. This includes critical real-time data, such as the exact location of the user and the specific type of emergency reported.
+  <p><img src="Images/read_admin_walkthrough/1.png" alt="Admin Dashboard" width="800"></p>
 
-  **Alerts:** After clicking the "Alerts" on the left navigation menu, the operator will be directed to the Alerts Management page where they will be able to see the details of SOS reports from the users.
-  <p><img src="Images/read_admin_walkthrough/3.jpg" alt="Main Page 3" width="800"></p>
+  *Live Map:* By clicking "Live Maps" on the left navigation menu, the operator is directed to an interactive map displaying real-time, active incident mapping across the municipality, where the operator can visibly see the locations of users' SOS alerts. 
+  <p><img src="Images/read_admin_walkthrough/2.png" alt="Live Incident Map" width="800"></p>
 
- **Centers:** By tapping "Centers" in the left navigation menu, the operator will be able to know the capacity of evacuation centers along with their details.
-  <p>
-    <img src="Images/read_admin_walkthrough/4.jpg" alt="Evacuation Centers" width="800">
-  </p>
+  *Alerts:* After clicking "Alerts" on the left navigation menu, the operator will be directed to the Alerts Management page, where they can see the full details and history of SOS reports from users.
+  <p><img src="Images/read_admin_walkthrough/3.png" alt="Alerts Management" width="800"></p>
 
-  **Weather:** By tapping "Weather" in the left navigation menu, the operator will be directed to the Weather Intelligence page where weather info based on the Open-Meteo API and current location of the operator will be displayed.
-  <p><img src="Images/read_admin_walkthrough/5.jpg" alt="Main Page 6" width="800">
-  &nbsp;&nbsp;&nbsp;
-  <img src="Images/read_admin_walkthrough/6.jpg" alt="Route Navigation" width="800"></p>
+  *Centers:* By tapping "Centers" in the left navigation menu, the operator will be able to manage and view the capacity and status of local evacuation centers.
+  <p><img src="Images/read_admin_walkthrough/4.png" alt="Evacuation Centers" width="800"></p>
 
-  **User Approval:** In the Users Approval page, the operator/admin can authenticate new user accounts.
-  <p><img src="Images/read_admin_walkthrough/7.jpg" alt="Main Page 6" width="800">
-  &nbsp;&nbsp;&nbsp;
-  <img src="Images/read_admin_walkthrough/8.jpg" alt="Route Navigation" width="800"></p>
+  *Weather:* By tapping "Weather" in the left navigation menu, the operator is directed to the Weather Intelligence page. This displays localized info based on the Open-Meteo API for the municipality's coordinates.
+  <p><img src="Images/read_admin_walkthrough/5.png" alt="Weather Intelligence" width="800"></p>
 
-  **Settings:** In the settings page the operator can change the offline service number, this number will be used for receiving SOS alerts even if the user doesn't have online access using the Philsys API
-  <p>
-    <img src="Images/read_admin_walkthrough/4.jpg" alt="Evacuation Centers" width="800">
-  </p>
+  *User Approval:* In the Users Approval page, the operator/admin can authenticate and approve new user accounts after verifying their submitted identity documents.
+  <p><img src="Images/read_admin_walkthrough/7.png" alt="User Approval List" width="800"></p>
 
-
+  *Settings:* In the settings page, the operator can configure the *Offline Service Number*. This number is used to receive SOS alerts via SMS from users who do not have internet access.
+  <p><img src="Images/read_admin_walkthrough/9.png" alt="Admin Settings" width="800"></p>
 
 </details>
 
@@ -116,37 +110,39 @@ The User Dashboard is the main home screen where users can access and interact w
   ### 1. Login Process
 Here is the step-by-step process for users to authenticate and access the system securely.
 
-**Step 1:** Users begin at the ARPS landing page. By tapping the **"Open Citizen App"** button, they will be directed to the Login portal.
+*Step 1:* Users begin at the ARPS landing page. By tapping the *"Open Citizen App"* button, they will be directed to the Login portal.
 <p><img src="Images/read_user_walkthrough/16.jpg" alt="Landing Page" width="300"></p>
 
-**Step 2:** New users can register their accounts by inputting their Name, Email, and Password, while returning users can quickly access their accounts via the Sign In page.
+*Step 2:* New users can register their accounts by inputting their Name, Email, and Password, while returning users can quickly access their accounts via the Sign In page.
 <p>
   <img src="Images/read_user_walkthrough/7.jpg" alt="Sign Up" width="300">
   &nbsp;&nbsp;&nbsp;
   <img src="Images/read_user_walkthrough/13.jpg" alt="Sign In" width="300">
 </p>
 
-> **Note:** Users only need to perform a **one-time login**. Once authenticated, the system keeps you logged in so that the SOS button and critical emergency features are instantly accessible in high-pressure situations without needing to re-enter credentials.
+**Note:** Users only need to perform a **one-time login**. Once authenticated, the system keeps you logged in so that the SOS button and critical emergency features are instantly accessible in high-pressure situations without needing to re-enter credentials.
 
-**Step 3:** In this page, the user will have to input their personal information such as Name, Age, Contact Number, Address, and Gender.
+
+*Step 3:* In this page, the user will have to input their personal information such as Name, Age, Contact Number, Address, and Gender.
 <p><img src="Images/read_user_walkthrough/8.jpg" alt="Personal Info" width="300"></p>
 
-**Step 4:** A facial and ID verification using the phone's camera will be conducted to further authenticate the user and prevent trolls or fake accounts from accessing the system.
+*Step 4:* A facial and ID verification using the phone's camera will be conducted to further authenticate the user which the admins can manually authenticate.
 <p>
   <img src="Images/read_user_walkthrough/14.jpg" alt="ID Upload" width="300">
   &nbsp;&nbsp;&nbsp;
   <img src="Images/read_user_walkthrough/9.jpg" alt="Face Verification" width="300">
 </p>
 
-> **Anti-Troll Measure:** This verification step ensures accountability. Any user found sending malicious or fake SOS signals will be identified and reported to authorities for violating **Presidential Decree No. 1727**, which penalizes the dissemination of false information and emergency alarms.
+**Anti-Troll Measure:** This verification steps ensures accountability. Any user found sending malicious or fake SOS signals will be identified and reported to authorities for violating **Presidential Decree No. 1727**, which penalizes the dissemination of false information and emergency alarms.
 
-**Step 5:** In this page the user can read and agree to the terms and services of using the ARPS system. 
+
+*Step 5:* In this page the user can read and agree to the terms and services of using the ARPS system. 
 <p><img src="Images/read_user_walkthrough/10.jpg" alt="Terms and Services" width="300"></p>
 
-**Step 6:** This page confirms the information the user has provided to ensure everything is correct before moving forward.
+*Step 6:* This page confirms the information the user has provided to ensure everything is correct before moving forward.
 <p><img src="Images/read_user_walkthrough/11.jpg" alt="Confirm Information" width="300"></p>
 
-**Step 7:** This page confirms the submission and informs the user that their account is pending. They must wait for an administrator to manually verify their submitted ID picture before gaining full access.
+*Step 7:* This page confirms the submission and informs the user that their account is pending. They must wait for an administrator to manually verify their submitted ID picture before gaining full access.
 <p><img src="Images/read_user_walkthrough/12.jpg" alt="Pending Approval" width="300"></p>
 
   <hr>
@@ -154,28 +150,34 @@ Here is the step-by-step process for users to authenticate and access the system
   ### 2. Main Dashboard
 Once logged in, users are greeted by the main page where they can navigate the system.
 
-**Overview:** The main dashboard gives the user tips and information that can be helpful in times of need. This includes an SOS button, AI-driven contextual tips, and the Nearest Home Shelter based on your current location.
+*Overview:* The main dashboard gives the user tips and information that can be helpful in times of need. This includes an SOS button, AI-driven contextual tips, and the Nearest Home Shelter based on your current location.
 <p><img src="Images/read_user_walkthrough/1.jpg" alt="Main Page 1" width="300"></p>
 
-**SOS Button:** When the SOS button is clicked, this page will appear prompting the user to select what kind of emergency they are experiencing so that the appropriate help can be dispatched immediately.
+*SOS Button:* When the SOS button is clicked, this page will appear prompting the user to select what kind of emergency they are experiencing so that the appropriate help can be dispatched immediately.
 <p><img src="Images/read_user_walkthrough/2.jpg" alt="Main Page 2" width="300"></p>
 
-> **Legal Warning:** To protect the integrity of the system and ensure responders are available for real emergencies, **prank reporting is strictly prohibited.** False reports are a criminal offense under **Presidential Decree No. 1727** and **Article 155 of the Revised Penal Code (Alarms and Scandals)**. Violators will be tracked via their verified ID and face legal prosecution.
+**Legal Warning:** To protect the integrity of the system and ensure responders are available for real emergencies, **prank reporting is strictly prohibited.** False reports are a criminal offense under **Presidential Decree No. 1727** and **Article 155 of the Revised Penal Code (Alarms and Scandals)**. Violators will be tracked via their verified ID and face legal prosecution.
+**📡 Offline SOS Capability:** The SOS button is designed to save lives even during total internet blackouts. If no connection is detected:
+:
+1. The system automatically retrieves your **last recorded location** from the secure local cache.
+2. It triggers a **fail-safe SMS fallback** to the administrator's emergency line.
+3. The message includes an automated **Google Maps location link**, allowing responders to navigate to your position using GPS coordinates even without a data signal.
 
-**Reports:** After an SOS is sent, users can track the status of their emergency on the Reports page. This is easily accessible by tapping the Reports icon on the bottom navigation bar. It also provides situational guidance while you wait for help.
+
+*Reports:* After an SOS is sent, users can track the status of their emergency on the Reports page. This is easily accessible by tapping the Reports icon on the bottom navigation bar. It also provides situational guidance while you wait for help.
 <p><img src="Images/read_user_walkthrough/3.jpg" alt="Main Page 3" width="300"></p>
 
-**Centers & Routing:** By tapping "Centers" in the bottom navigation menu, users can easily locate the nearest evacuation center. The app automatically calculates and displays the safest route to guide you to your destination.
+*Centers & Routing:* By tapping "Centers" in the bottom navigation menu, users can easily locate the nearest evacuation center. The app automatically calculates and displays the safest route to guide you to your destination.
 <p>
   <img src="Images/read_user_walkthrough/4.jpg" alt="Evacuation Centers" height="550">
   &nbsp;&nbsp;&nbsp;
   <img src="Images/read_user_walkthrough/5.jpg" alt="Route Navigation" height="550">
 </p>
 
-**Settings/Profile:** In the settings page, users can view and edit their profile information to ensure their emergency contact details and health info stay up to date.
+*Settings/Profile:* In the settings page, users can view and edit their profile information to ensure their emergency contact details and health info stay up to date.
 <p><img src="Images/read_user_walkthrough/6.jpg" alt="Profile Settings" width="300"></p>
 
-**ARPS AI Assistant:** The system features an integrated AI Assistant that provides real-time, context-aware advice. It offers immediate safety protocols and disaster-preparedness tips tailored to the user's current environment and active hazards.
+*ARPS AI Assistant:* The system features an integrated AI Assistant that provides real-time, context-aware advice. It offers immediate safety protocols and disaster-preparedness tips tailored to the user's current environment and active hazards.
 <p><img src="Images/read_user_walkthrough/15.jpg" alt="ARPS AI Assistant" width="300"></p>
 
 </details>
@@ -186,33 +188,34 @@ Once logged in, users are greeted by the main page where they can navigate the s
 These API'S are the External Services Used in the System
 
 ### 1. Nominatim (Address Finder)
-* **What it does:** It translates raw GPS coordinates (latitude and longitude) into a readable human location, like "Street, Barangay, Province."
-* **How it helps:** When the app detects exactly where you are on the map, it uses this service to figure out your actual street address and display it on the screen.
+* *What it does:* It translates raw GPS coordinates (latitude and longitude) into a readable human location, like "Street, Barangay, Province."
+* *How it helps:* When the app detects exactly where you are on the map, it uses this service to figure out your actual street address and display it on the screen.
 
 ### 2. BigDataCloud (Backup Address Finder)
-* **What it does:** This is our backup tool for finding addresses, specifically tuned to recognize Philippine "Barangays."
-* **How it helps:** If the main address finder is running slow or is temporarily unavailable, the app automatically switches to this service so you never lose your location details.
+* *What it does:* This is our backup tool for finding addresses, specifically tuned to recognize Philippine "Barangays."
+* *How it helps:* If the main address finder is running slow or is temporarily unavailable, the app automatically switches to this service so you never lose your location details.
 
 ### 3. PhilSMS (Emergency Text Messenger)
-* **What it does:** It is a service that sends out automated SMS text messages over the internet.
-* **How it helps:** When you press the SOS button, this service instantly texts your emergency contacts with your current location and the type of emergency. If you don't have internet access, the app is smart enough to open your phone's regular texting app so you can still send the message manually.
+* *What it does:* It is a service that sends out automated SMS text messages over the internet.
+* *How it helps:* When you press the SOS button, this service instantly texts your emergency contacts with your current location and the type of emergency. If you don't have internet access, the app is smart enough to open your phone's regular texting app so you can still send the message manually.
 
 ### 4. Open-Meteo (Live Weather)
-* **What it does:** It acts as the app's personal weatherman by checking the conditions at your exact GPS coordinates.
-* **How it helps:** It fetches the real-time temperature, wind speed, and weather status (like "Rainy" or "Mostly Clear") and displays them right on your home screen so you can stay informed about the environment around you.
+* *What it does:* It acts as the app's personal weatherman by checking the conditions at your exact GPS coordinates.
+* *How it helps:* It fetches the real-time temperature, wind speed, and weather status (like "Rainy" or "Mostly Clear") and displays them right on your home screen so you can stay informed about the environment around you.
 
 ### 5. Overpass API (Safe Zone Locator)
-* **What it does:** It acts like a highly specific search engine for buildings on a map.
-* **How it helps:** It scans the immediate area around your current location to find nearby evacuation centers, emergency facilities, and barangay halls. It then takes those locations and drops marker pins on your map so you know exactly where to go in an emergency.
+* *What it does:* It acts like a highly specific search engine for buildings on a map.
+* *How it helps:* It scans the immediate area around your current location to find nearby evacuation centers, emergency facilities, and barangay halls. It then takes those locations and drops marker pins on your map so you know exactly where to go in an emergency.
 
 # Use of AI Tools
 
-**Tool Used:** 
+*Tool Used:* 
 ### Google Gemini
 
-**Role:** Development Assistant & Debugging Support
+*Role:* Development Assistant & Debugging Support
 
-* **Notification System Logic:** Assisted in structuring and troubleshooting the backend code logic to ensure reliable delivery of alerts and notifications.
-* **UI/CSS Troubleshooting:** Helped identify and fix CSS layout and responsiveness issues to maintain a clean user interface.
-* **Admin Mapping Integration:** To find the official source of the Leaflet API and retrieve the correct developer settings for the map's foundation.
-* **Evacuation Routing Logic:** Aided in refining the data-handling logic used to fetch, filter, and display nearby evacuation centers accurately.
+* *Notification System Logic:* Assisted in structuring and troubleshooting the backend code logic to ensure reliable delivery of alerts and notifications.
+* *UI/CSS Troubleshooting:* Helped identify and fix CSS layout and responsiveness issues to maintain a clean user interface.
+* *Admin Mapping Integration:* To find the official source of the Leaflet API and retrieve the correct developer settings for the map's foundation.
+* *Evacuation Routing Logic:* Aided in refining the data-handling logic used to fetch, filter, and display nearby evacuation centers accurately.
+antique-arps.com

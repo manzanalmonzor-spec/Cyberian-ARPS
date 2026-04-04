@@ -95,7 +95,7 @@ The Admin page will primarily be handled by the respected MDRRMO in their respec
   <p><img src="Images/read_admin_walkthrough/7.png" alt="User Approval List" width="800"></p>
 
   *Settings:* In the settings page, the operator can configure the *Offline Service Number*. This number is used to receive SOS alerts via SMS from users who do not have internet access.
-  <p><img src="Images/read_admin_walkthrough/9.png" alt="Admin Settings" width="800"></p>
+  <p><img src="Images/read_admin_walkthrough/111.png" alt="Admin Settings" width="800"></p>
 
 </details>
 

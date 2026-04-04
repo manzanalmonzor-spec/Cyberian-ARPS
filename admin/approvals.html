@@ -22,28 +22,6 @@
     </script>
     <link rel="stylesheet" href="../shared.css" />
     <style>
-      .sidebar-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 16px;
-        color: #94A3B8;
-        font-weight: 600;
-        font-size: 14px;
-        border-radius: 12px;
-        transition: all 0.2s;
-        text-decoration: none;
-      }
-      .sidebar-item:hover {
-        background: rgba(255, 255, 255, 0.05);
-        color: #ffffff;
-      }
-      .sidebar-item.active {
-        background: #2563EB;
-        color: #ffffff;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-      }
-
       /* Tab styles */
       .tab-btn {
         position: relative;
@@ -138,12 +116,12 @@
       <aside class="w-[280px] bg-[#0F172A] text-white flex flex-col shrink-0 shadow-2xl z-50">
         <div class="px-6 py-8 border-b border-white/10">
           <div class="sidebar-brand">
-            <div class="flex items-center gap-3">
-              <img src="../Images/ARPLOGO.png" alt="ARPS logo" class="w-10 h-10 object-contain" />
-              <div>
-                <h3 class="text-2xl font-black tracking-tight text-white leading-none">ARPS</h3>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Admin Panel</p>
-              </div>
+            <div class="sidebar-brand-logo">
+              <img src="../Images/ARPLOGO.png" alt="ARPS logo" />
+            </div>
+            <div class="sidebar-brand-copy">
+              <h3>ARPS</h3>
+              <p>Admin Panel</p>
             </div>
           </div>
         </div>

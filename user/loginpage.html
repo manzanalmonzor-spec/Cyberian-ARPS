@@ -909,6 +909,17 @@
         if (!email) { showError('signUpError', 'Please enter your email.'); return; }
         if (password.length < 6) { showError('signUpError', 'Password must be at least 6 characters.'); return; }
 
+        // Check if email is banned
+        try {
+            if (firebase.apps && firebase.apps.length) {
+                var bannedDoc = await firebase.firestore().collection('bannedEmails').doc(email).get();
+                if (bannedDoc.exists) {
+                    showError('signUpError', 'This email has been permanently banned and cannot be used to create an account.');
+                    return;
+                }
+            }
+        } catch (e) { console.error('Ban check failed:', e); }
+
         // Check duplicate email in local accounts
         if (findLocalAccount(email)) {
             showError('signUpError', 'This email is already registered. Please sign in instead.');
@@ -951,6 +962,17 @@
 
         if (!email) { showError('signInError', 'Please enter your email.'); return; }
         if (!password) { showError('signInError', 'Please enter your password.'); return; }
+
+        // Check if email is banned
+        try {
+            if (firebase.apps && firebase.apps.length) {
+                var bannedDoc = await firebase.firestore().collection('bannedEmails').doc(email).get();
+                if (bannedDoc.exists) {
+                    showError('signInError', 'This email has been permanently banned. You cannot sign in.');
+                    return;
+                }
+            }
+        } catch (e) { console.error('Ban check failed:', e); }
 
         var btn = document.getElementById('signInBtn');
         btn.innerHTML = '<div class="spinner"></div>';

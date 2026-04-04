@@ -28,11 +28,11 @@
 The Project is a creation of the Team Cyberians from Saint Anthony's College as an entry for the 𝗞𝗼𝗺𝘀𝗮𝗶 𝗛𝗮𝗰𝗸 𝟮𝟬𝟮𝟲: 𝗥𝗶𝘀𝗸𝗥𝗲𝗮𝗱𝘆 hosted by the University of the Philippines Miag-ao
 
 ## Team Members
-1. Almonzor Manzan - Project Lead and Developer
-2. Khing Jay Regala - Project Developer
-3. Alleah Wendine Tejares - Spokesperson
-4. Marl Ellie Alfonga - Spokesperson
-5. Ian Jude C. Fabila - Documentator
+1. Almonzor Manzan - Hacker/Project Lead
+2. Khing Jay Regala - Hacker
+3. Alleah Wendine Tejares - Hipster
+4. Marl Ellie Alfonga - Hipster
+5. Ian Jude C. Fabila - Hustler
 
 <img src="Images/team_pic/1.jpg" alt="Cyberian Team" width="700">
 <br>
@@ -64,12 +64,7 @@ You can Install the Web Application in your device for a better experience enabl
 * **One-Tap SOS System:** Send immediate emergency alerts to the MDRRMO. The system intelligently uses PhilSMS for internet-based alerts but automatically falls back to your phone’s native SMS app if you are offline.
 
 
-
-
 # Walkthrough
-
-
-</details>
 
 ## Admin
   The Admin page will primarily be handled by the respected MDRRMO in their respected municipalities in Antique in order to receive emergency alerts and define areas with possible hazards and risks.
@@ -97,7 +92,7 @@ You can Install the Web Application in your device for a better experience enabl
   <img src="Images/read_admin_walkthrough/6.jpg" alt="Route Navigation" width="800"></p>
 
   **User Approval:** In the Users Approval page, the operator/admin can authenticate new user accounts.
-  <p><img src="images/read_admin_walkthrough/7.jpg" alt="Main Page 6" width="800">
+  <p><img src="Images/read_admin_walkthrough/7.jpg" alt="Main Page 6" width="800">
   &nbsp;&nbsp;&nbsp;
   <img src="Images/read_admin_walkthrough/8.jpg" alt="Route Navigation" width="800"></p>
 
@@ -119,52 +114,69 @@ The User Dashboard is the main home screen where users can access and interact w
   <br>
 
   ### 1. Login Process
-  Here is the step-by-step process for users to authenticate and access the system securely.
-  
-  **Step 1.1:** First time users can register their accounts in this Sign In page by inputting their Name, Email, and Password.
-  <p><img src="Images/read_user_walkthrough/7.jpg" alt="Sign Up" width="300"></p>
+Here is the step-by-step process for users to authenticate and access the system securely.
 
-  **Step 1.2:** Returning users may access their account using this Sign Up page by inputting their Email, and Password.
-  <p><img src="Images/read_user_walkthrough/13.jpg" alt="Sign In" width="300"></p>
+**Step 1:** Users begin at the ARPS landing page. By tapping the **"Open Citizen App"** button, they will be directed to the Login portal.
+<p><img src="Images/read_user_walkthrough/16.jpg" alt="Landing Page" width="300"></p>
 
-  **Step 2:** In this page, the user will have to input their personal information such as Name, Age, Contact Number, Address, and Gender.
-  <p><img src="Images/read_user_walkthrough/8.jpg" alt="Login Step 3" width="300"></p>
+**Step 2:** New users can register their accounts by inputting their Name, Email, and Password, while returning users can quickly access their accounts via the Sign In page.
+<p>
+  <img src="Images/read_user_walkthrough/7.jpg" alt="Sign Up" width="300">
+  &nbsp;&nbsp;&nbsp;
+  <img src="Images/read_user_walkthrough/13.jpg" alt="Sign In" width="300">
+</p>
 
-  **Step 3:** A facial and ID verification using the phone's camera will be conducted to further authenticate the user and prevent trolls or fake accounts from accessing the system.
-  <p><img src="Images/read_user_walkthrough/9.jpg" alt="Login Step 4" width="300"></p>
+> **Note:** Users only need to perform a **one-time login**. Once authenticated, the system keeps you logged in so that the SOS button and critical emergency features are instantly accessible in high-pressure situations without needing to re-enter credentials.
 
-  **Step 4:** In this page the user can read and agree to the terms and services of using the ARPS system. 
-  <p><img src="Images/read_user_walkthrough/10.jpg" alt="Login Step 5" width="300"></p>
+**Step 3:** In this page, the user will have to input their personal information such as Name, Age, Contact Number, Address, and Gender.
+<p><img src="Images/read_user_walkthrough/8.jpg" alt="Personal Info" width="300"></p>
 
-  **Step 5:** This page confirms the information the user has provided to ensure everything is correct before moving forward.
-  <p><img src="Images/read_user_walkthrough/11.jpg" alt="Login Step 6" width="300"></p>
+**Step 4:** A facial and ID verification using the phone's camera will be conducted to further authenticate the user and prevent trolls or fake accounts from accessing the system.
+<p>
+  <img src="Images/read_user_walkthrough/14.jpg" alt="ID Upload" width="300">
+  &nbsp;&nbsp;&nbsp;
+  <img src="Images/read_user_walkthrough/9.jpg" alt="Face Verification" width="300">
+</p>
 
-  **Step 6:** This page confirms the submission and informs the user that their account is pending. They must wait for an administrator to manually verify their submitted ID picture before gaining full access.
-  <p><img src="Images/read_user_walkthrough/12.jpg" alt="Login Step 7" width="300"></p>
+> **Anti-Troll Measure:** This verification step ensures accountability. Any user found sending malicious or fake SOS signals will be identified and reported to authorities for violating **Presidential Decree No. 1727**, which penalizes the dissemination of false information and emergency alarms.
+
+**Step 5:** In this page the user can read and agree to the terms and services of using the ARPS system. 
+<p><img src="Images/read_user_walkthrough/10.jpg" alt="Terms and Services" width="300"></p>
+
+**Step 6:** This page confirms the information the user has provided to ensure everything is correct before moving forward.
+<p><img src="Images/read_user_walkthrough/11.jpg" alt="Confirm Information" width="300"></p>
+
+**Step 7:** This page confirms the submission and informs the user that their account is pending. They must wait for an administrator to manually verify their submitted ID picture before gaining full access.
+<p><img src="Images/read_user_walkthrough/12.jpg" alt="Pending Approval" width="300"></p>
 
   <hr>
 
   ### 2. Main Dashboard
-  Once logged in, users are greeted by the main page where they can navigate the system.
+Once logged in, users are greeted by the main page where they can navigate the system.
 
-  **Overview:** The main dashboard gives the user tips and information that can be helpful in times of need. this includes an SOS button, AI driven contextual tips, and Nearest Home Shelter based on location.
-  <p><img src="Images/read_user_walkthrough/1.jpg" alt="Main Page 1" width="300"></p>
+**Overview:** The main dashboard gives the user tips and information that can be helpful in times of need. This includes an SOS button, AI-driven contextual tips, and the Nearest Home Shelter based on your current location.
+<p><img src="Images/read_user_walkthrough/1.jpg" alt="Main Page 1" width="300"></p>
 
-  **SOS Button:** When the SOS button is clicked, this page will appear prompting the user what kind of emergency he/she is experiencing in order to identify what kind of help should be sent to him/her.
-  <p><img src="Images/read_user_walkthrough/2.jpg" alt="Main Page 2" width="300"></p>
+**SOS Button:** When the SOS button is clicked, this page will appear prompting the user to select what kind of emergency they are experiencing so that the appropriate help can be dispatched immediately.
+<p><img src="Images/read_user_walkthrough/2.jpg" alt="Main Page 2" width="300"></p>
 
-  **Reports:** After an SOS is sent, users can track the status of their emergency on the Reports page. This is easily accessible by tapping the Reports icon on the bottom navigation bar. There is also additional information on what to do based on the situation.
-  <p><img src="Images/read_user_walkthrough/3.jpg" alt="Main Page 3" width="300"></p>
+> **Legal Warning:** To protect the integrity of the system and ensure responders are available for real emergencies, **prank reporting is strictly prohibited.** False reports are a criminal offense under **Presidential Decree No. 1727** and **Article 155 of the Revised Penal Code (Alarms and Scandals)**. Violators will be tracked via their verified ID and face legal prosecution.
 
- **Centers & Routing:** By tapping "Centers" in the bottom navigation menu, users can easily locate the nearest evacuation center. The app will also calculate and display the best route to safely guide the user to their destination.
-  <p>
-    <img src="Images/read_user_walkthrough/4.jpg" alt="Evacuation Centers" height="550">
-    &nbsp;&nbsp;&nbsp;
-    <img src="Images/read_user_walkthrough/5.jpg" alt="Route Navigation" height="550">
-  </p>
+**Reports:** After an SOS is sent, users can track the status of their emergency on the Reports page. This is easily accessible by tapping the Reports icon on the bottom navigation bar. It also provides situational guidance while you wait for help.
+<p><img src="Images/read_user_walkthrough/3.jpg" alt="Main Page 3" width="300"></p>
 
-  **Settings/Profile:** By tapping "Settings" in the bottom navigation menu, users will be directed to the settings page where the user can see and edit their profile.
-  <p><img src="Images/read_user_walkthrough/6.jpg" alt="Main Page 6" width="300"></p>
+**Centers & Routing:** By tapping "Centers" in the bottom navigation menu, users can easily locate the nearest evacuation center. The app automatically calculates and displays the safest route to guide you to your destination.
+<p>
+  <img src="Images/read_user_walkthrough/4.jpg" alt="Evacuation Centers" height="550">
+  &nbsp;&nbsp;&nbsp;
+  <img src="Images/read_user_walkthrough/5.jpg" alt="Route Navigation" height="550">
+</p>
+
+**Settings/Profile:** In the settings page, users can view and edit their profile information to ensure their emergency contact details and health info stay up to date.
+<p><img src="Images/read_user_walkthrough/6.jpg" alt="Profile Settings" width="300"></p>
+
+**ARPS AI Assistant:** The system features an integrated AI Assistant that provides real-time, context-aware advice. It offers immediate safety protocols and disaster-preparedness tips tailored to the user's current environment and active hazards.
+<p><img src="Images/read_user_walkthrough/15.jpg" alt="ARPS AI Assistant" width="300"></p>
 
 </details>
 <br>
@@ -204,7 +216,3 @@ These API'S are the External Services Used in the System
 * **UI/CSS Troubleshooting:** Helped identify and fix CSS layout and responsiveness issues to maintain a clean user interface.
 * **Admin Mapping Integration:** To find the official source of the Leaflet API and retrieve the correct developer settings for the map's foundation.
 * **Evacuation Routing Logic:** Aided in refining the data-handling logic used to fetch, filter, and display nearby evacuation centers accurately.
-<br>
-
- 
-

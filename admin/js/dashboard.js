@@ -666,7 +666,82 @@ window.addEventListener("load", () => {
   initDashboardMap();
   renderDashboardMapMarkers();
   startAdminLocationTracking();
+  fetchLiveSignal();
 });
+
+// ── Live PAGASA Wind Signal for Antique ──────────────────────────────────────
+async function fetchLiveSignal() {
+  const LAT = 11.3683;
+  const LNG = 122.0643;
+  const badge = document.getElementById('signalBadge');
+  const text = document.getElementById('signalText');
+  if (!badge || !text) return;
+
+  try {
+    const res = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LNG}&current_weather=true&windspeed_unit=kmh`
+    );
+    const data = await res.json();
+    const wind = data.current_weather;
+    const gustKmh = wind.windspeed || 0;
+    const wmoCode = wind.weathercode || 0;
+
+    // PAGASA wind signal thresholds
+    let signal, bgClass, dotClass, textClass, dotPing;
+    if (gustKmh >= 185) {
+      signal = { num: 5, label: 'SIGNAL #5 ACTIVE' };
+    } else if (gustKmh >= 118) {
+      signal = { num: 4, label: 'SIGNAL #4 ACTIVE' };
+    } else if (gustKmh >= 89) {
+      signal = { num: 3, label: 'SIGNAL #3 ACTIVE' };
+    } else if (gustKmh >= 62) {
+      signal = { num: 2, label: 'SIGNAL #2 ACTIVE' };
+    } else if (gustKmh >= 39) {
+      signal = { num: 1, label: 'SIGNAL #1 ACTIVE' };
+    } else {
+      signal = { num: 0, label: '' };
+    }
+
+    if (signal.num >= 3) {
+      bgClass = 'bg-red-100'; dotClass = 'bg-red-600'; textClass = 'text-red-900';
+      dotPing = '<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>';
+    } else if (signal.num === 2) {
+      bgClass = 'bg-orange-100'; dotClass = 'bg-orange-500'; textClass = 'text-orange-900';
+      dotPing = '<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>';
+    } else if (signal.num === 1) {
+      bgClass = 'bg-amber-100'; dotClass = 'bg-amber-500'; textClass = 'text-amber-900';
+      dotPing = '<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>';
+    } else {
+      // No signal — show weather description
+      var desc = 'Fair Weather';
+      if (wmoCode === 0) desc = 'Clear Sky';
+      else if (wmoCode <= 3) desc = 'Partly Cloudy';
+      else if (wmoCode <= 48) desc = 'Foggy';
+      else if (wmoCode <= 57) desc = 'Light Drizzle';
+      else if (wmoCode <= 67) desc = 'Rainy';
+      else if (wmoCode <= 82) desc = 'Rain Showers';
+      else if (wmoCode <= 94) desc = 'Heavy Showers';
+      else desc = 'Thunderstorm';
+
+      bgClass = 'bg-emerald-50'; dotClass = 'bg-emerald-500'; textClass = 'text-emerald-800';
+      dotPing = '';
+      signal.label = desc + ' · No Signal';
+    }
+
+    badge.className = `flex items-center gap-1.5 ${bgClass} px-3.5 py-2 rounded-[10px] transition-all`;
+    badge.querySelector('.relative.flex').innerHTML = (dotPing ? dotPing : '') +
+      `<span class="relative inline-flex rounded-full h-2 w-2 ${dotClass}"></span>`;
+    text.className = `text-xs font-semibold ${textClass}`;
+    text.textContent = signal.label;
+
+  } catch (e) {
+    console.error('Signal fetch error:', e);
+    text.textContent = 'Weather unavailable';
+  }
+
+  // Refresh every 10 minutes
+  setTimeout(fetchLiveSignal, 10 * 60 * 1000);
+}
 
 // ── Firebase real-time listener ────────────────────────────────────────────────
 let _prevSosCount = -1;

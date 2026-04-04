@@ -93,6 +93,24 @@
 
     document.body.appendChild(overlay);
 
+    // Lock scroll on body and html
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.height = '100%';
+    document.documentElement.style.overflow = 'hidden';
+
+    // Block all touch/scroll events on the page behind the overlay
+    overlay.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
+    document.addEventListener('touchmove', function(e) {
+      if (document.getElementById('arps-ban-overlay')) e.preventDefault();
+    }, { passive: false });
+    document.addEventListener('scroll', function(e) {
+      if (document.getElementById('arps-ban-overlay')) {
+        window.scrollTo(0, 0);
+      }
+    });
+
     requestAnimationFrame(function() {
       overlay.style.opacity = '1';
       overlay.firstElementChild.style.transform = 'scale(1)';

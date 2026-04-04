@@ -32,6 +32,13 @@
     return;
   }
 
+  // If rejected, block access and redirect to login
+  if (profile.status === 'rejected' && currentPath.indexOf('loginpage.html') === -1) {
+    localStorage.removeItem('arps_session');
+    window.location.href = 'loginpage.html';
+    return;
+  }
+
   // Expose session data globally
   window.arpsUser = session;
 

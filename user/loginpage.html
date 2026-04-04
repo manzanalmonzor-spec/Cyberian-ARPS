@@ -685,18 +685,22 @@
             }));
         }
 
-        // If already marked as onboarded locally, go to home
-        if (localStorage.getItem('arps_onboarded_' + user.uid) === 'true') {
-            window.location.href = 'home.html';
-            return;
-        }
-
-        // Check Firestore for existing user data (covers users who onboarded before this update)
+        // Check Firestore for existing user data and status
         try {
             if (firebase.apps && firebase.apps.length) {
                 var userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
                 if (userDoc.exists) {
                     var userData = userDoc.data();
+                    var userStatus = userData.status || 'pending';
+
+                    // Block rejected users from logging in
+                    if (userStatus === 'rejected') {
+                        localStorage.removeItem('arps_session');
+                        var reason = userData.rejectionReason || 'Your account has been rejected by the administrator.';
+                        showError('signInError', 'Account rejected: ' + reason);
+                        return;
+                    }
+
                     // User already has a Firestore profile — they already onboarded
                     localStorage.setItem('arps_onboarded_' + user.uid, 'true');
                     // Restore their profile locally
@@ -706,7 +710,7 @@
                     profile.emergencyContact = userData.emergencyContact || '';
                     profile.emergencyNumber = userData.emergencyNumber || '';
                     profile.atRisk = userData.atRisk || 'None';
-                    profile.status = userData.status || 'approved';
+                    profile.status = userStatus;
                     localStorage.setItem(profileKey, JSON.stringify(profile));
                     // Restore emergency contact for settings page
                     if (userData.emergencyContact || userData.emergencyNumber) {
@@ -715,12 +719,23 @@
                             number: userData.emergencyNumber || ''
                         }));
                     }
-                    window.location.href = 'home.html';
+
+                    if (userStatus === 'pending') {
+                        window.location.href = 'pending.html';
+                    } else {
+                        window.location.href = 'home.html';
+                    }
                     return;
                 }
             }
         } catch (e) {
             console.error('Firestore check failed, falling back to onboarding:', e);
+        }
+
+        // If already marked as onboarded locally but no Firestore data
+        if (localStorage.getItem('arps_onboarded_' + user.uid) === 'true') {
+            window.location.href = 'home.html';
+            return;
         }
 
         // No Firestore record found — new user, go to onboarding

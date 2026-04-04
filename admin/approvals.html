@@ -422,7 +422,7 @@
 
     <script type="module">
       import { db } from "../firebase-config.js";
-      import { collection, query, where, onSnapshot, doc, updateDoc, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+      import { collection, query, where, onSnapshot, getDocs, doc, updateDoc, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
       window.toast = function(msg, type='success') {
         const t = document.createElement('div');
@@ -1040,10 +1040,23 @@
       window.unbanUser = async function(index) {
         const banned = bannedUsers[index];
         if (!banned) return;
-        if (!confirm(`Are you sure you want to unban ${banned.email}? This email will be able to sign up and log in again.`)) return;
+        if (!confirm(`Are you sure you want to unban ${banned.email}? This account will be restored to approved and can log in again.`)) return;
         try {
+          // Remove from bannedEmails collection
           await deleteDoc(doc(db, "bannedEmails", banned.docId));
-          toast('Unbanned ' + banned.email, 'success');
+
+          // Find the user document by email and restore status to approved
+          const userQuery = query(collection(db, "users"), where("email", "==", banned.email));
+          const userSnap = await getDocs(userQuery);
+          userSnap.forEach(async (userDoc) => {
+            await updateDoc(doc(db, "users", userDoc.id), {
+              status: 'approved',
+              rejectionReason: '',
+              rejectedAt: ''
+            });
+          });
+
+          toast('Unbanned & restored ' + banned.email, 'success');
         } catch (e) {
           console.error(e);
           toast('Failed to unban', 'error');

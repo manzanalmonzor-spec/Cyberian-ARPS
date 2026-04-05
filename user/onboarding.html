@@ -186,6 +186,17 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
     }
+    @media (max-width: 400px) {
+      .photo-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+      }
+      .photo-grid .photo-card:first-child {
+        grid-column: 1 / -1;
+        max-width: 60%;
+        margin: 0 auto;
+      }
+    }
     .photo-card {
       border: 2px dashed #cbd5e1;
       border-radius: 14px;
@@ -250,15 +261,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 3px;
-      padding: 7px 4px;
+      gap: 2px;
+      padding: 7px 2px;
       border: 1.5px solid #e2e8f0;
       border-radius: 8px;
       background: #fff;
       cursor: pointer;
       transition: all 0.2s;
       font-family: inherit;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
       color: #64748B;
       margin-top: 0;
@@ -266,6 +277,9 @@
       text-transform: none;
       letter-spacing: normal;
       width: auto;
+      white-space: nowrap;
+      overflow: hidden;
+      min-width: 0;
     }
     .photo-actions button:hover {
       border-color: #7c3aed;

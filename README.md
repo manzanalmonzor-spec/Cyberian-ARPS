@@ -73,7 +73,7 @@ The Admin page will primarily be handled by the respected MDRRMO in their respec
   <summary><strong><font color="blue">Click to view: Admin Walkthrough</font></strong></summary>
 
 
-  **Admin Login:**To ensure secure access, administrators from the MDRRMO must authenticate on the secure login page using the account "admin@gmail.com" with the password "admin1234", which can be accessed via [Antique ARPS Admin Page](https://antique-arps.com/admin/index.html)
+  **Admin Login:** To ensure secure access, administrators from the MDRRMO must authenticate on the secure login page using the account "admin@gmail.com" with the password "admin1234", which can be accessed via [Antique ARPS Admin Page](https://antique-arps.com/admin/index.html)
   <p><img src="Images/read_admin_walkthrough/10.png" alt="Admin Login" width="800"></p>
 
   **Admin Dashboard:** The Admin Dashboard provides the operator with a comprehensive overview of all incoming emergency requests from users. This includes critical real-time data, such as the exact location of the user and the specific type of emergency reported.
@@ -150,7 +150,7 @@ Once logged in, users are greeted by the main page where they can navigate the s
 **Overview:** The main dashboard gives the user tips and information that can be helpful in times of need. This includes an SOS button, AI-driven contextual tips, and the Nearest Home Shelter based on your current location.
 
 **SOS Button:** When the SOS button is clicked, this page will appear prompting the user to select what kind of emergency they are experiencing so that the appropriate help can be dispatched immediately.
-<p><img src="Images/read_user_walkthrough/1.jpg" alt="Main Page 1" width="300"> <img src="Images/read_user_walkthrough/2.jpg" alt="Main Page 2" width="300"></p>
+<p><img src="Images/read_user_walkthrough/1.jpg" alt="Main Page 1" width="300"> <img src="Images/read_user_walkthrough/55.jpg" alt="Main Page 2" width="300"></p>
 
 > **Legal Warning:** To protect the integrity of the system and ensure responders are available for real emergencies, **prank reporting is strictly prohibited.** False reports are a criminal offense under **Presidential Decree No. 1727** and **Article 155 of the Revised Penal Code (Alarms and Scandals)**. Violators will be tracked via their verified ID and face legal prosecution.
 <br>

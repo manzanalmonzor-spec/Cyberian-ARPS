@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <script src="../shared.js"></script>
+  <script src="./js/auth-guard.js"></script>
+  <meta name="theme-color" content="#1E293B" />
+  <title>ARPS — SOS Report</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["DM Sans", "Segoe UI", "system-ui", "sans-serif"],
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="stylesheet" href="../shared.css" />
+  <link rel="stylesheet" href="./css/admin-mobile.css" />
+  <link rel="icon" type="image/png" href="../Images/ARPLOGO.png">
+
+  <style>
+    .report-filter-btn {
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #64748B;
+      border: 1.5px solid #E2E8F0;
+      background: #fff;
+      cursor: pointer;
+      transition: all 0.18s;
+      font-family: inherit;
+      border-radius: 10px;
+    }
+    .report-filter-btn:hover {
+      color: #1E293B;
+      background: #F1F5F9;
+      border-color: #CBD5E1;
+    }
+    .report-filter-btn.active {
+      color: #1D4ED8;
+      background: #EFF6FF;
+      border-color: #93C5FD;
+    }
+
+    .report-table-row {
+      display: grid;
+      grid-template-columns: 1.6fr 1.2fr 1fr 0.9fr 0.9fr 1.3fr;
+      align-items: center;
+      padding: 14px 20px;
+      border-bottom: 1px solid #F1F5F9;
+      transition: background 0.15s;
+      gap: 12px;
+    }
+    .report-table-row:hover {
+      background: #F8FAFC;
+    }
+    .report-table-row:last-child {
+      border-bottom: none;
+    }
+    .report-table-header {
+      display: grid;
+      grid-template-columns: 1.6fr 1.2fr 1fr 0.9fr 0.9fr 1.3fr;
+      align-items: center;
+      padding: 10px 20px;
+      gap: 12px;
+      background: #F8FAFC;
+      border-bottom: 1.5px solid #E2E8F0;
+    }
+
+    .type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .type-flood    { background: #EFF6FF; color: #1D4ED8; }
+    .type-medical  { background: #FFF1F2; color: #E11D48; }
+    .type-fire     { background: #FFF7ED; color: #EA580C; }
+    .type-earthquake { background: #FFFBEB; color: #B45309; }
+    .type-typhoon  { background: #F5F3FF; color: #7C3AED; }
+    .type-sos      { background: #FEF2F2; color: #DC2626; }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .status-pending    { background: #FEF3C7; color: #92400E; }
+    .status-responding { background: #DBEAFE; color: #1E40AF; }
+    .status-resolved   { background: #D1FAE5; color: #065F46; }
+
+    .print-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      background: #1D4ED8;
+      border: none;
+      border-radius: 11px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.18s, transform 0.1s;
+      box-shadow: 0 2px 10px rgba(29,78,216,0.18);
+    }
+    .print-btn:hover { background: #1e40af; }
+    .print-btn:active { transform: scale(0.97); }
+
+    .export-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1D4ED8;
+      background: #EFF6FF;
+      border: 1.5px solid #93C5FD;
+      border-radius: 11px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.18s, transform 0.1s;
+    }
+    .export-btn:hover { background: #DBEAFE; }
+    .export-btn:active { transform: scale(0.97); }
+
+    @media print {
+      aside, .no-print { display: none !important; }
+      main { padding: 0 !important; }
+      body { background: #fff !important; }
+      .report-table-row:hover { background: transparent !important; }
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.4s infinite;
+      border-radius: 8px;
+    }
+    @keyframes skeleton-loading {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ── Export / Print Modal ───────────────────────────────── */
+    .ep-overlay {
+      position: fixed; inset: 0;
+      background: rgba(15,23,42,0.45);
+      backdrop-filter: blur(3px);
+      z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .ep-overlay.open { opacity: 1; pointer-events: all; }
+
+    .ep-dialog {
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: 0 24px 80px rgba(15,23,42,0.22), 0 4px 16px rgba(15,23,42,0.08);
+      width: 520px;
+      max-width: calc(100vw - 32px);
+      transform: translateY(18px) scale(0.97);
+      transition: transform 0.22s cubic-bezier(.34,1.56,.64,1), opacity 0.2s;
+      opacity: 0;
+    }
+    .ep-overlay.open .ep-dialog { transform: translateY(0) scale(1); opacity: 1; }
+
+    .ep-dialog-header {
+      padding: 22px 24px 18px;
+      border-bottom: 1px solid #F1F5F9;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .ep-dialog-body { padding: 22px 24px; }
+    .ep-dialog-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #F1F5F9;
+      display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+    }
+
+    .ep-close-btn {
+      width: 32px; height: 32px; border-radius: 10px;
+      border: none; background: #F1F5F9;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: #64748B; transition: background 0.15s;
+    }
+    .ep-close-btn:hover { background: #E2E8F0; color: #0F172A; }
+
+    .ep-section-label {
+      font-size: 11px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: .06em; color: #94A3B8; margin-bottom: 10px;
+    }
+
+    .ep-quick-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      margin-bottom: 18px;
+    }
+    .ep-quick-btn {
+      padding: 9px 6px;
+      font-size: 12px; font-weight: 700;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 11px;
+      background: #fff;
+      color: #475569;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .ep-quick-btn:hover { border-color: #93C5FD; background: #EFF6FF; color: #1D4ED8; }
+    .ep-quick-btn.selected {
+      border-color: #1D4ED8; background: #EFF6FF; color: #1D4ED8;
+      box-shadow: 0 0 0 3px rgba(29,78,216,0.12);
+    }
+
+    .ep-range-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+      margin-bottom: 18px;
+    }
+    .ep-date-field {
+      display: flex; flex-direction: column; gap: 5px;
+    }
+    .ep-date-field label {
+      font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: .04em;
+    }
+    .ep-date-input {
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 13px; font-weight: 600;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 11px;
+      outline: none;
+      font-family: inherit;
+      color: #0F172A;
+      background: #F8FAFC;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .ep-date-input:focus {
+      border-color: #93C5FD;
+      box-shadow: 0 0 0 3px rgba(29,78,216,0.10);
+      background: #fff;
+    }
+    .ep-date-input.active-custom { border-color: #1D4ED8; background: #fff; }
+
+    .ep-filter-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+      margin-bottom: 4px;
+    }
+    .ep-select {
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 13px; font-weight: 600;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 11px;
+      outline: none;
+      font-family: inherit;
+      color: #0F172A;
+      background: #F8FAFC;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .ep-select:focus { border-color: #93C5FD; background: #fff; }
+
+    .ep-info-bar {
+      margin-top: 16px;
+      padding: 10px 14px;
+      border-radius: 11px;
+      background: #F0FDF4;
+      border: 1px solid #BBF7D0;
+      font-size: 12px; font-weight: 600; color: #065F46;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .ep-info-bar.warn { background: #FFF7ED; border-color: #FED7AA; color: #92400E; }
+
+    .ep-action-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 11px 22px;
+      font-size: 13px; font-weight: 800;
+      border: none; border-radius: 12px;
+      cursor: pointer; font-family: inherit;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .ep-action-btn:active { transform: scale(0.97); }
+    .ep-action-btn.csv  { background: #1D4ED8; color: #fff; box-shadow: 0 2px 10px rgba(29,78,216,0.2); }
+    .ep-action-btn.csv:hover  { background: #1e40af; }
+    .ep-action-btn.print { background: #0F172A; color: #fff; box-shadow: 0 2px 10px rgba(15,23,42,0.18); }
+    .ep-action-btn.print:hover { background: #1E293B; }
+
+    .ep-cancel-btn {
+      padding: 11px 18px;
+      font-size: 13px; font-weight: 700;
+      background: #F1F5F9;
+      border: none; border-radius: 12px;
+      color: #475569; cursor: pointer; font-family: inherit;
+      transition: background 0.15s;
+    }
+    .ep-cancel-btn:hover { background: #E2E8F0; }
+
+    .ep-divider { height: 1px; background: #F1F5F9; margin: 0 0 18px; }
+  </style>
+</head>
+
+<body class="bg-[#F8FAFC] font-sans">
+  <div class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-[280px] bg-[#0F172A] text-white flex flex-col shrink-0 shadow-2xl z-50">
+      <div class="px-6 py-8 border-b border-white/10">
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-logo">
+            <img src="../Images/ARPLOGO.png" alt="ARPS logo" />
+          </div>
+          <div class="sidebar-brand-copy">
+            <h3>ARPS</h3>
+            <p>Admin Panel</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="px-4 py-6 flex-1 gap-1 flex flex-col">
+        <a href="./dashboard.html" class="sidebar-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+          </svg>
+          Dashboard
+        </a>
+
+        <a href="./map.html" class="sidebar-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+          </svg>
+          Live Map
+        </a>
+
+        <a href="./alerts.html" class="sidebar-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          Alerts
+        </a>
+
+        <a href="./weather.html" class="sidebar-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+          </svg>
+          Weather
+        </a>
+
+        <a href="./approvals.html" class="sidebar-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          User Approvals
+        </a>
+
+        <a href="./report.html" class="sidebar-item active">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 17v-2m3 2v-4m3 4v-6M5 20h14a2 2 0 002-2V7l-5-5H5a2 2 0 00-2 2v13a2 2 0 002 2z" />
+          </svg>
+          Report
+        </a>
+
+        <a href="./settings.html" class="sidebar-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+          </svg>
+          Settings
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-auto p-8">
+
+      <!-- Header -->
+      <div class="flex justify-between items-start mb-8 no-print">
+        <div>
+          <h1 class="text-3xl font-black text-slate-900 tracking-tight">SOS Incident Report</h1>
+          <p class="text-[14px] text-slate-500 font-medium mt-1.5">Resident SOS history with timestamps and details</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="text-[13px] text-slate-400" id="currentDate"></div>
+          <button class="export-btn no-print" id="btnExportCSV">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export CSV
+          </button>
+          <button class="print-btn no-print" id="btnPrint">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+            </svg>
+            Print Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Summary Stats -->
+      <div class="grid grid-cols-4 gap-4 mb-6" id="reportStatsGrid">
+        <!-- Skeleton placeholders -->
+        <div class="bg-white rounded-3xl border border-slate-200/60 shadow-sm p-6">
+          <div class="skeleton h-4 w-24 mb-4"></div>
+          <div class="skeleton h-9 w-12"></div>
+        </div>
+        <div class="bg-white rounded-3xl border border-slate-200/60 shadow-sm p-6">
+          <div class="skeleton h-4 w-20 mb-4"></div>
+          <div class="skeleton h-9 w-12"></div>
+        </div>
+        <div class="bg-white rounded-3xl border border-slate-200/60 shadow-sm p-6">
+          <div class="skeleton h-4 w-24 mb-4"></div>
+          <div class="skeleton h-9 w-12"></div>
+        </div>
+        <div class="bg-white rounded-3xl border border-slate-200/60 shadow-sm p-6">
+          <div class="skeleton h-4 w-20 mb-4"></div>
+          <div class="skeleton h-9 w-12"></div>
+        </div>
+      </div>
+
+      <!-- Filter + Table -->
+      <div class="bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden">
+
+        <!-- Filter bar -->
+        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between flex-wrap gap-3 no-print">
+          <div class="flex items-center gap-1.5">
+            <button class="report-filter-btn active" data-period="today">Today</button>
+            <button class="report-filter-btn" data-period="week">This Week</button>
+            <button class="report-filter-btn" data-period="month">This Month</button>
+            <button class="report-filter-btn" data-period="all">All Time</button>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="filterType" class="text-xs border border-slate-200 rounded-lg px-3 py-2 font-bold font-sans bg-white outline-none text-slate-600 cursor-pointer">
+              <option value="">All Types</option>
+              <option value="SOS">SOS</option>
+              <option value="Medical">Medical</option>
+              <option value="Fire">Fire</option>
+              <option value="Flood">Flood</option>
+              <option value="Earthquake">Earthquake</option>
+              <option value="Typhoon">Typhoon</option>
+            </select>
+            <select id="filterStat" class="text-xs border border-slate-200 rounded-lg px-3 py-2 font-bold font-sans bg-white outline-none text-slate-600 cursor-pointer">
+              <option value="">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Responding">Responding</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+            <div class="flex items-center gap-1.5 ml-2 pl-2 border-l border-slate-200">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span class="text-xs text-slate-400 font-medium">Live</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Print header (only visible when printing) -->
+        <div style="display:none;" id="printHeader">
+          <div style="padding: 20px 24px 0; border-bottom: 2px solid #E2E8F0; margin-bottom: 0;">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+              <img src="../Images/ARPLOGO.png" style="width:40px;height:40px;border-radius:8px;" alt="ARPS"/>
+              <div>
+                <div style="font-size:18px;font-weight:900;color:#0F172A;">ARPS — SOS Incident Report</div>
+                <div style="font-size:12px;color:#64748B;" id="printSubtitle"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table header -->
+        <div class="report-table-header">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Resident / Name</span>
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Contact</span>
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Type</span>
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Severity</span>
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status</span>
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Date &amp; Time</span>
+        </div>
+
+        <!-- Table rows -->
+        <div id="reportTableBody">
+          <!-- Skeleton rows -->
+          <div class="report-table-row" style="pointer-events:none;">
+            <div class="skeleton h-4 w-36 rounded"></div>
+            <div class="skeleton h-4 w-28 rounded"></div>
+            <div class="skeleton h-5 w-20 rounded-lg"></div>
+            <div class="skeleton h-5 w-16 rounded-lg"></div>
+            <div class="skeleton h-5 w-20 rounded-full"></div>
+            <div class="skeleton h-4 w-32 rounded"></div>
+          </div>
+          <div class="report-table-row" style="pointer-events:none;">
+            <div class="skeleton h-4 w-32 rounded"></div>
+            <div class="skeleton h-4 w-24 rounded"></div>
+            <div class="skeleton h-5 w-16 rounded-lg"></div>
+            <div class="skeleton h-5 w-16 rounded-lg"></div>
+            <div class="skeleton h-5 w-24 rounded-full"></div>
+            <div class="skeleton h-4 w-28 rounded"></div>
+          </div>
+          <div class="report-table-row" style="pointer-events:none;">
+            <div class="skeleton h-4 w-40 rounded"></div>
+            <div class="skeleton h-4 w-28 rounded"></div>
+            <div class="skeleton h-5 w-20 rounded-lg"></div>
+            <div class="skeleton h-5 w-16 rounded-lg"></div>
+            <div class="skeleton h-5 w-20 rounded-full"></div>
+            <div class="skeleton h-4 w-32 rounded"></div>
+          </div>
+        </div>
+
+        <!-- Footer row count -->
+        <div class="px-5 py-3 border-t border-slate-100 flex items-center justify-between no-print" id="reportFooter">
+          <span class="text-xs text-slate-400 font-medium" id="reportCount">Loading...</span>
+          <span class="text-[11px] text-slate-300">ARPS Incident Database</span>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Export / Print Modal -->
+  <div class="ep-overlay no-print" id="epOverlay" role="dialog" aria-modal="true">
+    <div class="ep-dialog" id="epDialog">
+
+      <!-- Header -->
+      <div class="ep-dialog-header">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-[11px] flex items-center justify-center" id="epHeaderIcon"
+               style="background:#EFF6FF;">
+            <!-- icon injected by JS -->
+          </div>
+          <div>
+            <p class="text-[15px] font-black text-slate-900" id="epTitle">Export CSV</p>
+            <p class="text-[12px] text-slate-400 font-medium mt-0.5">Choose a date range and filters</p>
+          </div>
+        </div>
+        <button class="ep-close-btn" id="epClose" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="ep-dialog-body">
+
+        <!-- Quick range -->
+        <p class="ep-section-label">Quick Select Range</p>
+        <div class="ep-quick-grid">
+          <button class="ep-quick-btn" data-ep-period="today">Today</button>
+          <button class="ep-quick-btn" data-ep-period="week">This Week</button>
+          <button class="ep-quick-btn" data-ep-period="month">This Month</button>
+          <button class="ep-quick-btn" data-ep-period="3months">Last 3 Mo.</button>
+          <button class="ep-quick-btn" data-ep-period="6months">Last 6 Mo.</button>
+          <button class="ep-quick-btn" data-ep-period="year">Last Year</button>
+          <button class="ep-quick-btn" data-ep-period="5years">Last 5 Yrs</button>
+          <button class="ep-quick-btn" data-ep-period="all">All Time</button>
+        </div>
+
+        <div class="ep-divider"></div>
+
+        <!-- Custom range -->
+        <p class="ep-section-label">Custom Date Range</p>
+        <div class="ep-range-row">
+          <div class="ep-date-field">
+            <label for="epDateFrom">From</label>
+            <input type="date" id="epDateFrom" class="ep-date-input" />
+          </div>
+          <div class="ep-date-field">
+            <label for="epDateTo">To</label>
+            <input type="date" id="epDateTo" class="ep-date-input" />
+          </div>
+        </div>
+
+        <div class="ep-divider"></div>
+
+        <!-- Filters -->
+        <p class="ep-section-label">Filters (optional)</p>
+        <div class="ep-filter-row">
+          <div class="ep-date-field">
+            <label for="epFilterType">Emergency Type</label>
+            <select id="epFilterType" class="ep-select">
+              <option value="">All Types</option>
+              <option value="SOS">SOS</option>
+              <option value="Medical">Medical</option>
+              <option value="Fire">Fire</option>
+              <option value="Flood">Flood</option>
+              <option value="Earthquake">Earthquake</option>
+              <option value="Typhoon">Typhoon</option>
+            </select>
+          </div>
+          <div class="ep-date-field">
+            <label for="epFilterStatus">Status</label>
+            <select id="epFilterStatus" class="ep-select">
+              <option value="">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Responding">Responding</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+          </div>
+        </div>
+
+        
+        <div class="ep-info-bar" id="epInfoBar">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 17v-2m3 2v-4m3 4v-6M5 20h14a2 2 0 002-2V7l-5-5H5a2 2 0 00-2 2v13a2 2 0 002 2z"/></svg>
+          <span id="epInfoText">0 records match this selection</span>
+        </div>
+      </div>
+
+      
+      <div class="ep-dialog-footer">
+        <button class="ep-cancel-btn" id="epCancel">Cancel</button>
+        <button class="ep-action-btn csv" id="epActionBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="epActionIcon">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span id="epActionLabel">Export CSV</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/sos-sound.js"></script>
+  <script type="module" src="./js/report.js"></script>
+  <script src="./js/admin-mobile.js"></script>
+</body>
+
+</html>

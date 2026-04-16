@@ -54,12 +54,14 @@ You can Install the Web Application in your device for a better experience enabl
 3. After doing so, some of the ARPS features will now be accessible offline.
 
 
-# Features
+# Primary Features
 * **Offline Access:** Install the application directly to your device home screen. This allows you to access critical safety information and emergency guides even during total internet blackouts, and also has an offline SMS integration for when there is no internet connection available.
 * **One-Tap SOS System:** Send immediate emergency alerts to the MDRRMO. The system intelligently uses PhilSMS for internet-based alerts but automatically falls back to your phone’s native SMS app if you are offline.
+  * **Emergency Severity Scale:** The system automatically determines the priority level of an incoming SOS to help responders allocate resources. It evaluates **Role-Based Vulnerability** (flagging alerts from highly vulnerable demographics like the elderly, children, or PWD with a higher baseline severity) and **Community Threat Mapping** (dynamically upgrading the severity level if a high volume of SOS alerts originates from a single community simultaneously, signaling a large-scale disaster).
 * **Smart Evacuation Routing:** Find the nearest "Safe Zones" and evacuation centers instantly. The system uses the Overpass API to locate facilities and provides real-time navigation to guide you safely to your destination.
 * **Real-Time Weather Intelligence:** Stay ahead of hazards with live weather updates and storm tracking powered by Open-Meteo localized specifically to your current GPS coordinates.
 * **Live Incident Mapping:** For administrators, a real-time "Live Map" visualizes all active SOS signals across the municipality, allowing for faster response times and better resource management.
+* **Offline Risk-Mitigation AI Chatbot:** An AI built with the LIM (Light Intelligent Model), this locally-cached chatbot serves as a critical safety guide-through. It is designed to help users minimize risks by providing interactive, real-time access to "Self-Rescue" instructions and emergency guidance, even during complete network blackouts.
 
 
 
@@ -155,7 +157,7 @@ Once logged in, users are greeted by the main page where they can navigate the s
 > **Legal Warning:** To protect the integrity of the system and ensure responders are available for real emergencies, **prank reporting is strictly prohibited.** False reports are a criminal offense under **Presidential Decree No. 1727** and **Article 155 of the Revised Penal Code (Alarms and Scandals)**. Violators will be tracked via their verified ID and face legal prosecution.
 <br>
 
-> **📡 Offline SOS Capability:** The SOS button is designed to save lives even during total internet blackouts. If no connection is detected:
+> **Offline SOS Capability:** The SOS button is designed to save lives even during total internet blackouts. If no connection is detected:
 > 1. The system automatically retrieves your **last recorded location** from the secure local cache.
 > 2. It triggers a **fail-safe SMS fallback** to the administrator's emergency line.
 > 3. The message includes an automated **Google Maps location link**, allowing responders to navigate to your position using GPS coordinates even without a data signal.
@@ -189,13 +191,42 @@ These API'S are the External Services Used in the System
 * **What it does:** It is a service that sends out automated SMS text messages over the internet.
 * **How it helps:** When you press the SOS button, this service instantly texts your emergency contacts with your current location and the type of emergency. If you don't have internet access, the app is smart enough to open your phone's regular texting app so you can still send the message manually.
 
-### 4. Open-Meteo (Live Weather)
+### 4. PAG-ASA Weather API
 * **What it does:** It acts as the app's personal weatherman by checking the conditions at your exact GPS coordinates.
 * **How it helps:** It fetches the real-time temperature, wind speed, and weather status (like "Rainy" or "Mostly Clear") and displays them right on your home screen so you can stay informed about the environment around you.
 
 ### 5. Overpass API (Safe Zone Locator)
 * **What it does:** It acts like a highly specific search engine for buildings on a map.
 * **How it helps:** It scans the immediate area around your current location to find nearby evacuation centers, emergency facilities, and barangay halls. It then takes those locations and drops marker pins on your map so you know exactly where to go in an emergency.
+
+# Future References
+
+### 1. Signal-Independent Messaging
+The current system utilizes **Phil SMS**, which requires a standard cellular signal to function. To improve reliability in "dead zones" or during network outages, we propose integrating more resilient messaging technologies:
+
+* **Emergency Roaming:** Implementing protocols similar to 911 services, allowing the system to transmit data via any available carrier tower regardless of the SIM provider.
+* **Satellite-to-Cell APIs:** Utilizing Non-Terrestrial Network (NTN) connectivity to ensure message delivery in remote areas without traditional cell tower coverage.
+* **LoRaWAN Mesh Networks:** Enabling peer-to-peer message relaying through long-range radio frequencies, bypassing cellular infrastructure entirely.
+
+### 2. Geographic Expansion & Nationwide Scaling
+Currently, the system is explicitly designed for and geo-fenced to the province of Antique. For future development, to maximize the platform's impact and disaster response capabilities, we propose scaling the architecture for a nationwide deployment:
+
+* **Nationwide Rollout:** Expanding the system infrastructure and cloud resources to support full operation across the entire Philippines.
+* **Dynamic Geo-Fencing:** Upgrading the current static, single-province geo-fence to a dynamic system, allowing various Local Government Units (LGUs) nationwide to define and manage their own specific jurisdictions.
+* **Cross-Provincial Coordination:** Enabling the system to handle inter-province alerts and data sharing, ensuring seamless communication during large-scale national emergencies.
+
+### 3. Enhanced SOS Reporting Capabilities
+Currently, the SOS button triggers a standard alert. To provide responders with better situational awareness and actionable context, we propose upgrading the SOS functionality with voice telemetry:
+
+* **Voice-Enabled SOS Alerts:** Allowing users to record and attach short voice messages directly to their SOS ping. This enables individuals in distress to quickly elaborate on their specific needs (e.g., medical requirements, specific location details) without the time-consuming process of typing.
+
+### 4. Automated Identity Verification & Fraud Detection
+Currently, the system relies on a manual approval process where administrators must verify users by cross-referencing submitted ID photos with facial selfies to prevent troll accounts and fake SOS alerts. To improve onboarding efficiency and enhance security at scale, we propose automating this workflow:
+
+* **AI-Powered KYC Integration:** Implementing automated "Know Your Customer" (KYC) APIs that use machine learning to instantly detect fraudulent or tampered IDs, verify document authenticity, and perform facial matching without human intervention.
+* **Biometric Liveness Detection:** Upgrading the face verification step with real-time liveness checks (e.g., requiring the user to blink or move their head) to ensure they are a live human and not submitting a static photo of a photo.
+* **PhilSys API Integration:** Exploring integration with the Philippine Identification System (PhilSys) for seamless, government-validated identity checks. This would create an air-tight deterrent against malicious actors and strictly enforce accountability for false emergency reports.
+
 
 # Use of AI Tools
 

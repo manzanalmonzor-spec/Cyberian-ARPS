@@ -171,9 +171,9 @@ Once logged in, users are greeted by the main page where they can navigate the s
 
 **Centers & Routing:** By tapping "Centers" in the bottom navigation menu, users can easily locate the nearest evacuation center. The app will also calculate and display the best route to safely guide the user to their destination.
   <p>
-    <img src="read_user_walkthrough/4.jpg" alt="Evacuation Centers" height="550">
+    <img src="../Cyberian-ARPS-main/Images/read_user_walkthrough/4.jpg" alt="Evacuation Centers" height="550">
     &nbsp;&nbsp;&nbsp;
-    <img src="read_user_walkthrough/5.jpg" alt="Route Navigation" height="550">
+    <img src="../Cyberian-ARPS-main/Images/read_user_walkthrough/5.jpg" alt="Route Navigation" height="550">
   </p>
 
 **Settings/Profile:** In the settings page, users can view and edit their profile information to ensure their emergency contact details and health info stay up to date.

@@ -20,6 +20,7 @@
 - [Features](#features)
 - [Application Walkthrough](#walkthrough)
 - [APIs](#application-programming-interface)
+- [Future References](#future-references)
 - [AI Tools](#use-of-ai-tools)
 
 
@@ -61,7 +62,7 @@ You can Install the Web Application in your device for a better experience enabl
 * **Smart Evacuation Routing:** Find the nearest "Safe Zones" and evacuation centers instantly. The system uses the Overpass API to locate facilities and provides real-time navigation to guide you safely to your destination.
 * **Real-Time Weather Intelligence:** Stay ahead of hazards with live weather updates and storm tracking powered by Open-Meteo localized specifically to your current GPS coordinates.
 * **Live Incident Mapping:** For administrators, a real-time "Live Map" visualizes all active SOS signals across the municipality, allowing for faster response times and better resource management.
-* **Offline Risk-Mitigation AI Chatbot:** An AI built with the LIM (Light Intelligent Model), this locally-cached chatbot serves as a critical safety guide-through. It is designed to help users minimize risks by providing interactive, real-time access to "Self-Rescue" instructions and emergency guidance, even during complete network blackouts.
+* **Offline Risk-Mitigation AI Chatbot:** Powered by an LLM (Large Language Model) for advanced, natural interactions online, this chatbot serves as a critical safety guide to help users minimize risks. To ensure absolute reliability during complete network blackouts, the system seamlessly transitions to a locally-cached offline mode. Using offline keyword matching and text parsing, it provides users with uninterrupted, real-time access to vital 'Self-Rescue' instructions and emergency guidance, even without an internet connection.
 
 
 
@@ -84,15 +85,18 @@ The Admin page will primarily be handled by the respected MDRRMO in their respec
   **Live Map:** By clicking "Live Maps" on the left navigation menu, the operator is directed to an interactive map displaying real-time, active incident mapping across the municipality, where the operator can visibly see the locations of users' SOS alerts. 
   <p><img src="Images/read_admin_walkthrough/2.png" alt="Live Incident Map" width="800"></p>
 
-  **Alerts:** After clicking "Alerts" on the left navigation menu, the operator will be directed to the Alerts Management page, where they can see the full details and history of SOS reports from users.
+  **Alerts:** Upon selecting "Alerts" from the navigation menu, the operator is directed to the Alerts Management page. This dashboard displays comprehensive SOS report details, AI-generated summaries, and the volume of SOS requests categorized by location.
   <p><img src="Images/read_admin_walkthrough/3.png" alt="Alerts Management" width="800"></p>
 
 
-  **Weather:** By tapping "Weather" in the left navigation menu, the operator is directed to the Weather Intelligence page. This displays localized info based on the Open-Meteo API for the municipality's coordinates.
+  **Weather:** By tapping "Weather" in the left navigation menu, the operator is directed to the Weather Intelligence page. This displays localized info based on the PAG-ASA Weather API for the municipality's coordinates.
   <p><img src="Images/read_admin_walkthrough/5.png" alt="Weather Intelligence" width="800"></p>
 
   **User Approval:** In the Users Approval page, the operator/admin can authenticate and approve new user accounts after verifying their submitted identity documents.
   <p><img src="Images/read_admin_walkthrough/7.png" alt="User Approval List" width="800"></p>
+
+  **Reports:** The Reports page provides admins with a centralized dashboard to track all SOS requests. It categorizes total incidents by status (pending, responding, resolved) and logs specific emergency types. Users can easily filter records by timeframes such as today, this week, or all time and apply custom criteria to pinpoint exact data, which can then be printed or exported as a CSV file.
+  <p><img src="Images/read_admin_walkthrough/11.png" alt="User Approval List" width="800"></p>
 
   **Settings:** In the settings page, the operator can configure the **Offline Service Number**. This number is used to receive SOS alerts via SMS from users who do not have internet access.
   <p><img src="Images/read_admin_walkthrough/9.png" alt="Admin Settings" width="800"></p>

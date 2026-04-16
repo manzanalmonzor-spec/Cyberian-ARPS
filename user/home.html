@@ -1767,43 +1767,202 @@ Reply naturally in the user's language. Give direct practical advice. Use number
 
       function getOfflineFallback(userText) {
         const text = userText.toLowerCase();
-        if (/\b(hi|hello|hey|good morning|good afternoon|good evening|kamusta)\b/.test(text)) {
-          return "Hello! I'm your ARPS disaster preparedness assistant. I can help with typhoons, floods, earthquakes, fire, landslides, and all emergencies. What do you need?";
+
+        // ── IMMEDIATE DANGER / SOS ────────────────────────────────────────────
+        if (/\b(sos|tulong|help me|save me|rescue me|i('m| am) dying|namamatay|nasugatan|nasaktan|naiipit|stuck|trapped|natrapped|stranded|naiwanan|naipit)\b/.test(text)) {
+          return "🚨 TAP THE SOS BUTTON NOW!\n\nWhile waiting for rescue:\n1. Stay calm and stay visible\n2. Keep your GPS turned ON\n3. Move to the highest, safest spot nearby\n4. Wave a bright cloth or flashlight to signal rescuers\n5. Don't move if you're injured unless in immediate danger\n\nHelp is on the way. You are not alone.";
         }
-        if (/\b(snake bite|snake|ahas|kagat ng ahas|nakagat ng ahas)\b/.test(text)) {
-          return "Kung nakagat ng ahas:\n1. Huwag tumakbo o magpanic.\n2. I-immobilize ang nakagat na bahagi at panatilihing mas mababa sa puso.\n3. Alisin ang singsing o masisikip na gamit.\n4. Huwag hiwain, sipsipin, o lagyan ng tourniquet.\n5. Magpatingin agad sa ospital o gumamit ng SOS kung delikado ang lagay.";
+
+        // ── GREETINGS ─────────────────────────────────────────────────────────
+        if (/\b(hi|hello|hey|good morning|good afternoon|good evening|good night|kamusta|kumusta|musta|uy|hoy|oi|sup|yo|greetings|magandang|maayong|ayos)\b/.test(text)) {
+          return "Hello! I'm your ARPS offline disaster assistant 🛡️\n\nI can help you with:\n• Typhoon, flood, earthquake, fire, landslide\n• Volcanic eruption, tsunami, storm surge\n• First aid: choking, CPR, bleeding, burns, drowning\n• Evacuation, Go Bag, emergency numbers\n• What to do before, during & after disasters\n\nJust ask me anything! I work even without internet.";
         }
-        if (/\b(dog bite|animal bite|kagat ng aso|aso kumagat)\b/.test(text)) {
-          return "Kung kinagat ng aso o hayop:\n1. Hugasan agad ang sugat gamit ang sabon at umaagos na tubig nang 15 minuto.\n2. Huwag takpan nang mahigpit ang sugat.\n3. Magpatingin agad para sa anti-rabies at tetanus advice.\n4. Kung malakas ang pagdurugo, idiin ang malinis na tela.\n5. Gumamit ng SOS kung malala ang sugat o nahihilo ang pasyente.";
+
+        // ── WHAT IS ARPS / HOW TO USE ─────────────────────────────────────────
+        if (/\b(what is arps|ano ang arps|arps meaning|arps system|how does arps|paano gamitin|how to use|arps app|arps help)\b/.test(text)) {
+          return "ARPS — Antique Risk Prevention System 🛡️\n\nARPS is a disaster response app for residents of Antique, Philippines.\n\nKey features:\n• SOS Button — sends your GPS location to responders instantly\n• Live Map — shows nearby incidents and hazards\n• Alerts — real-time weather and disaster advisories\n• Evacuation Centers — find the nearest shelter\n• This AI Chat — offline disaster guidance 24/7\n\nEven without internet, you can read your cached alerts and use this chat.";
         }
-        if (/\b(typhoon|bagyo|storm|signal)\b/.test(text)) {
-          return "For typhoon safety:\n1. Monitor PAGASA updates & storm signals\n2. Secure your home — board windows, tie down loose items\n3. Stock food, water & medicine for 3 days\n4. Prepare your Go Bag\n5. Know your evacuation center\n6. If Signal #3+, evacuate early!\n\nAsk me for more details on any step.";
+
+        if (/\b(how.*sos|paano.*sos|sos.*work|sos.*gamitin|gamitin.*sos|send sos|trigger sos|i-sos)\b/.test(text)) {
+          return "How to use SOS in ARPS:\n1. Open the ARPS app\n2. Tap the big red SOS button on the home screen\n3. Choose your emergency type (flood, fire, medical, etc.)\n4. Your GPS location is automatically sent to the admin/responders\n5. Stay put and wait for help — keep GPS ON\n\n⚠️ Only use SOS for real emergencies. False alarms waste rescue resources.";
         }
-        if (/\b(flood|baha|tubig|water level|rising water)\b/.test(text)) {
-          return "Flood safety:\n1. Move to higher ground immediately\n2. Never walk or drive through floodwater\n3. Turn off electricity if water enters your home\n4. Monitor ARPS Alerts for updates\n5. Tap SOS if you need rescue\n\nStay safe!";
+
+        // ── EMERGENCY NUMBERS ─────────────────────────────────────────────────
+        if (/\b(emergency number|hotline|contact|number|numero|call|tawag|911|bfp|pnp|police|fire department|hospital|ndrrmc|pagasa|coast guard|red cross)\b/.test(text)) {
+          return "🆘 Emergency Hotlines (Philippines):\n\n• National Emergency Hotline: 911\n• BFP (Fire): 160\n• PNP (Police): 117\n• NDRRMC: (02) 8911-1406\n• Philippine Red Cross: 143\n• Coast Guard: (02) 8527-8481\n• PAGASA: (02) 8284-0800\n\n📍 Antique-specific:\n• Antique PDRRMO — check your local barangay for the number\n\nSave these numbers now while you have signal!";
         }
-        if (/\b(earthquake|lindol|quake|tremor)\b/.test(text)) {
-          return "During an earthquake:\n1. DROP to the ground\n2. Take COVER under a sturdy table/desk\n3. HOLD ON until shaking stops\n4. Stay away from windows & heavy objects\n5. After shaking: check for injuries, evacuate if building is damaged\n6. Expect aftershocks\n\nNever use elevators during an earthquake!";
+
+        // ── SIGNAL NUMBERS ────────────────────────────────────────────────────
+        if (/\b(signal number|signal 1|signal 2|signal 3|signal 4|signal 5|storm signal|public storm|psws|ano ang signal|what signal|ilan signal|signal level)\b/.test(text)) {
+          return "🌀 PAGASA Tropical Cyclone Wind Signals:\n\nSignal #1 — 30–60 km/h winds expected. Minimal damage. Precautionary measures.\n\nSignal #2 — 61–120 km/h winds. Minor damage. Prepare Go Bag. Evacuate low areas.\n\nSignal #3 — 121–185 km/h winds. Significant damage. Evacuate immediately!\n\nSignal #4 — 186–220 km/h winds. Extensive damage. DO NOT go outside!\n\nSignal #5 — 220+ km/h winds. Catastrophic. Extreme danger to life.\n\n⚠️ At Signal #3 and above — EVACUATE EARLY. Don't wait.";
         }
-        if (/\b(fire|sunog|burn|blaze)\b/.test(text)) {
-          return "Fire safety:\n1. GET OUT immediately — don't go back for belongings\n2. Stay LOW — smoke rises, crawl if needed\n3. Feel doors before opening — if hot, use another exit\n4. Stop, Drop, Roll if clothes catch fire\n5. Call BFP (fire dept) or tap SOS\n6. Meet at your designated assembly point";
+
+        // ── TYPHOON ───────────────────────────────────────────────────────────
+        if (/\b(typhoon|bagyo|bagyong|cyclone|tropical storm|habagat|amihan|ulan|signal|hangin|strong wind|malakas na hangin|malaking ulan|storm surge|daluyong)\b/.test(text)) {
+          return "🌀 Typhoon Safety Guide:\n\nBEFORE:\n1. Monitor PAGASA — check signal level\n2. Secure your home (board windows, tie loose items)\n3. Stock water, food & meds for at least 3 days\n4. Charge all devices & power banks\n5. Prepare your Go Bag — keep it by the door\n6. Know your nearest evacuation center\n7. Trim trees near your house\n\nDURING:\n• Stay indoors away from windows\n• If Signal #3+ and in flood/landslide area — EVACUATE EARLY\n• Never cross flooded roads\n• Unplug appliances\n\nAFTER:\n• Watch out for fallen wires\n• Check for structural damage before re-entering\n• Boil water before drinking\n• Report injuries via SOS";
         }
-        if (/\b(landslide|pagguho|mudslide|erosion)\b/.test(text)) {
-          return "Landslide safety:\n1. Watch for warning signs: unusual sounds, cracks in ground, tilting trees\n2. Evacuate immediately if you suspect a slide\n3. Move away from the path of the slide\n4. If caught: curl into a ball and protect your head\n5. After: avoid the area — more slides may follow";
+
+        // ── FLOOD ─────────────────────────────────────────────────────────────
+        if (/\b(flood|baha|tubig|bumabaha|mataas na tubig|rising water|water level|flash flood|inundation|napuno ng tubig|binahaan|nalunod ang|lubog)\b/.test(text)) {
+          return "🌊 Flood Safety Guide:\n\nDURING FLOOD:\n1. Move to HIGHER GROUND immediately — don't wait\n2. NEVER walk, swim, or drive through floodwater (6 inches can knock you down)\n3. Turn off electricity at the main breaker if water enters\n4. Avoid touching floodwater — it may be contaminated or electrified\n5. Tap SOS if you need rescue\n\nIF TRAPPED INDOORS:\n• Go to the highest floor/roof\n• Signal for help with a flashlight or bright cloth\n• Do NOT try to swim in fast current\n\nAFTER FLOOD:\n• Don't return home until authorities say it's safe\n• Disinfect everything that touched floodwater\n• Boil water or use bottled water only\n• Watch for snake encounters (they come out during floods)";
         }
-        if (/\b(evac|shelter|center|relief)\b/.test(text)) {
-          return "Check the Evacuation Centers screen for nearby shelters. Bring IDs, medicines, water, food, and a fully charged phone before evacuating.";
+
+        // ── EARTHQUAKE ────────────────────────────────────────────────────────
+        if (/\b(earthquake|lindol|quake|tremor|lumindol|yumanig|aftershock|seismic|fault|fault line|nagyanig|nanginig ang|naramdaman.*lindol)\b/.test(text)) {
+          return "🏔️ Earthquake Safety Guide:\n\nDURING SHAKING:\n1. DROP — get low to the ground\n2. COVER — under a sturdy table or against an interior wall\n3. HOLD ON — until shaking stops completely\n4. Stay AWAY from windows, glass & heavy objects\n5. If outdoors: move away from buildings, trees & power lines\n6. If in a car: pull over away from bridges, stop and stay inside\n\nAFTER SHAKING:\n• Check yourself and others for injuries\n• Expect AFTERSHOCKS — they can be strong\n• Check for gas leaks (smell, sound) — if detected, leave immediately\n• Don't use elevators\n• Exit the building if there's structural damage\n• Never go back inside until inspected\n\nDrop, Cover, Hold On — always!";
         }
-        if (/\b(sos|rescue|help|emergency|danger)\b/.test(text)) {
-          return "If you're in immediate danger, tap the SOS button now! Keep your GPS on so rescuers can find you. Move to the safest visible spot while waiting for help.";
+
+        if (/\b(aftershock|after.*quake|after.*lindol|aftershocks|lindol ulit|pangalawang lindol)\b/.test(text)) {
+          return "⚠️ About Aftershocks:\n\nAfterquake tremors can happen minutes, hours, days or even weeks after the main earthquake.\n\n1. Expect them — don't be caught off guard\n2. Apply DROP-COVER-HOLD during each one\n3. Aftershocks can collapse already-weakened structures\n4. Stay outside or in an open area after a major quake\n5. Do NOT re-enter damaged buildings\n6. Keep your Go Bag with you at all times\n\nAfterquakes are normal — stay prepared, stay calm.";
         }
-        if (/\b(prepare|kit|bag|supply|emergency kit|go bag)\b/.test(text)) {
-          return "Your Go Bag checklist:\n1. Water (3-day supply)\n2. Canned food & can opener\n3. Flashlight & extra batteries\n4. First aid kit & medicines\n5. Important documents (in waterproof bag)\n6. Fully charged power bank & phone\n7. Whistle & emergency blanket\n8. Extra clothes & rain gear";
+
+        // ── FIRE ──────────────────────────────────────────────────────────────
+        if (/\b(fire|sunog|nasusunog|nasunog|apoy|smoke|usok|nagliliyab|burning|blaze|flames|house fire|building fire|kitchen fire|kalan|may sunog|may apoy)\b/.test(text)) {
+          return "🔥 Fire Safety Guide:\n\nIF THERE IS FIRE:\n1. Shout 'SUNOG!' to alert everyone — get everyone OUT immediately\n2. Do NOT go back for belongings\n3. Stay LOW — smoke is more deadly than flames, crawl if needed\n4. Before opening a door: FEEL it — if hot, don't open, use another exit\n5. If your clothes catch fire: STOP, DROP, ROLL\n6. Go to your assembly point after exiting\n7. Call BFP (160) or tap SOS\n\nIF TRAPPED:\n• Close doors between you and the fire\n• Signal from window with cloth or flashlight\n• Seal door gaps with wet cloth to slow smoke\n• Never jump from high floors unless fire is directly below\n\nAFTER:\n• Never re-enter a burned building\n• Report gas leaks to authorities";
         }
-        if (/\b(step|how|what|tell me|explain|more|do|ano|paano)\b/.test(text)) {
-          return "I can help with step-by-step guidance for any disaster! Ask me about:\n- Typhoon preparation\n- Flood safety\n- Earthquake response\n- Fire escape plans\n- Landslide warnings\n- Emergency kit preparation\n- Evacuation procedures\n\nWhat specific situation do you need help with?";
+
+        // ── LANDSLIDE ─────────────────────────────────────────────────────────
+        if (/\b(landslide|pagguho|mudslide|mudflow|rockfall|guho|nagguho|gumuho|pagguho ng lupa|erosion|soil|lupa|slopes|bangin|gulod|warning.*lupa|lupa.*guho)\b/.test(text)) {
+          return "⛰️ Landslide Safety Guide:\n\nWARNING SIGNS:\n• Unusual rumbling or cracking sounds from hillside\n• Cracks appearing in ground, walls, or roads\n• Tilting trees, fences, or utility poles\n• Water suddenly becoming muddy in streams\n• Doors/windows sticking (ground shifting)\n\nDURING A LANDSLIDE:\n1. GET OUT of the path IMMEDIATELY\n2. Run sideways — perpendicular to the slide direction\n3. If caught: curl into a ball, protect your head\n4. Move to higher ground — watch for secondary slides\n\nAFTER:\n• STAY AWAY from the slide area — more may follow\n• Report the incident using SOS or to MDRRMO\n• Check for injured people — don't move them unless in danger\n• Landslides often happen with typhoons and heavy rain — stay alert";
         }
-        return "I'm your ARPS disaster preparedness assistant! I can help with typhoons, floods, earthquakes, fire, landslides, volcanic eruptions, and all emergencies. What do you need help with?";
+
+        // ── VOLCANIC ERUPTION ─────────────────────────────────────────────────
+        if (/\b(volcano|bulkan|eruption|ash fall|ashfall|lahar|lava|phivolcs|alert level|volcanic|putok ng bulkan|abo ng bulkan|umaapaw|nagputok)\b/.test(text)) {
+          return "🌋 Volcanic Eruption Safety:\n\nBEFORE ERUPTION:\n1. Monitor PHIVOLCS alerts and Alert Levels\n2. Know your evacuation zone (danger radius)\n3. Prepare N95 masks or wet cloth for ash\n4. Store water in sealed containers (ash contaminates water)\n5. Keep vehicles fueled and facing the exit\n\nDURING ASHFALL:\n• Stay INDOORS — close doors, windows & ventilation\n• Wear N95 mask or wet cloth over nose/mouth\n• Wear goggles or glasses to protect eyes\n• Don't drive in heavy ash (reduces visibility, damages engine)\n• Brush ash off roofs to prevent collapse\n\nDURING ERUPTION/LAHAR:\n• EVACUATE immediately when told to by authorities\n• Follow official evacuation routes — never shortcut\n\nAlert Levels: 0=No activity, 1=Low, 2=Increasing, 3=Decreased risk, 4=High risk, 5=Eruption";
+        }
+
+        // ── TSUNAMI ───────────────────────────────────────────────────────────
+        if (/\b(tsunami|tidal wave|seismic wave|malalaking alon|malaking alon|ocean wave|daloy ng dagat|surging wave|tubig mula dagat|dagat bumaha)\b/.test(text)) {
+          return "🌊 Tsunami Safety Guide:\n\nNATURAL WARNINGS (act immediately):\n• Strong earthquake felt near the coast\n• Ocean suddenly retreats (water pulls back far)\n• Loud roaring sound from the sea\n• DO NOT WAIT for an official warning — these ARE the warning\n\nDURING TSUNAMI WARNING:\n1. MOVE INLAND immediately — go to high ground\n2. Get to at least 30 meters above sea level\n3. GO ON FOOT if traffic is jammed\n4. Stay away from rivers and streams (tsunamis travel upstream)\n5. Do NOT watch from the shore\n\nAFTER FIRST WAVE:\n• DO NOT return — multiple waves come, later ones may be bigger\n• Wait for official ALL CLEAR from authorities\n\nRemember: If you feel a strong earthquake near the coast, RUN to high ground — don't wait!";
+        }
+
+        // ── STORM SURGE ───────────────────────────────────────────────────────
+        if (/\b(storm surge|daluyong|sea surge|coastal flood|high tide.*typhoon|dagat umaapaw|coastal wave)\b/.test(text)) {
+          return "🌊 Storm Surge Safety:\n\nWhat is storm surge? — A wall of ocean water pushed inland by a typhoon. It is MORE DEADLY than wind and rain.\n\n1. If you live near the coast and a typhoon is coming — EVACUATE EARLY\n2. Don't wait for the water to arrive — by then it's too late\n3. Move to high ground at least 5km inland or to a solid evacuation center\n4. Storm surge can be 3–6 meters high and arrive within minutes\n5. Even Signal #2 typhoons can produce deadly storm surge\n\n⚠️ People who died in Yolanda (Haiyan) were mostly killed by storm surge — not wind.\n\nEVACUATE COASTAL AREAS EARLY — NO EXCEPTIONS.";
+        }
+
+        // ── LIGHTNING / THUNDER ───────────────────────────────────────────────
+        if (/\b(lightning|thunder|kidlat|kulog|thunderstorm|struck by lightning|nasamid ng kidlat|nakidlat|nagkukulog|nagkikidlat)\b/.test(text)) {
+          return "⚡ Lightning Safety:\n\nOUTDOORS — When you hear thunder, go inside immediately:\n1. Seek shelter in a solid building or hard-top car\n2. AVOID: tall trees, open fields, hilltops, water, metal objects\n3. If caught in the open: crouch low, feet together, minimize contact with ground\n4. Never shelter under isolated trees\n5. Stay off hilltops, ridges, peaks\n\nINDOORS:\n• Avoid using wired electronics or landline phones\n• Stay away from windows, doors, fireplaces\n• Don't shower or use running water during a storm\n\nIF SOMEONE IS STRUCK:\n• Call for help (SOS or 911)\n• It is SAFE to touch lightning victims — they carry no charge\n• Begin CPR immediately if they are not breathing\n\n30-30 Rule: If thunder comes within 30 seconds of lightning, go inside. Wait 30 minutes after last thunder before going out.";
+        }
+
+        // ── HEAT STROKE / EXTREME HEAT ────────────────────────────────────────
+        if (/\b(heat stroke|heat exhaustion|heat wave|mainit|sobrang init|matinding init|pagod sa init|nanghihina.*init|nahihilo.*init|sunstroke|overheating|hyperthermia|el nino)\b/.test(text)) {
+          return "☀️ Heat Stroke Emergency:\n\nSIGNS of Heat Stroke (Medical Emergency):\n• Body temp above 40°C / 104°F\n• Confusion, slurred speech\n• Hot, dry or damp skin\n• Rapid, strong pulse\n• Loss of consciousness\n\nFIRST AID:\n1. Call for help or tap SOS immediately\n2. Move the person to shade or air-conditioned place\n3. Cool them RAPIDLY — wet cloth on neck, armpits, groin; fan them\n4. Give sips of cool water only if they are conscious\n5. Do NOT give drinks to unconscious person\n6. Continue cooling until help arrives\n\nPREVENTION:\n• Drink water every 15–20 minutes even if not thirsty\n• Wear light, loose, light-colored clothes\n• Avoid outdoor activities 10AM–4PM\n• Never leave children or elderly in parked cars";
+        }
+
+        // ── CPR / CARDIAC ARREST ──────────────────────────────────────────────
+        if (/\b(cpr|cardiac arrest|heart attack|atake sa puso|heart failure|hindi humihinga|not breathing|walang pulso|no pulse|unconscious|nawalan ng malay|wala nang malay|collapse|bumagsak)\b/.test(text)) {
+          return "❤️ CPR — Do This NOW:\n\n1. CHECK — Tap shoulders, shout 'Are you okay?'\n2. CALL — Shout for someone to call 911 or tap SOS\n3. CHECK breathing — look for chest rise for 10 seconds\n4. If NOT breathing normally — start CPR:\n\nHANDS-ONLY CPR:\n• Place heel of hand on CENTER of chest\n• Put other hand on top, interlace fingers\n• Press DOWN hard and fast — 5–6 cm deep\n• 100–120 compressions per minute (beat of 'Staying Alive')\n• Don't stop until emergency services arrive\n\nIF TRAINED IN CPR:\n• Give 2 rescue breaths after every 30 compressions\n• Tilt head, lift chin, pinch nose, seal mouth, blow 1 second\n\n⚠️ SIGNS of Heart Attack:\n• Chest pain/pressure/tightening\n• Pain spreading to arm, jaw, back\n• Shortness of breath, sweating, nausea\n\nEvery minute without CPR reduces survival by 10%. START IMMEDIATELY.";
+        }
+
+        // ── CHOKING ───────────────────────────────────────────────────────────
+        if (/\b(chok|choking|nabilaukan|napaklang|nakuha sa lalamunan|hindi makahinga|di makahinga|nakabitin sa lalamunan|nasakal|obstruction.*throat|something.*throat|food.*stuck|nakain)\b/.test(text)) {
+          return "🤲 Choking — Act Fast:\n\nADULT or CHILD (over 1 year):\n1. Ask 'Are you choking?' — if they can't speak/cough/breathe:\n2. Give 5 BACK BLOWS — firm blows between shoulder blades with heel of hand\n3. Give 5 ABDOMINAL THRUSTS (Heimlich):\n   • Stand behind them, arms around waist\n   • Make a fist above navel, below ribcage\n   • Thrust INWARD and UPWARD sharply\n4. Alternate 5 back blows + 5 thrusts until object comes out\n\nIF THEY LOSE CONSCIOUSNESS:\n• Lower them carefully, call 911/SOS\n• Start CPR — each time you open airway, check for object\n\nINFANT (under 1 year):\n• 5 back blows face-down on your forearm\n• 5 chest thrusts with 2 fingers on breastbone\n\n⚠️ If they can cough forcefully — let them keep coughing. Don't interfere.";
+        }
+
+        // ── DROWNING ──────────────────────────────────────────────────────────
+        if (/\b(drown|drowning|nalunod|nalulunod|nangaw|nahulog.*tubig|fell.*water|water.*accident|swimming accident|hindi lumabas.*tubig|tubig.*napalamon)\b/.test(text)) {
+          return "🏊 Drowning Emergency:\n\nIF SOMEONE IS DROWNING:\n1. CALL for help or tap SOS — don't go in alone if you're not a trained rescuer\n2. THROW something — rope, life ring, cooler, anything that floats\n3. If you must go in: approach from behind to avoid them pulling you under\n4. Get them to shore as quickly as possible\n\nONCE OUT OF WATER:\n1. Check for breathing — if not breathing, begin CPR immediately\n2. Call 911 or SOS\n3. Keep them warm — wet body loses heat fast\n4. Don't leave them alone even if they seem okay — delayed complications can occur\n\nPREVENTION:\n• Never swim alone or at night\n• Don't swim in flooded areas — current is deceptive\n• Children need constant adult supervision near any water\n• Never dive in unknown waters";
+        }
+
+        // ── SEVERE BLEEDING / WOUND ───────────────────────────────────────────
+        if (/\b(bleeding|bleed|blood|sugat|dumudugo|nadugo|wound|hiwa|nawasak|nasugatan|laceration|cut deeply|malaking sugat|maraming dugo|stop.*bleeding|tourniquet)\b/.test(text)) {
+          return "🩸 Severe Bleeding — First Aid:\n\n1. PROTECT yourself — use gloves or plastic bag if available\n2. PRESS firmly on the wound with a clean cloth or clothing\n3. DO NOT lift the cloth — if blood soaks through, add more on top\n4. ELEVATE the injured limb above heart level if possible\n5. HOLD pressure for at least 10–15 minutes without releasing\n\nTOURNIQUET (for severe limb bleeding only):\n• Apply 5–7 cm above the wound\n• Tighten until bleeding stops\n• Note the exact TIME it was applied\n• Do NOT remove it — leave it for medical professionals\n\n6. Keep the person STILL and CALM\n7. Call 911 or tap SOS for severe wounds\n\n⚠️ Seek medical help even if bleeding stops — deep wounds need proper treatment to prevent infection.";
+        }
+
+        // ── BURNS ─────────────────────────────────────────────────────────────
+        if (/\b(burn|paso|nasunog.*balat|naapuyan|scald|hot water|tubig na mainit|chemical burn|sunburn|apoy.*balat|nasunog ang)\b/.test(text)) {
+          return "🔥 Burns — First Aid:\n\nMINOR BURNS (skin red, painful, no blisters):\n1. Cool with cool running water for 10–20 minutes\n2. Do NOT use ice, butter, toothpaste or any home remedy\n3. Cover loosely with clean cloth or bandage\n4. Take pain reliever if available\n\nSEVERE BURNS (blisters, deep tissue, large area):\n1. Call 911 or tap SOS immediately\n2. Cool with cool water — not ice\n3. Remove clothing/jewelry near the burn ONLY if not stuck\n4. Do NOT pop blisters\n5. Cover loosely — do not wrap tight\n6. Keep the person warm (burned skin can't regulate temperature)\n\nCHEMICAL BURNS:\n• Flush with large amounts of water for 20+ minutes\n• Remove contaminated clothing (protect your own hands)\n\n⚠️ Burns covering hands, face, genitals, or large body areas are ALWAYS emergencies — seek help immediately.";
+        }
+
+        // ── FRACTURE / BROKEN BONE ────────────────────────────────────────────
+        if (/\b(fracture|broken bone|bali|nabasag.*buto|buto.*nabasag|broken.*arm|broken.*leg|sprain|dislocation|nabaluktot|hindi.*makagalaw|swollen.*bone|injured.*bone)\b/.test(text)) {
+          return "🦴 Fracture / Broken Bone — First Aid:\n\n1. Do NOT try to straighten the broken limb\n2. IMMOBILIZE it in the position you found it\n3. Make a SPLINT using stiff material (board, stick) padded with cloth\n4. Tie the splint above and below the injury — not at the break\n5. Apply ice pack wrapped in cloth to reduce swelling (20 min on, 20 min off)\n6. Elevate the limb if possible\n7. Get to a hospital — X-ray is needed to confirm fracture\n\nOPEN FRACTURE (bone visible through skin):\n• Cover the wound loosely with clean cloth\n• Control bleeding with gentle pressure around (not on) the bone\n• This is a MEDICAL EMERGENCY — call 911 or SOS\n\n⚠️ Suspected SPINE or NECK injury:\n• DO NOT MOVE the person unless in immediate danger\n• Keep the head and neck still\n• Call emergency services immediately";
+        }
+
+        // ── ELECTROCUTION ─────────────────────────────────────────────────────
+        if (/\b(electrocution|nakuryente|kuryente|electric shock|naelectrify|electric wire|live wire|naapakan.*wire|nakahawak.*wire|nabagsak.*poste|downed wire|naputol.*wire|current)\b/.test(text)) {
+          return "⚡ Electrocution — First Aid:\n\n⚠️ DO NOT TOUCH the victim while they're still in contact with electricity!\n\n1. TURN OFF the power source at the breaker/switch — don't touch the person yet\n2. If you can't turn off power: use a DRY non-conducting object (wood, plastic, rubber) to push the wire away\n3. Call 911 or tap SOS immediately\n4. Once safe to touch: check for breathing — start CPR if needed\n5. Treat burns — electrical burns may look minor but can be deep\n6. Keep the victim lying down, warm, and still\n7. Do not give food or water\n\nDOWNED POWER LINES:\n• Stay at least 10 meters away\n• Do NOT drive over fallen wires\n• Call your electric company and 911\n• Warn others to stay back";
+        }
+
+        // ── POISONING ─────────────────────────────────────────────────────────
+        if (/\b(poison|poisoning|nalason|nainom.*lason|nakainom|accidental.*drink|ingest|swallow.*chemical|pesticide|nag-overdose|overdose|nakalason|lason|nainom.*gamot|wrong.*medicine|too much.*medicine)\b/.test(text)) {
+          return "☠️ Poisoning — First Aid:\n\n1. Call 911 or tap SOS immediately\n2. Try to IDENTIFY what was taken (keep the container)\n3. Note time of ingestion and amount\n\nDO NOT induce vomiting UNLESS specifically told to by a poison control expert.\n\nIF CONSCIOUS:\n• Keep them calm and still\n• If they vomit on their own, turn them on their side to prevent choking\n• Bring the container/label to the hospital\n\nCHEMICAL INGESTION:\n• Give small sips of water or milk if conscious (dilutes chemical)\n• Do NOT give anything if unconscious\n\nSKIN/EYE CONTACT WITH CHEMICAL:\n• Flush skin/eye with clean running water for 15–20 minutes\n• Remove contaminated clothing\n\nSYMPTOMS of poisoning:\n• Nausea, vomiting, stomach pain, dizziness\n• Difficulty breathing, seizures, loss of consciousness\n\n⚠️ Time is critical — get help immediately.";
+        }
+
+        // ── SNAKE BITE ────────────────────────────────────────────────────────
+        if (/\b(snake|ahas|snake bite|kagat.*ahas|nakagat.*ahas|ahas.*kumagat|bitten.*snake|serpent|cobra|viper|python)\b/.test(text)) {
+          return "🐍 Snake Bite — First Aid:\n\n1. Stay CALM — don't run (increases heart rate, spreads venom faster)\n2. Move AWAY from the snake — do not try to catch or kill it\n3. IMMOBILIZE the bitten limb — keep it below heart level\n4. Remove rings, bracelets, tight clothing near the bite (swelling will occur)\n5. Mark the edge of swelling with a pen every 15 minutes if possible\n6. Get to a HOSPITAL IMMEDIATELY — antivenom must be given quickly\n\nDO NOT:\n❌ Cut the wound or try to suck out venom\n❌ Apply tourniquet\n❌ Apply ice\n❌ Drink alcohol or eat\n❌ Take aspirin or ibuprofen (thins blood)\n\nIF POSSIBLE: Take a photo of the snake from a safe distance — helps doctors choose correct antivenom\n\nTap SOS if hospital is far or the person is losing consciousness.";
+        }
+
+        // ── DOG / ANIMAL BITE ─────────────────────────────────────────────────
+        if (/\b(dog bite|animal bite|aso.*kumagat|kumagat.*aso|kagat.*aso|nakagat.*hayop|cat bite|monkey bite|bat bite|animal attack|rabies|anti.?rabies)\b/.test(text)) {
+          return "🐕 Animal Bite — First Aid:\n\n1. WASH the wound IMMEDIATELY with soap and running water for 15–20 minutes — this is the most important step\n2. Apply antiseptic (povidone-iodine or alcohol) if available\n3. Cover loosely with clean bandage\n4. Go to the nearest health center or hospital FOR ANTI-RABIES VACCINE as soon as possible\n5. Do NOT apply tourniquet or try to suck the wound\n\nANTI-RABIES INFO:\n• Rabies is 100% fatal once symptoms appear\n• Vaccine must be started immediately — don't delay\n• Bats, dogs, cats, monkeys can all transmit rabies\n• Even if the animal 'seems healthy' — get vaccinated\n\nREPORT the animal:\n• Inform your barangay health center about the biting animal\n• If possible, the animal should be observed for 10 days\n\n⚠️ Any bat exposure (even a scratch or touch during sleep) requires immediate medical attention.";
+        }
+
+        // ── BEE STING / INSECT STING ──────────────────────────────────────────
+        if (/\b(bee sting|wasp|hornet|insect sting|putakti|bubuyog|stung|natadtad|allergic.*sting|anaphylaxis|puffy.*sting|swollen.*sting)\b/.test(text)) {
+          return "🐝 Bee/Insect Sting — First Aid:\n\nNORMAL REACTION:\n1. Remove stinger by scraping sideways (don't squeeze)\n2. Wash area with soap and water\n3. Apply ice wrapped in cloth — 10 minutes on, 10 off\n4. Take antihistamine if available\n5. Don't scratch — it worsens swelling\n\nSEVERE ALLERGIC REACTION (Anaphylaxis) — EMERGENCY:\nSigns: throat swelling, difficulty breathing, hives spreading, dizziness, loss of consciousness\n1. Call 911 or tap SOS IMMEDIATELY\n2. Use epinephrine auto-injector (EpiPen) if available — inject into outer thigh\n3. Lay the person down, elevate legs unless breathing is difficult\n4. Begin CPR if they stop breathing\n\n⚠️ Multiple bee stings (especially from swarms) require emergency care even without allergy — the venom accumulates.";
+        }
+
+        // ── TYPHOON / FLOOD — AFTER DISASTER ──────────────────────────────────
+        if (/\b(after.*typhoon|after.*bagyo|after.*flood|after.*baha|pagkatapos.*bagyo|pagkatapos.*baha|pumunta na|pwede na.*umuwi|ligtas na ba|safe na|return.*home|uwi na|balik na)\b/.test(text)) {
+          return "✅ After the Disaster — What to Do:\n\n1. Wait for OFFICIAL ALL CLEAR before returning home\n2. Inspect your home from the OUTSIDE first — check for structural damage\n3. Watch for downed power lines — report them, don't touch\n4. BOIL drinking water or use bottled water — water supply may be contaminated\n5. Avoid floodwater — may contain sewage, chemicals, or electricity\n6. Check on elderly neighbors and those with special needs\n7. Document damage with photos for insurance/relief claims\n8. Look out for snakes that came in with floodwater\n9. Clean and disinfect everything that touched floodwater\n10. Report injuries or missing persons via SOS or MDRRMO\n\n💊 Health: Watch for diarrhea, skin infections, leptospirosis (fever, headache, muscle pain after floodwater exposure) — see a doctor if symptoms appear.";
+        }
+
+        // ── LEPTOSPIROSIS ─────────────────────────────────────────────────────
+        if (/\b(leptospirosis|lepto|leptospira|nakalipas.*baha.*lagnat|lagnat.*baha|fever.*flood|after.*flood.*sick|rat urine|daga|contaminated water)\b/.test(text)) {
+          return "🦠 Leptospirosis Warning:\n\nWhat is it? A bacterial disease from contact with floodwater contaminated with rat urine.\n\nSYMPTOMS (appear 2–14 days after exposure):\n• High fever, chills, severe headache\n• Severe muscle pain especially in calves\n• Red eyes, jaundice (yellow skin/eyes)\n• Rash, nausea, vomiting\n\nIMMEDIATELY SEE A DOCTOR if you:\n• Waded through floodwater AND have fever/muscle pain\n\nPREVENTION:\n• Wear rubber boots and gloves in floodwater\n• Avoid contact with floodwater if you have open wounds\n• Wash exposed skin with soap and water after floodwater contact\n• Doxycycline (ask your doctor) can be used as preventive medicine\n\n⚠️ Leptospirosis can cause organ failure if untreated — don't ignore fever after flood exposure.";
+        }
+
+        // ── GO BAG / EMERGENCY KIT ────────────────────────────────────────────
+        if (/\b(go bag|emergency kit|disaster kit|bag.*emergency|emergency.*bag|prepare.*bag|bug out|survival kit|what.*bring|dalhin|ihanda|paghanda|supplies|stock|emergency supply)\b/.test(text)) {
+          return "🎒 Complete Go Bag Checklist:\n\nWATER & FOOD:\n☑ Water — 3 liters per person per day (3-day supply minimum)\n☑ Canned goods, instant food, energy bars\n☑ Manual can opener\n☑ Water purification tablets or filter straw\n\nHEALTH & FIRST AID:\n☑ Complete first aid kit\n☑ Prescription medicines (7-day supply)\n☑ Alcohol, antiseptic, bandages, gauze\n☑ N95 or surgical mask\n☑ Sanitary pads/diapers if needed\n\nDOCUMENTS (in waterproof bag):\n☑ IDs (PhilSys, voter's, passport)\n☑ Land title, birth certificates\n☑ Insurance cards, medical records\n☑ Cash (small bills) — ATMs may not work\n\nCOMMUNICATION & LIGHT:\n☑ Fully charged power bank + cables\n☑ Flashlight + extra batteries\n☑ Battery or hand-crank radio\n☑ Whistle to signal for help\n\nCLOTHING:\n☑ Extra clothes (1–2 sets per person)\n☑ Sturdy closed-toe shoes\n☑ Rain poncho or raincoat\n☑ Emergency mylar blanket\n\n✅ Keep your Go Bag near the door. Review it every 6 months.";
+        }
+
+        // ── WATER SAFETY / PURIFICATION ───────────────────────────────────────
+        if (/\b(safe.*water|drinking water|purify water|clean water|water.*safe|water.*drink|boil water|pakuluan.*tubig|malinis.*tubig|contaminated.*water|water.*purif)\b/.test(text)) {
+          return "💧 Safe Drinking Water After Disaster:\n\n1. BOIL water — bring to rolling boil for 1 minute (3 min at high altitude)\n2. Use water PURIFICATION TABLETS if available (follow package instructions)\n3. Use a WATER FILTER or filter straw\n4. Use BOTTLED water if uncertain\n\n⚠️ DO NOT DRINK:\n• Floodwater\n• Well water that may be contaminated\n• Water that smells, looks, or tastes unusual\n\nSTORAGE:\n• Store in clean, sealed containers\n• Keep away from sunlight\n• Label with the date — use within 3 days if not boiled\n\nSIGNS of waterborne illness:\n• Diarrhea, vomiting, fever, stomach cramps\n• See a doctor if symptoms are severe or last more than 2 days";
+        }
+
+        // ── EVACUATION ────────────────────────────────────────────────────────
+        if (/\b(evacuation|evacuation center|evacuate|lugar ng ligtas|shelter|safe place|likas|lumikas|saan.*ligtas|san.*magshelter|san.*pupunta|refugee|temporary.*shelter|community.*shelter)\b/.test(text)) {
+          return "🏫 Evacuation Guide:\n\nWHEN TO EVACUATE:\n• When authorities issue an evacuation order — obey immediately\n• Storm Signal #3 and above + you live near coast, river, or hillside\n• When floodwater starts rising in your home\n• When you smell gas or see structural damage after earthquake\n\nHOW TO EVACUATE:\n1. Grab your Go Bag — it should already be packed\n2. Turn off gas, electricity, and water main\n3. Lock your home\n4. Go to your designated evacuation center (check ARPS Evacuation Centers tab)\n5. Inform a relative of where you're going\n6. Register your family upon arrival at the center\n\nWHAT TO BRING:\n✅ Go Bag, medicines, IDs, phone + charger, food, water, baby supplies if needed\n\nSPECIAL NEEDS:\n• Arrange early transport for elderly, PWD, pregnant, and young children\n• Inform barangay officials in advance if you need evacuation assistance";
+        }
+
+        // ── ELDERLY / PWD / PREGNANT / CHILDREN IN DISASTER ──────────────────
+        if (/\b(elderly|matanda|lolo|lola|senior|pwd|disabled|may.*kapansanan|wheelchair|pregnant|buntis|baby|sanggol|infant|bata|child|children|special needs|vulnerable)\b/.test(text)) {
+          return "👴👵🤰 Protecting Vulnerable Persons During Disasters:\n\nELDERLY:\n• Evacuate them FIRST and EARLY — they move slower\n• Pack all maintenance medicines in Go Bag\n• Keep them warm — elderly are prone to hypothermia\n• Assign a family member to stay with them at all times\n\nPWD / DISABLED:\n• Inform your barangay in advance for evacuation assistance\n• Know the accessible evacuation routes\n• Bring mobility aids (wheelchair, cane, walker)\n• Emergency services may have priority vehicles — register with barangay\n\nPREGNANT:\n• Evacuate early — stress and physical exertion can trigger early labor\n• Bring prenatal records and medicines\n• Know the location of the nearest functioning hospital/clinic\n• Avoid floodwater — risk of leptospirosis and falls\n\nINFANTS & CHILDREN:\n• Bring formula, diapers, extra clothing\n• Keep children close and calm\n• In earthquakes: place child under a table, cover their head\n• Never leave children alone during or after a disaster";
+        }
+
+        // ── COMMUNICATION WITHOUT INTERNET ────────────────────────────────────
+        if (/\b(no signal|walang signal|walang internet|offline communication|how.*contact|how.*communicate|dead.*zone|no network|no coverage|walang load|reach.*family|contact.*family|walay internet)\b/.test(text)) {
+          return "📡 Communicating Without Internet:\n\n1. SMS TEXT — works even with very weak signal (1 bar). Use short texts.\n2. RADIO — keep a battery/hand-crank radio for PAGASA & government broadcasts\n3. PRE-ARRANGED MEETING POINTS — agree with family on a 'meeting spot' if separated\n4. BARANGAY TANOD / OFFICIALS — they often have radio communications\n5. WHISTLE — 3 blasts = international distress signal\n6. SIGNAL MIRROR — reflect sunlight to attract rescuers\n7. WRITE A NOTE — leave a note on your door with where you went\n\nBEFORE THE NEXT DISASTER:\n• Save all family members' numbers in your phone (and memorize 1–2)\n• Agree on an out-of-town contact person both sides can reach\n• Identify your family's meeting point near your home and near school/work\n• Keep a battery-powered or hand-crank radio";
+        }
+
+        // ── TYPHOON SIGNALS ───────────────────────────────────────────────────
+        if (/\b(what.*do.*signal|signal.*what to do|signal 1.*what|signal 2.*what|signal 3.*what|may.*signal|may bagyo|may bagyo.*kami|may typhoon.*kami)\b/.test(text)) {
+          return "🌀 What to Do per Signal Level:\n\nSIGNAL #1:\n• Monitor PAGASA updates every 6 hours\n• Secure loose objects outside\n• Prepare Go Bag just in case\n• Inform family members\n\nSIGNAL #2:\n• Prepare Go Bag — keep it ready at door\n• Buy extra food and water\n• Check your evacuation center\n• Low-lying and coastal areas: consider early evacuation\n\nSIGNAL #3:\n• EVACUATE now if in flood/landslide-prone or coastal area\n• Board up windows\n• Unplug appliances\n• Stay indoors if in a strong building\n\nSIGNAL #4–5:\n• DO NOT GO OUTSIDE — extremely dangerous\n• Stay in the strongest part of your shelter (interior room, ground floor if no flood risk)\n• Lie flat if roof is at risk of being blown\n• Use SOS if in danger";
+        }
+
+        // ── MENTAL HEALTH / STRESS AFTER DISASTER ─────────────────────────────
+        if (/\b(trauma|stress|scared|takot|nakakatakot|anxiety|pangamba|hindi makatulog|nightmares|depression|nalulungkot|nalulula|overwhelmed|mental health|psychological|affected|naapektuhan|grief|namatay.*kamag.?anak|nawala)\b/.test(text)) {
+          return "💙 Mental Health After a Disaster:\n\nWhat you feel is NORMAL:\n• Fear, anxiety, sadness, anger, numbness\n• Trouble sleeping, nightmares\n• Difficulty concentrating\n• Physical symptoms like headaches or stomach aches\n\nWHAT HELPS:\n1. Talk to someone you trust — don't keep it inside\n2. Stick to routines as much as possible\n3. Limit news exposure — it can increase anxiety\n4. Get enough rest, water, and food\n5. Help others — it gives a sense of purpose and reduces grief\n6. Pray, meditate, or do deep breathing if it helps you\n\nSEEK HELP if:\n• Feelings last more than 4 weeks\n• You can't function in daily life\n• You have thoughts of self-harm\n\nContact NCMH Crisis Hotline: 1553 (free)\nRed Cross Psychosocial Support: 143\n\nYou are not alone. Recovery takes time — be patient with yourself. 💙";
+        }
+
+        // ── WHAT CAN YOU DO / TOPIC MENU ──────────────────────────────────────
+        if (/\b(what can you|ano kaya|what do you know|anong alam|help me with|tulungan mo|topics|what.*help|makakatulong.*ano|saan.*makakatulong|what.*ask|tanong.*kita|capabilities|features)\b/.test(text)) {
+          return "📋 I can help with these topics (offline):\n\n🌀 DISASTERS:\nTyphoon · Flood · Earthquake · Fire · Landslide · Volcanic Eruption · Tsunami · Storm Surge · Lightning · Heat Stroke\n\n🩺 FIRST AID:\nCPR · Choking · Drowning · Bleeding · Burns · Fractures · Electrocution · Poisoning · Heat Stroke · Heart Attack\n\n🐍 ANIMAL BITES:\nSnake · Dog/Animal · Bee Sting\n\n🎒 PREPAREDNESS:\nGo Bag · Emergency Kit · Water Safety · Evacuation Plan · Emergency Numbers · Signal Levels\n\n👨‍👩‍👧 SPECIAL NEEDS:\nElderly · PWD · Pregnant · Children in Disaster\n\n📡 COMMUNICATION:\nNo Signal · How to Contact Family · After Disaster Steps\n\n💙 MENTAL HEALTH:\nStress · Trauma · Recovery After Disaster\n\nJust type your question naturally — in English, Filipino, or Taglish!";
+        }
+
+        // ── HOW / WHAT / GENERIC FOLLOW-UP ────────────────────────────────────
+        if (/\b(how|what|paano|ano|tell me|explain|steps|guide|tips|advice|what should|what do|pano|saan|kailan|bakit|why|when|where|sino|who)\b/.test(text)) {
+          return "I'm here to help! 🛡️ Try asking me something specific like:\n\n• \"What do I do during a typhoon?\"\n• \"How to do CPR?\"\n• \"Snake bite first aid\"\n• \"What to bring when evacuating?\"\n• \"Signal #3 what to do?\"\n• \"Flood safety tips\"\n• \"Earthquake what to do?\"\n• \"Go bag checklist\"\n• \"Emergency hotline numbers\"\n\nI understand English, Filipino, and Taglish. Just ask!";
+        }
+
+        // ── DEFAULT ───────────────────────────────────────────────────────────
+        return "I'm your ARPS offline disaster assistant 🛡️\n\nI can help with:\n• Typhoon, flood, earthquake, fire, landslide, volcano, tsunami\n• First aid: CPR, choking, bleeding, burns, drowning, snake bite\n• Go Bag, evacuation, emergency numbers, signal levels\n• What to do before, during & after any disaster\n\nType your question in English, Filipino, or Taglish — I'm ready to help even without internet!";
       }
 
       function getUnavailableMessage() {

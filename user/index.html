@@ -259,6 +259,67 @@
             line-height: 1.6;
         }
 
+        .hero-highlight {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.55rem;
+            position: absolute;
+            top: clamp(5.3rem, 11vw, 6.2rem);
+            left: 50%;
+            transform: translateX(-50%);
+            margin: 0;
+            padding: 0.6rem 1rem;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(252, 163, 17, 0.15), rgba(230, 57, 70, 0.12));
+            border: 1px solid rgba(252, 163, 17, 0.45);
+            color: #7a4b00;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.01em;
+            max-width: calc(100% - 2rem);
+            text-align: center;
+            z-index: 4;
+        }
+
+        .hero-highlight i {
+            color: #fca311;
+            font-size: 1.1rem;
+        }
+
+        .confetti-layer {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1300;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            top: -14vh;
+            opacity: 0;
+            border-radius: 2px;
+            animation: confettiFall var(--fall-duration, 5.2s) linear forwards;
+            will-change: transform, opacity;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translate3d(var(--drift-start, 0), -14vh, 0) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate3d(var(--drift-end, 0), 112vh, 0) rotate(760deg);
+                opacity: 0.1;
+            }
+        }
+
         .hero-actions {
             display: flex;
             gap: 1rem;
@@ -518,6 +579,132 @@
             line-height: 1.6;
         }
 
+        .team-section {
+            position: relative;
+            padding: 6.5rem 5%;
+            background: radial-gradient(circle at 8% 20%, rgba(252, 163, 17, 0.12) 0%, rgba(252, 163, 17, 0) 35%),
+                radial-gradient(circle at 92% 12%, rgba(230, 57, 70, 0.18) 0%, rgba(230, 57, 70, 0) 40%),
+                linear-gradient(165deg, #08192f 0%, #051223 100%);
+            color: #e2e8f0;
+            overflow: hidden;
+        }
+
+        .team-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.18;
+            pointer-events: none;
+        }
+
+        .team-section .section-header {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 3.2rem;
+        }
+
+        .team-section .section-header h2 {
+            color: #ffffff;
+        }
+
+        .team-section .section-header p {
+            color: rgba(226, 232, 240, 0.84);
+            max-width: 760px;
+        }
+
+        .team-grid {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 1.3rem;
+        }
+
+        .team-card {
+            background: linear-gradient(155deg, rgba(2, 10, 22, 0.92), rgba(7, 21, 38, 0.9));
+            border: 1px solid rgba(148, 163, 184, 0.26);
+            border-radius: 22px;
+            padding: 1.6rem 1.25rem 1.4rem;
+            text-align: center;
+            box-shadow: 0 14px 36px rgba(2, 9, 20, 0.4);
+            transition: var(--transition);
+            backdrop-filter: blur(3px);
+        }
+
+        .team-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(252, 163, 17, 0.65);
+            box-shadow: 0 18px 42px rgba(2, 9, 20, 0.52);
+        }
+
+        .team-avatar {
+            width: 84px;
+            height: 84px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.45rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            color: #f8fafc;
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.9));
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            box-shadow: inset 0 0 0 8px rgba(255, 255, 255, 0.015);
+        }
+
+        .team-card h3 {
+            font-size: 1.16rem;
+            color: #ffffff;
+            line-height: 1.35;
+            margin-bottom: 0.65rem;
+        }
+
+        .team-role {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            border-radius: 999px;
+            padding: 0.38rem 0.78rem;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 0.9rem;
+            border: 1px solid transparent;
+        }
+
+        .team-role.role-hacker {
+            color: #ffd596;
+            background: rgba(252, 163, 17, 0.12);
+            border-color: rgba(252, 163, 17, 0.45);
+        }
+
+        .team-role.role-hipster {
+            color: #9be6dc;
+            background: rgba(42, 157, 143, 0.14);
+            border-color: rgba(42, 157, 143, 0.45);
+        }
+
+        .team-role.role-hustler {
+            color: #ffc9cf;
+            background: rgba(230, 57, 70, 0.13);
+            border-color: rgba(230, 57, 70, 0.48);
+        }
+
+        .team-note {
+            color: rgba(226, 232, 240, 0.78);
+            font-size: 0.93rem;
+            line-height: 1.55;
+            max-width: 28ch;
+            margin: 0 auto;
+        }
+
         
         footer {
             background: #06152a;
@@ -637,7 +824,7 @@
 
         @media (max-width: 768px) {
             header {
-                padding: 1rem;
+                padding: 0.85rem 1rem;
                 flex-wrap: wrap;
             }
 
@@ -670,10 +857,17 @@
             }
 
             .hero {
-                padding-top: 7rem;
+                padding-top: 6.4rem;
+                padding-bottom: 3.5rem;
                 text-align: left;
                 flex-direction: column-reverse;
                 gap: 2rem;
+            }
+
+            .hero-content {
+                display: flex;
+                flex-direction: column;
+                margin-top: 0.4rem;
             }
 
             .hero-illustration {
@@ -681,11 +875,33 @@
             }
 
             .hero h1 {
-                font-size: 2.8rem;
+                font-size: clamp(2.25rem, 12vw, 2.9rem);
+                line-height: 1.08;
+                margin-bottom: 1rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+                margin-bottom: 1.4rem;
             }
 
             .hero-actions {
                 flex-direction: column;
+            }
+
+            .hero-highlight {
+                position: static;
+                top: auto;
+                left: auto;
+                transform: none;
+                order: -1;
+                align-self: center;
+                width: auto;
+                max-width: 100%;
+                margin: 0 0 1.05rem;
+                font-size: 0.86rem;
+                padding: 0.52rem 0.92rem;
+                line-height: 1.25;
             }
 
             .btn-primary,
@@ -700,9 +916,48 @@
             .stat-grid {
                 grid-template-columns: 1fr 1fr;
             }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .team-card {
+                max-width: 420px;
+                margin: 0 auto;
+            }
         }
 
         @media (max-width: 480px) {
+            .logo-container img {
+                height: 48px;
+            }
+
+            .logo-text {
+                font-size: 2rem;
+            }
+
+            .hero {
+                padding-top: 6.1rem;
+            }
+
+            .hero-content {
+                margin-top: 0.2rem;
+            }
+
+            .hero h1 {
+                font-size: clamp(2.05rem, 11.2vw, 2.55rem);
+            }
+
+            .hero-highlight {
+                font-size: 0.8rem;
+                padding: 0.48rem 0.82rem;
+                text-align: center;
+            }
+
+            .confetti-piece {
+                border-radius: 1.8px;
+            }
+
             .stat-grid {
                 grid-template-columns: 1fr;
                 gap: 1rem;
@@ -718,6 +973,8 @@
 
 <body>
 
+    <div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
+
     <header id="header">
         <a href="#" class="logo-container">
             
@@ -730,6 +987,7 @@
             <ul>
                 <li><a href="#context">About</a></li>
                 <li><a href="#features">Features</a></li>
+                <li><a href="#team">Team</a></li>
                 <li><a href="evacuation.html">Map Tracker</a></li>
                 <li><a href="weather.html">Early Warnings</a></li>
             </ul>
@@ -745,6 +1003,10 @@
             <p class="fade-in delay-2">Bridging the safety gap across Antique. When signal drops, our digital platform
                 ensures your distress signal reaches the Provincial Command Center via SMS fallback, augmented by
                 real-time geomapping and AI guidance.</p>
+            <div class="hero-highlight fade-in delay-3">
+                <i class="ph-bold ph-trophy"></i>
+                <span>5th Place during UPV Komsaihack 2026</span>
+            </div>
             <div class="hero-actions fade-in delay-3">
                 <a href="loginpage.html" class="btn-primary">
                     <i class="ph-bold ph-shield-check"></i> Open Citizen App
@@ -831,6 +1093,51 @@
         </div>
     </section>
 
+    <section id="team" class="team-section">
+        <div class="section-header">
+            <h2 class="fade-in">Komsai Hack 2026 Core Team</h2>
+            <p class="fade-in delay-1">Built by a focused team combining engineering, design, and product execution to
+                make ARPS reliable when communities need it most.</p>
+        </div>
+
+        <div class="team-grid">
+            <article class="team-card scroll-reveal">
+                <div class="team-avatar">AM</div>
+                <h3>Almonzor Manzan</h3>
+                <p class="team-role role-hacker"><i class="ph-bold ph-code"></i> Hacker / Project Lead</p>
+                <p class="team-note">Led ARPS architecture, integration decisions, and core technical direction.</p>
+            </article>
+
+            <article class="team-card scroll-reveal">
+                <div class="team-avatar">KR</div>
+                <h3>Khing Jay Regala</h3>
+                <p class="team-role role-hacker"><i class="ph-bold ph-code"></i> Hacker</p>
+                <p class="team-note">Implemented core engineering components that power app reliability.</p>
+            </article>
+
+            <article class="team-card scroll-reveal">
+                <div class="team-avatar">AT</div>
+                <h3>Alleah Wendine Tejares</h3>
+                <p class="team-role role-hipster"><i class="ph-bold ph-palette"></i> Hipster</p>
+                <p class="team-note">Crafted user interface and visual experience for intuitive emergency use.</p>
+            </article>
+
+            <article class="team-card scroll-reveal">
+                <div class="team-avatar">MA</div>
+                <h3>Marl Ellie Alfonga</h3>
+                <p class="team-role role-hipster"><i class="ph-bold ph-palette"></i> Hipster</p>
+                <p class="team-note">Helped shape product visuals and interaction polish across key screens.</p>
+            </article>
+
+            <article class="team-card scroll-reveal">
+                <div class="team-avatar">IF</div>
+                <h3>Ian Jude C. Fabila</h3>
+                <p class="team-role role-hustler"><i class="ph-bold ph-megaphone"></i> Hustler</p>
+                <p class="team-note">Drove project momentum, planning, and execution toward deployment goals.</p>
+            </article>
+        </div>
+    </section>
+
     <footer>
         <div class="footer-waves"></div>
         <div style="max-width: 500px; margin: 0 auto; text-align: center; padding: 2rem 1rem;">
@@ -885,6 +1192,46 @@
         hamburgerBtn.addEventListener('click', () => {
             mobileNav.classList.toggle('active');
         });
+
+        // Confetti celebration effect
+        const confettiLayer = document.getElementById('confettiLayer');
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const confettiColors = ['#fca311', '#e63946', '#2a9d8f', '#3b82f6', '#ffffff', '#f59e0b'];
+
+        function launchConfettiBurst(totalPieces) {
+            if (!confettiLayer || prefersReducedMotion) return;
+
+            for (let i = 0; i < totalPieces; i++) {
+                const piece = document.createElement('span');
+                piece.className = 'confetti-piece';
+
+                const size = 6 + Math.random() * 8;
+                piece.style.width = `${size}px`;
+                piece.style.height = `${size * (Math.random() > 0.55 ? 0.58 : 1.35)}px`;
+                piece.style.left = `${Math.random() * 100}vw`;
+                piece.style.backgroundColor = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                piece.style.setProperty('--drift-start', `${(Math.random() - 0.5) * 16}vw`);
+                piece.style.setProperty('--drift-end', `${(Math.random() - 0.5) * 30}vw`);
+                piece.style.setProperty('--fall-duration', `${3.8 + Math.random() * 2.4}s`);
+                piece.style.animationDelay = `${Math.random() * 0.8}s`;
+
+                confettiLayer.appendChild(piece);
+                setTimeout(() => piece.remove(), 6800);
+            }
+        }
+
+        function celebrateConfetti() {
+            const basePieces = window.innerWidth < 640 ? 60 : 110;
+            launchConfettiBurst(basePieces);
+            setTimeout(() => launchConfettiBurst(Math.floor(basePieces * 0.45)), 420);
+        }
+
+        setTimeout(celebrateConfetti, 260);
+
+        const heroHighlight = document.querySelector('.hero-highlight');
+        if (heroHighlight) {
+            heroHighlight.addEventListener('click', celebrateConfetti);
+        }
     </script>
 </body>
 
